@@ -31,7 +31,7 @@ PowerPoint `.pptx` 파일을 read-only로 파싱하여 텍스트·제목·노트
 ## Quick Reference
 
 ```bash
-PPTX=~/ai-workspace/work/_sys/skills/skills/pptx-toolkit/pptx
+PPTX=~/workspace/work/_sys/skills/skills/pptx-toolkit/pptx
 
 $PPTX read <file.pptx>               # 전체 텍스트 + 노트 (markdown)
 $PPTX read <file.pptx> --slide 3     # 특정 슬라이드만

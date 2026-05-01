@@ -31,7 +31,7 @@ Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 
 
 ```bash
 # 경로는 work repo 기준 (서브모듈 _sys/skills 내부)
-XLSX=~/ai-workspace/work/_sys/skills/skills/xlsx-toolkit/xlsx
+XLSX=~/workspace/work/_sys/skills/skills/xlsx-toolkit/xlsx
 
 $XLSX read <file.xlsx>                    # 전체 시트 → markdown 표
 $XLSX read <file.xlsx> --sheet 1          # 특정 시트만
