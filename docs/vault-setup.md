@@ -31,7 +31,7 @@ cp docs/templates/*.md "$VAULT/notes/"
 export CC_SKILLS_VAULT="$VAULT"
 
 # Option B: workspace.config.yaml at your workspace root
-cp docs/workspace-config.example.yaml ./workspace.config.yaml
+cp workspace-config.example.yaml ./workspace.config.yaml
 # then edit the paths.vault entry to match $VAULT
 ```
 
