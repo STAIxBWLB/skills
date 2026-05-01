@@ -8,10 +8,9 @@ Reference documents for the skills in this catalog. Skills load these on demand;
 |------|---------|
 | `design-skills-overview.md` | Map of design-related skills (this catalog + complementary external plugins), shared design language, and anti-AI-slop principles |
 | `design-skills-workflows.md` | Practical workflows: skill-selection matrix, recipes (quick polish / full audit / premium upgrade), and combination patterns |
-| `graphify-usage.md` | Build a knowledge graph of any markdown vault or code repo with `build-graph.py` (Leiden communities + god nodes + surprising connections) |
-| `vault-setup.md` | Optional: how to scaffold a minimal markdown "vault" so multi-skill knowledge (design tokens, glossary, motion library, roadmaps) can be shared across skills |
 
-> The sample `workspace.config.yaml` lives at the repo root: [`../workspace-config.example.yaml`](../workspace-config.example.yaml). Skills walk up from CWD to find it.
+> Top-level guides live at the repo root, not under `docs/`:
+> [`../vault-setup.md`](../vault-setup.md), [`../graphify-usage.md`](../graphify-usage.md), [`../workspace-config.example.yaml`](../workspace-config.example.yaml). Skills walk up from CWD to find the YAML.
 
 ## Subdirectories
 

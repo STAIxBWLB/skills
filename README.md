@@ -44,7 +44,7 @@ Run `./install.sh` for guided installation.
 
 ## Vault dependencies
 
-A few skills (notably the design family) reference a small markdown vault for tokens, glossary, and patterns. The vault is **opt-in** — see [`docs/vault-setup.md`](./docs/vault-setup.md) for a minimal setup, or skip it entirely if you only use the document-toolkit and slide-deck skills. Templates and bootstrap prompts live under [`docs/templates/`](./docs/templates/) and [`docs/prompts/`](./docs/prompts/).
+A few skills (notably the design family) reference a small markdown vault for tokens, glossary, and patterns. The vault is **opt-in** — see [`vault-setup.md`](./vault-setup.md) for a minimal setup, or skip it entirely if you only use the document-toolkit and slide-deck skills. Templates and bootstrap prompts live under [`docs/templates/`](./docs/templates/) and [`docs/prompts/`](./docs/prompts/). For knowledge-graph builds, see [`graphify-usage.md`](./graphify-usage.md).
 
 The 12 skills here are mostly self-contained. Workspace-specific skills (vault sync, inbox processing, task management with personal credentials) live in private repos and are NOT part of this catalog.
 
