@@ -44,7 +44,7 @@ Run `./install.sh` for guided installation.
 
 ## Scope
 
-The 12 skills here are self-contained — install and use. A few (notably the design family) read optional starter notes for tokens, glossary, and motion patterns; markdown templates live under [`docs/templates/`](./docs/templates/), and [`docs/prompts/`](./docs/prompts/) has LLM prompts to bootstrap them from an existing codebase. No skill in this catalog requires a vault, Obsidian, or a configured workspace.
+The 12 skills here are self-contained — install and use. The only repo-level reference material is [`docs/slide-decks/`](./docs/slide-decks/), the visual-style catalog that `canva-deck`, `notebooklm-deck`, and `gpt-images-deck` consume. No skill requires a vault, Obsidian, or a configured workspace.
 
 Workspace-specific skills (vault sync, inbox processing, task management with personal credentials) live in private repos and are NOT part of this catalog.
 

@@ -39,13 +39,11 @@ triggers: [keyword1, keyword2, ...]   # optional but encouraged
 ---
 ```
 
-## Vault dependencies
+## External resources
 
-If a skill references vault-style notes (e.g. design tokens, glossary), include:
-- A schema description in `SKILL.md` ("expects note `glossary.md` with sections `acronyms`, `institutions`")
-- A starter template under `docs/templates/` so new users can scaffold one quickly
+Each skill must be self-contained. If a skill needs reference material (style catalogs, schema notes, examples), package it under that skill's own `references/`. Do **not** introduce new top-level `docs/` content unless it is genuinely shared across multiple skills, as `docs/slide-decks/` is.
 
-Do **not** assume the user has Obsidian. Note references should also work with plain markdown folders.
+Do **not** assume the user runs Obsidian or a configured workspace. Skills must work against plain markdown folders.
 
 ## Pull request checklist
 
