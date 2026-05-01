@@ -1,0 +1,34 @@
+# Example workspace configuration for STAIxBWLB/skills users.
+# Drop at your workspace root, or anywhere a skill can discover it.
+# See docs/vault-bootstrap/README.md for installation.
+
+version: 1
+
+# ---------- Owner identity (optional, for skills that personalize output) ----------
+owner:
+  name: Your Name
+  github: your-username
+
+# ---------- Paths ----------
+paths:
+  primary: ~/workspace        # your code root
+  vault: ~/Documents/vault    # vault location (any folder of .md files)
+
+# ---------- Vault access ----------
+vault:
+  path: ~/Documents/vault
+  # access: obsidian-mcp | folder
+  # - obsidian-mcp: skills write through Obsidian REST/MCP plugin
+  # - folder:       skills read/write filesystem directly (works without Obsidian)
+  access: folder
+
+# ---------- SSOT pointers (used by some design skills) ----------
+ssot:
+  glossary: ~/Documents/vault/notes/glossary.md
+  design_tokens: ~/Documents/vault/notes/design-tokens.md
+  motion_library: ~/Documents/vault/notes/motion-library.md
+  roadmaps: ~/Documents/vault/notes/improvement-roadmaps.md
+
+# ---------- Skill catalog roots ----------
+skills:
+  public_root: ~/.claude/skills-staixbwlb/skills   # this catalog
