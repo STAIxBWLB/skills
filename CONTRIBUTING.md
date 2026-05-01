@@ -41,11 +41,11 @@ triggers: [keyword1, keyword2, ...]   # optional but encouraged
 
 ## Vault dependencies
 
-If a skill references a vault structure (e.g. design tokens, glossary), include:
-- A schema description in `SKILL.md` ("expects vault note `glossary.md` with sections `acronyms`, `institutions`")
-- A bootstrap template under `docs/vault-bootstrap/` so new users can scaffold their own vault
+If a skill references vault-style notes (e.g. design tokens, glossary), include:
+- A schema description in `SKILL.md` ("expects note `glossary.md` with sections `acronyms`, `institutions`")
+- A starter template under `docs/templates/` so new users can scaffold one quickly
 
-Do **not** assume the user has Obsidian. Vault references should also work with plain markdown folders.
+Do **not** assume the user has Obsidian. Note references should also work with plain markdown folders.
 
 ## Pull request checklist
 

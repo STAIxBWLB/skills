@@ -118,4 +118,4 @@ Each skill ships with its `SKILL.md` and supporting `references/`. Templates tha
 ## See also
 
 - [`design-skills-workflows.md`](./design-skills-workflows.md) — practical recipes and skill-combination patterns
-- [`vault-setup.md`](./vault-setup.md) — set up a markdown vault so design tokens and roadmaps persist across sessions
+- [`templates/design-tokens.md`](./templates/design-tokens.md) — starter design-token note that `design-system` reads

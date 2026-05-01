@@ -42,11 +42,11 @@ ln -s ~/.claude/skills-staixbwlb/skills/hwpx ~/.claude/skills/hwpx
 
 Run `./install.sh` for guided installation.
 
-## Vault dependencies
+## Scope
 
-A few skills (notably the design family) reference a small markdown vault for tokens, glossary, and patterns. The vault is **opt-in** — see [`docs/vault-setup.md`](./docs/vault-setup.md) for a minimal setup, or skip it entirely if you only use the document-toolkit and slide-deck skills. Templates and bootstrap prompts live under [`docs/templates/`](./docs/templates/) and [`docs/prompts/`](./docs/prompts/). For knowledge-graph builds, see [`docs/graphify-usage.md`](./docs/graphify-usage.md).
+The 12 skills here are self-contained — install and use. A few (notably the design family) read optional starter notes for tokens, glossary, and motion patterns; markdown templates live under [`docs/templates/`](./docs/templates/), and [`docs/prompts/`](./docs/prompts/) has LLM prompts to bootstrap them from an existing codebase. No skill in this catalog requires a vault, Obsidian, or a configured workspace.
 
-The 12 skills here are mostly self-contained. Workspace-specific skills (vault sync, inbox processing, task management with personal credentials) live in private repos and are NOT part of this catalog.
+Workspace-specific skills (vault sync, inbox processing, task management with personal credentials) live in private repos and are NOT part of this catalog.
 
 ## Contributing
 
