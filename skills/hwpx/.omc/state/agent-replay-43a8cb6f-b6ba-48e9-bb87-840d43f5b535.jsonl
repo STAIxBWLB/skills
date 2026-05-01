@@ -1,0 +1,5 @@
+{"t":0,"agent":"a069726","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"ad5f13b","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"ad5f13b","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":61419}
+{"t":0,"agent":"a069726","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":83215}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"docx"}

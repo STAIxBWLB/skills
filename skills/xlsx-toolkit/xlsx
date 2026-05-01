@@ -1,0 +1,49 @@
+#!/bin/bash
+# xlsx-toolkit wrapper — read/summary/to-csv/to-md subcommands
+#
+# Usage:
+#   ./xlsx read <file.xlsx> [--sheet N|name] [--max-rows N] [--values-only]
+#   ./xlsx summary <file.xlsx>
+#   ./xlsx to-csv <file.xlsx> [--sheet N] [-o out.csv] [--all-sheets]
+#   ./xlsx to-md  <file.xlsx> [--sheet N]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PY="/Users/yj.lee/My Drive (hello@jeju.ai)/work/_sys/env/.venv/bin/python3"
+
+if [ ! -x "$VENV_PY" ]; then
+    echo "[xlsx-toolkit] venv python 없음: $VENV_PY" >&2
+    echo "  _sys/env/.venv 활성화 또는 재생성 필요" >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    cat <<USAGE
+xlsx-toolkit — Excel(.xlsx) 파일 read-only 처리
+
+Usage: ./xlsx <command> [args...]
+
+Commands:
+  read       셀 값 추출 → markdown 표
+  summary    시트 목록 + 행/열 카운트
+  to-csv     CSV 출력
+  to-md      markdown 표 출력
+
+Options (commands별 상이):
+  --sheet <N|name>   시트 번호(1-based) 또는 이름
+  --max-rows <N>     처음 N행만
+  --values-only      수식 대신 캐시 값
+  -o, --output <f>   파일 출력 (기본 stdout)
+  --all-sheets       시트별로 각각 처리
+
+Examples:
+  ./xlsx read budget.xlsx
+  ./xlsx summary budget.xlsx
+  ./xlsx to-csv budget.xlsx --sheet "2026" -o budget-2026.csv
+  ./xlsx to-md budget.xlsx --sheet 1
+USAGE
+    exit 0
+fi
+
+exec "$VENV_PY" "$SCRIPT_DIR/scripts/xlsx_cli.py" "$@"

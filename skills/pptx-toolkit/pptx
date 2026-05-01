@@ -1,0 +1,45 @@
+#!/bin/bash
+# pptx-toolkit wrapper — read/outline/notes/to-md subcommands
+#
+# Usage:
+#   ./pptx read    <file.pptx> [--slide N]
+#   ./pptx outline <file.pptx>
+#   ./pptx notes   <file.pptx> [--slide N]
+#   ./pptx to-md   <file.pptx> [-o out.md]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PY="/Users/yj.lee/My Drive (hello@jeju.ai)/work/_sys/env/.venv/bin/python3"
+
+if [ ! -x "$VENV_PY" ]; then
+    echo "[pptx-toolkit] venv python 없음: $VENV_PY" >&2
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    cat <<USAGE
+pptx-toolkit — PowerPoint(.pptx) read-only CLI
+
+Usage: ./pptx <command> [args...]
+
+Commands:
+  read       슬라이드 텍스트 + 노트 → markdown
+  outline    슬라이드 제목 목록
+  notes      발표자 노트만 추출
+  to-md      markdown 변환 (파일 저장)
+
+Options:
+  --slide <N>      특정 슬라이드 번호 (1-based)
+  -o, --output     저장 파일 (기본 stdout)
+
+Examples:
+  ./pptx outline presentation.pptx
+  ./pptx read presentation.pptx --slide 5
+  ./pptx notes presentation.pptx
+  ./pptx to-md presentation.pptx -o deck.md
+USAGE
+    exit 0
+fi
+
+exec "$VENV_PY" "$SCRIPT_DIR/scripts/pptx_cli.py" "$@"
