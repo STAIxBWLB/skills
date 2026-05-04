@@ -9,13 +9,37 @@
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_PY="/Users/yj.lee/My Drive (hello@jeju.ai)/work/_sys/env/.venv/bin/python3"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
-if [ ! -x "$VENV_PY" ]; then
-    echo "[xlsx-toolkit] venv python 없음: $VENV_PY" >&2
-    echo "  _sys/env/.venv 활성화 또는 재생성 필요" >&2
-    exit 1
+find_env_python() {
+    local dir="$SCRIPT_DIR"
+    local candidate
+    while [ "$dir" != "/" ]; do
+        for candidate in \
+            "$dir/env/.venv/bin/python3" \
+            "$dir/_sys/skills/env/.venv/bin/python3" \
+            "$dir/skills/env/.venv/bin/python3"; do
+            [ -x "$candidate" ] && printf '%s\n' "$candidate" && return 0
+        done
+        dir="$(dirname "$dir")"
+    done
+    return 1
+}
+
+VENV_PY="${SKILL_PYTHON:-}"
+if [ -z "$VENV_PY" ] || [ ! -x "$VENV_PY" ]; then
+    VENV_PY="$(find_env_python || true)"
+fi
+
+if [ -z "$VENV_PY" ] || [ ! -x "$VENV_PY" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+        VENV_PY="$(command -v python3)"
+        echo "[xlsx-toolkit] skills env 없음, python3 fallback 사용: $VENV_PY" >&2
+    else
+        echo "[xlsx-toolkit] venv python 없음" >&2
+        echo "  _sys/skills/env 에서 make setup 실행 필요" >&2
+        exit 1
+    fi
 fi
 
 if [ $# -eq 0 ]; then

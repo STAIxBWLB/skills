@@ -4,9 +4,7 @@ Layout (relative to this file):
   scripts/runtime_paths.py        ← __file__
   scripts/                        ← parent
   /                               ← SKILL_ROOT (skills/hwpx/)
-  ../../                          ← skills/
-  ../../../                       ← _sys/
-  ../../../env/                   ← ENV_ROOT (jre + .venv)
+  ancestor _sys/skills/env/       ← ENV_ROOT (jre + .venv)
   runtime/                        ← bundled Java assets (in skill, committed)
 """
 from __future__ import annotations
@@ -16,7 +14,21 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent          # skills/hwpx/
 RUNTIME = SKILL_ROOT / "runtime"
-ENV_ROOT = SKILL_ROOT.parents[2] / "env"                      # _sys/env/
+
+
+def _find_env_root(start: Path) -> Path:
+    for base in (start, *start.parents):
+        for candidate in (
+            base / "env",
+            base / "_sys" / "skills" / "env",
+            base / "skills" / "env",
+        ):
+            if (candidate / "pyproject.toml").exists() or (candidate / ".venv").exists():
+                return candidate
+    return SKILL_ROOT.parents[2] / "skills" / "env"
+
+
+ENV_ROOT = _find_env_root(SKILL_ROOT)
 
 JAVA_BIN = ENV_ROOT / "jre" / "bin" / "java"
 HWPXLIB_JAR = RUNTIME / "hwpxlib-1.0.5.jar"

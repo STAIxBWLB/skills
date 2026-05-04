@@ -2,7 +2,7 @@
 name: pptx-toolkit
 description: >
   PowerPoint(.pptx) 파일 읽기·아웃라인·노트 추출 스킬. python-pptx 기반
-  (_sys/env/.venv 기설치). MVP는 read-only — 슬라이드 텍스트, 제목 아웃라인,
+  (_sys/skills/env/.venv 기설치). MVP는 read-only — 슬라이드 텍스트, 제목 아웃라인,
   발표자 노트, markdown 변환. inbox-processor 단계 2 추출 도구로 사용.
   트리거: pptx, 파워포인트, powerpoint, 프레젠테이션, 슬라이드, .pptx 읽기,
   슬라이드 아웃라인, 발표자료, 프리젠테이션 추출
@@ -12,7 +12,7 @@ description: >
 
 ## Overview
 
-PowerPoint `.pptx` 파일을 read-only로 파싱하여 텍스트·제목·노트 추출, markdown 변환을 수행한다. `_sys/env/.venv`의 python-pptx 1.0.2 사용. inbox-processor 단계 2에서 SharePoint 본교 발표자료 처리.
+PowerPoint `.pptx` 파일을 read-only로 파싱하여 텍스트·제목·노트 추출, markdown 변환을 수행한다. `_sys/skills/env/.venv`의 python-pptx 1.0.2 사용. inbox-processor 단계 2에서 SharePoint 본교 발표자료 처리.
 
 ## MVP scope
 

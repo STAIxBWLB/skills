@@ -3,7 +3,7 @@ name: hwpx
 description: >
   한국 공문서 스타일의 HWPX 문서 작성·편집 스킬. 공문서, 기안문(내부결재/대외시행),
   사업계획서, 보고서, 회의록 템플릿 + {{anchor}} 치환 기반 문서 생성. python-hwpx 라이브러리
-  (_sys/env/.venv 기설치) 기반. 읽기·편집·검증·PDF 변환 지원. MVP는 템플릿 채우기 중심.
+  (_sys/skills/env/.venv 기설치) 기반. 읽기·편집·검증·PDF 변환 지원. MVP는 템플릿 채우기 중심.
   트리거: hwpx, 공문, 공문서, 기안문, 결재문서, 내부결재, 대외시행, 사업계획서, 보고서,
   회의록, 한글 문서 작성, .hwpx 생성/수정, 공문 써줘, 기안문 만들어줘, 한컴 문서
   사용하지 않음: 바이너리 .hwp (→ hwp-toolkit), .docx (→ docx 스킬), .pdf
@@ -306,11 +306,11 @@ inbox-processor 단계 2에서 이 명령으로 `.hwpx` 내용 추출에 사용�
 ### 사전 셋업 (1회)
 
 ```bash
-bash _sys/env/scripts/setup-jre.sh
-# → _sys/env/jre/bin/java (Temurin 21.0.10) 설치 + 동작 검증
+bash _sys/skills/env/scripts/setup-jre.sh
+# → _sys/skills/env/jre/bin/java (Temurin 21.0.10) 설치 + 동작 검증
 ```
 
-스크립트는 멱등하다: tidy 디렉토리가 있으면 그걸 복사하고, 없으면 Temurin API에서 플랫폼별 JRE 21을 다운로드한다. JRE 디렉토리(`_sys/env/jre/`)는 git-ignored.
+스크립트는 멱등하다: tidy 디렉토리가 있으면 그걸 복사하고, 없으면 Temurin API에서 플랫폼별 JRE 21을 다운로드한다. JRE 디렉토리(`_sys/skills/env/jre/`)는 git-ignored.
 
 ### `write-java` — 저수준 라이터
 
@@ -336,8 +336,8 @@ tidy의 `document:export-hwp` IPC 핸들러를 Python으로 직역한 경로. �
 
 | Stage | 엔진 | 의존 | 강점 |
 |-------|------|------|------|
-| 1 | bundled-hwpx-jre | `_sys/env/jre/` + hwpxlib | 가장 빠름, 시스템 의존 0 |
-| 2 | python-hwpx-template | `_sys/env/.venv` + tidy 템플릿 | 한국어 라벨 자동 매칭, 표 보존 |
+| 1 | bundled-hwpx-jre | `_sys/skills/env/jre/` + hwpxlib | 가장 빠름, 시스템 의존 0 |
+| 2 | python-hwpx-template | `_sys/skills/env/.venv` + tidy 템플릿 | 한국어 라벨 자동 매칭, 표 보존 |
 | 3 | pypandoc-hwpx | 외부 설치 시 | 마지막 폴백 |
 
 ```bash
@@ -419,7 +419,7 @@ brew install --cask libreoffice
 
 ## 10. 의존성
 
-- **Python**: `_sys/env/.venv` (공유)
+- **Python**: `_sys/skills/env/.venv` (공유)
   - `python-hwpx` (import: `hwpx`) — 기설치
   - `lxml` — 기설치 (validate.py에서 사용)
 - **선택**: LibreOffice + H2Orestart 확장 (PDF 변환용)
