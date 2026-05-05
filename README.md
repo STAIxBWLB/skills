@@ -33,6 +33,9 @@ A skill is a packaged prompt + reference files + (optionally) helper scripts tha
 ### Task management
 - **task-management** — workspace-local markdown tasks with Google Tasks and Google Calendar receipts. Personal IDs are loaded from the workspace config, not from the skill.
 
+### Git workflow
+- **git-sync** — CWD-scoped Git and submodule synchronization. Workspace-specific exclusions and project labels are loaded from local config files, not from the skill.
+
 ## Install
 
 ```bash
@@ -49,7 +52,7 @@ Run `./install.sh` for guided installation.
 
 The skills here are self-contained — install and use. The only repo-level reference material is [`docs/slide-decks/`](./docs/slide-decks/), the visual-style catalog that `canva-deck`, `notebooklm-deck`, and `gpt-images-deck` consume.
 
-Workspace-specific values such as owner identity, Google IDs, vault paths, and local secrets must live outside this public catalog. `task-management` documents how to read those values from a workspace-local config.
+Workspace-specific values such as owner identity, Google IDs, vault paths, local secrets, recursive Git exclusions, and project labels must live outside this public catalog. `task-management` and `git-sync` document how to read those values from workspace-local config.
 
 ## Contributing
 
