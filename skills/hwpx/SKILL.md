@@ -251,7 +251,7 @@ echo '{"제목":"테스트","본문":"본문"}' | \
 ./hwpx to-md report.hwpx -o out.md    # markdown 파일로 저장
 ```
 
-inbox-processor 단계 2에서 이 명령으로 `.hwpx` 내용 추출에 사용된다.
+`inbox-process` 추출 단계에서 이 명령으로 `.hwpx` 내용 추출에 사용된다.
 
 ## 4. 편집
 
@@ -401,9 +401,9 @@ brew install --cask libreoffice
 
 ## 8. 통합
 
-- **inbox-processor**: 단계 2에서 `.hwpx` → `./hwpx read <file>`로 내용 추출. `.hwp`는 계속 hwp-toolkit로.
+- **inbox-process**: `.hwpx` → `./hwpx read <file>`로 내용 추출. `.hwp`는 별도 HWP reader로 처리.
 - **gaejosik 스킬**: 본문 생성 시 개조식 종결("~함", "~임") 적용. 이 스킬은 `--kv 본문="…"`으로 받은 텍스트를 그대로 치환만 한다.
-- **ms-office 스킬**: 생성된 HWPX를 Outlook 첨부 또는 SharePoint 업로드로 전송.
+- **io-mso 스킬**: 생성된 HWPX를 Microsoft 365 mail/share workflow로 전송.
 - **meeting-notes 스킬**: 회의록 markdown → `./hwpx fill templates/회의록.hwpx` 경로 가능.
 
 ## 9. 자주 발생하는 실수

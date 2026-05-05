@@ -3,8 +3,7 @@ name: xlsx-toolkit
 description: >
   Excel(.xlsx) 파일 읽기·요약·변환 스킬. openpyxl 기반(_sys/skills/env/.venv 기설치).
   MVP는 read-only — 셀 값 추출, 시트 요약, markdown/CSV 변환.
-  inbox-processor 단계 2 추출 도구로 사용되며, SharePoint에서 받아온 본교
-  행정 .xlsx 처리가 주된 용도.
+  inbox-process 추출 도구로 사용되며, 스프레드시트 자료 처리에 재사용.
   트리거: xlsx, 엑셀, excel, 스프레드시트, .xlsx 읽기, 시트 요약, xlsx 변환,
   셀 값, 엑셀 내용, 스프레드시트 추출
 ---
@@ -13,7 +12,7 @@ description: >
 
 ## Overview
 
-Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 스킬. `_sys/skills/env/.venv`에 이미 설치된 openpyxl 3.1.5를 사용한다. inbox-processor 단계 2 내용 추출 도구로 호출된다.
+Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 스킬. `_sys/skills/env/.venv`에 이미 설치된 openpyxl 3.1.5를 사용한다. `inbox-process` 내용 추출 도구로 호출될 수 있다.
 
 ## MVP scope
 
@@ -55,15 +54,15 @@ $XLSX to-md <file.xlsx> --sheet 1
 - `2` — openpyxl 파싱 실패 (파일이 .xlsx가 아니거나 손상)
 - `3` — 지정한 시트/범위 없음
 
-## inbox-processor 통합
+## inbox-process 통합
 
-inbox-processor SKILL.md 단계 2 추출 도구 표에서:
+추출 도구 표:
 
 ```markdown
-| `.xlsx` | xlsx-toolkit | `_sys/skills/skills/xlsx-toolkit/xlsx read <file>` |
+| `.xlsx` | xlsx-toolkit | `_sys/skills-public/skills/xlsx-toolkit/xlsx read <file>` |
 ```
 
-요약 생성(단계 3)에 xlsx 콘텐츠를 markdown 표로 포함하여 전달.
+요약 생성에 xlsx 콘텐츠를 markdown 표로 포함하여 전달.
 
 ## 제약
 

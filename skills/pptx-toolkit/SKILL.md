@@ -3,7 +3,7 @@ name: pptx-toolkit
 description: >
   PowerPoint(.pptx) 파일 읽기·아웃라인·노트 추출 스킬. python-pptx 기반
   (_sys/skills/env/.venv 기설치). MVP는 read-only — 슬라이드 텍스트, 제목 아웃라인,
-  발표자 노트, markdown 변환. inbox-processor 단계 2 추출 도구로 사용.
+  발표자 노트, markdown 변환. inbox-process 추출 도구로 사용.
   트리거: pptx, 파워포인트, powerpoint, 프레젠테이션, 슬라이드, .pptx 읽기,
   슬라이드 아웃라인, 발표자료, 프리젠테이션 추출
 ---
@@ -12,7 +12,7 @@ description: >
 
 ## Overview
 
-PowerPoint `.pptx` 파일을 read-only로 파싱하여 텍스트·제목·노트 추출, markdown 변환을 수행한다. `_sys/skills/env/.venv`의 python-pptx 1.0.2 사용. inbox-processor 단계 2에서 SharePoint 본교 발표자료 처리.
+PowerPoint `.pptx` 파일을 read-only로 파싱하여 텍스트·제목·노트 추출, markdown 변환을 수행한다. `_sys/skills/env/.venv`의 python-pptx 1.0.2 사용. `inbox-process` 추출 단계에서 발표자료 처리에 사용할 수 있다.
 
 ## MVP scope
 
@@ -52,15 +52,15 @@ $PPTX to-md <file.pptx> -o out.md
 - `2` — python-pptx 파싱 실패 (`.ppt` 구형식 또는 손상)
 - `3` — 지정한 슬라이드 번호 범위 밖
 
-## inbox-processor 통합
+## inbox-process 통합
 
-단계 2 추출 도구 표 업데이트:
+추출 도구 표:
 
 ```markdown
-| `.pptx` | pptx-toolkit | `_sys/skills/skills/pptx-toolkit/pptx read <file>` |
+| `.pptx` | pptx-toolkit | `_sys/skills-public/skills/pptx-toolkit/pptx read <file>` |
 ```
 
-요약 생성(단계 3) 시 slide outline을 markdown body로 포함.
+요약 생성 시 slide outline을 markdown body로 포함.
 
 ## 제약
 

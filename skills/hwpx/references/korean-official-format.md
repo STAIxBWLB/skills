@@ -215,5 +215,5 @@ IX.  붙임            — 참여진 이력, 예산 상세, 추진 체계도
 
 - **gaejosik**: 개조식 본문 생성. HWPX 채우기 전에 호출
 - **task-management**: 기안문 결재 요청·회신을 태스크로 등록
-- **ms-office**: 결재 완료 HWPX를 Outlook 첨부로 전송
+- **io-mso**: 결재 완료 HWPX를 Microsoft 365 mail/share workflow로 전송
 - **meeting-notes**: 회의록 markdown → HWPX 템플릿 채우기
