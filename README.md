@@ -30,6 +30,9 @@ A skill is a packaged prompt + reference files + (optionally) helper scripts tha
 - **design-review** — `/polish`, `/audit`, `/distill`, `/roadmap` 코드 검수
 - **design-a11y** — KWCAG 2.2 한국 웹접근성 검수
 
+### Task management
+- **task-management** — workspace-local markdown tasks with Google Tasks and Google Calendar receipts. Personal IDs are loaded from the workspace config, not from the skill.
+
 ## Install
 
 ```bash
@@ -44,9 +47,9 @@ Run `./install.sh` for guided installation.
 
 ## Scope
 
-The 12 skills here are self-contained — install and use. The only repo-level reference material is [`docs/slide-decks/`](./docs/slide-decks/), the visual-style catalog that `canva-deck`, `notebooklm-deck`, and `gpt-images-deck` consume. No skill requires a vault, Obsidian, or a configured workspace.
+The skills here are self-contained — install and use. The only repo-level reference material is [`docs/slide-decks/`](./docs/slide-decks/), the visual-style catalog that `canva-deck`, `notebooklm-deck`, and `gpt-images-deck` consume.
 
-Workspace-specific skills (vault sync, inbox processing, task management with personal credentials) live in private repos and are NOT part of this catalog.
+Workspace-specific values such as owner identity, Google IDs, vault paths, and local secrets must live outside this public catalog. `task-management` documents how to read those values from a workspace-local config.
 
 ## Contributing
 
