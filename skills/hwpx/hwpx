@@ -87,7 +87,7 @@ Examples:
 
   # 보기 좋은 문서 (preset)
   ./hwpx styled --preset gongmun --markdown report.md \\
-    --header "제주한라대학교" --footer "- # / ## -" -o styled.hwpx
+    --header "예시대학교" --footer "- # / ## -" -o styled.hwpx
   ./hwpx styled --preset bogoseo --markdown plan.md -o plan.hwpx
 
   # 주어진 양식 따라가기 (기관 지정 양식 파일 있을 때)

@@ -87,10 +87,10 @@ description: |
 
 **중간 길이 개조식:**
 - Saltlux, 연세대, KAIST와 공동으로 AI Professor System 개발 추진 중
-- RISE 사업을 통한 지역 AI 혁신 생태계 구축이 핵심 목표
+- regional innovation 사업을 통한 지역 AI 혁신 생태계 구축이 핵심 목표
 
 **긴 개조식:**
-- 제주 지역의 도로 인프라 노후화에 대응하기 위해 AI 기반 도로 표면 점검 및 자율 보수 시스템을 서울대, KAIST, RovoRoad와 공동 개발하는 RISE 연계 프로젝트
+- 제주 지역의 도로 인프라 노후화에 대응하기 위해 AI 기반 도로 표면 점검 및 자율 보수 시스템을 서울대, KAIST, RovoRoad와 공동 개발하는 regional innovation 연계 프로젝트
 - 우즈베키스탄 타슈켄트에 AI 교육센터를 설립하여 Microsoft Azure 인증 과정 포함 16주 커리큘럼을 운영하고, IT 전공 학생 20명을 대상으로 첫 코호트 런칭 예정
 
 ## 문서 구조 가이드
@@ -125,7 +125,7 @@ description: |
   ○ 산업체 수요 대비 교육 공급 부족
 
 □ 개선 방안
-  ○ RISE 사업 연계 인프라 현대화 추진
+  ○ regional innovation 사업 연계 인프라 현대화 추진
   ○ 기업 맞춤형 단기 부트캠프 확대
   ○ 수도권 기업 제주 유치를 통한 일자리 창출
 ```

@@ -54,7 +54,7 @@ Use root channel names from `workspace.config.yaml`, not subchannel names:
 
 ```text
 inbox-process kakao
-inbox-process mso RISE plan project=rise
+inbox-process mso regional innovation plan project=rise
 inbox-process transcripts meeting=committee
 ```
 

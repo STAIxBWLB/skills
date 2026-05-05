@@ -59,7 +59,7 @@ $XLSX to-md <file.xlsx> --sheet 1
 추출 도구 표:
 
 ```markdown
-| `.xlsx` | xlsx-toolkit | `_sys/skills-public/skills/xlsx-toolkit/xlsx read <file>` |
+| `.xlsx` | xlsx-toolkit | `_sys/skills/skills/xlsx-toolkit/xlsx read <file>` |
 ```
 
 요약 생성에 xlsx 콘텐츠를 markdown 표로 포함하여 전달.

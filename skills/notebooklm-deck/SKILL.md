@@ -109,7 +109,7 @@ Topic / Source: {사용자가 입력한 주제}
 ## 사용 예시
 
 ### 예시 1 — 사용자가 스타일 직접 지정
-> "RISE 2년차 결과 보고를 Refined Minimal Portfolio 스타일로 NotebookLM 프롬프트 만들어줘."
+> "regional innovation 2년차 결과 보고를 Refined Minimal Portfolio 스타일로 NotebookLM 프롬프트 만들어줘."
 
 → 1·2단계 스킵 → 3단계: `_sys/docs/slide-decks/refined-minimal-portfolio.md` Read → 4단계: Topic만 추가 → 5단계 출력. 추천 패턴 조합: "Text + Data Emphasis → Vertical Timeline → Chart → Two Columns(Problem vs Solution)"
 

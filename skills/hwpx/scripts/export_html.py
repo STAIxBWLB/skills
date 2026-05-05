@@ -1,7 +1,7 @@
 """hwpx export-html — cascade fallback HTML→HWPX exporter.
 
 Direct port of tidy's `document:export-hwp` IPC handler
-(/Users/yj.lee/workspace/work/dev/tidy/app/electron/ipc-handlers.js:2756–2807).
+(<workspace-root>/dev/tidy/app/electron/ipc-handlers.js:2756–2807).
 
 Stages (each tried in order; first success returns):
   1. bundled JRE writer (Java) — flat HTML→text-block → HwpxWriter

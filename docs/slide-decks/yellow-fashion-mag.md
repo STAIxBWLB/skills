@@ -86,7 +86,7 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 |------|---------------|
 | 브랜드 콜라보 / 캠페인 제안 | Cover → Editorial Spread → Photo + Annotation → Quote → Closing |
 | 학생 행사·동아리·축제 | Cover → Sticker Wall → Index → Photo + Annotation → Closing |
-| 트렌드 리포트 (RISE 청년·라이프스타일) | Cover → Index → Editorial Spread (×2) → Data as Headline → Quote |
+| 트렌드 리포트 (regional innovation 청년·라이프스타일) | Cover → Index → Editorial Spread (×2) → Data as Headline → Quote |
 | 청년·MZ 대상 강의·워크숍 | Cover → Sticker Wall → Editorial Spread → Quote → Closing |
 
 ## 옐로 베리에이션 (액센트 전환)

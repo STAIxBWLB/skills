@@ -27,7 +27,7 @@
 
 ## rise.jeju.ai
 
-- **특성**: RISE 사업 공식 사이트, 47 pages, 5개 전공
+- **특성**: regional innovation 사업 공식 사이트, 47 pages, 5개 전공
 - **모드**: light-only (다른 색상 체계)
 - **Tailwind**: v4, `@theme` (font만 정의, 나머지는 `:root` CSS variables)
 - **CSS 파일**: 모듈화 — `global.css` → `base/variables.css`, `base/utilities.css`, `components/*.css`, `common/*.css`, `layouts/*.css`, `pages/*.css`

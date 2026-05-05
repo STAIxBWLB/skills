@@ -57,7 +57,7 @@ $PPTX to-md <file.pptx> -o out.md
 추출 도구 표:
 
 ```markdown
-| `.pptx` | pptx-toolkit | `_sys/skills-public/skills/pptx-toolkit/pptx read <file>` |
+| `.pptx` | pptx-toolkit | `_sys/skills/skills/pptx-toolkit/pptx read <file>` |
 ```
 
 요약 생성 시 slide outline을 markdown body로 포함.

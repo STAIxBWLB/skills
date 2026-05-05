@@ -74,7 +74,7 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 | 상황 | 권장 레이아웃 조합 |
 |------|-------------------|
 | 회사·연구실 소개 | Title Typography → Photo + List Split → Logo Grid → Full-Screen Graphic |
-| 사업 결과 보고 (RISE, KOICA) | Text + Data Emphasis → Vertical Timeline → Chart → Two Columns(Problem vs Solution) |
+| 사업 결과 보고 (regional innovation, international cooperation) | Text + Data Emphasis → Vertical Timeline → Chart → Two Columns(Problem vs Solution) |
 | 학술 발표·논문 | Formula / Flow Diagram → Bubble Chart → Dark Mode Diagram → Chart |
 | 포트폴리오·작품집 | Card Grid → Full-Screen Graphic → Centered Layout (Dark Mode) → Chronological List |
 | 행정·정책 브리핑 | 3-Step Columns → Arrow Steps → Minimal Map → Two Columns |

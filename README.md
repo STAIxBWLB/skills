@@ -1,67 +1,56 @@
 # STAI x BWLB Skills
 
-> Public Claude Code skills catalog — document toolkits, Korean writing, slide deck prompts, and design system tools.
+Public skills catalog for Codex and Claude Code. This repo contains reusable skill packages plus the shared runtime/helpers they use.
 
-A curated collection of [Claude Code](https://claude.com/claude-code) **skills** that work on any machine without personal context. These skills are extracted from a private workspace and refactored to be reusable.
+## Layout
 
-## What's a skill?
+```
+skills/<name>/SKILL.md     public skill packages
+env/                       shared Python/Node runtime scaffold
+lib/build-graph.py         shared graph builder
+lib/vault_adapter.md       Obsidian MCP vault access rules
+docs/                      shared reference catalogs
+```
 
-A skill is a packaged prompt + reference files + (optionally) helper scripts that Claude Code loads on demand. Each skill lives in `skills/<name>/SKILL.md` with optional `references/`, `scripts/`, and `templates/` subdirectories.
+There is no category subdirectory split or legacy helper directory split in this repo.
 
 ## Catalog
 
-### Document toolkits
-- **hwpx** — 한국 공문서·기안문 HWPX 작성·편집 (python-hwpx)
-- **pptx-toolkit** — PowerPoint(.pptx) read·outline·notes 추출 (python-pptx)
-- **xlsx-toolkit** — Excel(.xlsx) read·summary·markdown 변환 (openpyxl)
-
-### Korean writing
-- **gaejosik** — 한국어 개조식(명사형 종결) 공식 문서 글쓰기
-
-### Slide deck prompts
-- **canva-deck** — Canva Magic Design / AI 프레젠테이션 프롬프트 카탈로그
-- **notebooklm-deck** — NotebookLM Slide Deck / Visual Overview 프롬프트
-- **gpt-images-deck** — GPT 이미지 생성 덱 카탈로그
-
-### Design system
-- **design-init** — 새 프로젝트 디자인 방향 5단계 인터뷰 + scaffolding
-- **design-motion** — CSS 애니메이션 패턴 카탈로그
-- **design-system** — Tailwind v4 @theme 디자인 토큰 가이드
-- **design-review** — `/polish`, `/audit`, `/distill`, `/roadmap` 코드 검수
-- **design-a11y** — KWCAG 2.2 한국 웹접근성 검수
-
-### Task management
-- **task-management** — workspace-local markdown tasks with Google Tasks and Google Calendar receipts. Personal IDs are loaded from the workspace config, not from the skill.
-
-### Git workflow
-- **git-sync** — CWD-scoped Git and submodule synchronization. Workspace-specific exclusions and project labels are loaded from local config files, not from the skill.
+- Document toolkits: `hwpx`, `pptx-toolkit`, `xlsx-toolkit`
+- Korean writing: `gaejosik`
+- Slide deck prompts: `canva-deck`, `notebooklm-deck`, `gpt-images-deck`
+- Design system: `design-init`, `design-motion`, `design-system`, `design-review`, `design-a11y`
+- Task and git: `task-management`, `git-sync`
+- IO and inbox: `io-mso`, `io-gws`, `io-telegram`, `io-kakao`, `inbox-intake`, `inbox-process`, `meeting-notes`
+- Vault workflows: `vault-extract`, `vault-connect`, `vault-sync`, `vault-learn`, `vault-lint`, `vault-graph`, `vault-pipeline`, `vault-refactor`, `vault-rename`, `vault-update`, `vault-next`, `vault-remember`, `vault-rethink`, `vault-stats`
+- Skill analysis: `skill-mine`
 
 ## Install
 
 ```bash
-# Clone into your skills root (Claude Code reads ~/.claude/skills/)
-git clone https://github.com/STAIxBWLB/skills.git ~/.claude/skills-staixbwlb
+# Claude Code
+./install.sh
+./install.sh -n
 
-# Or selectively symlink individual skills
-ln -s ~/.claude/skills-staixbwlb/skills/hwpx ~/.claude/skills/hwpx
+# Codex
+./install-codex.sh
+./install-codex.sh -n
+
+# Specific skills
+./install.sh vault-lint vault-graph
+./install-codex.sh task-management skill-mine
 ```
 
-Run `./install.sh` for guided installation.
+Both installers symlink only directories containing `SKILL.md` from `skills/`.
 
-## Scope
+## Runtime Values
 
-The skills here are self-contained — install and use. The only repo-level reference material is [`docs/slide-decks/`](./docs/slide-decks/), the visual-style catalog that `canva-deck`, `notebooklm-deck`, and `gpt-images-deck` consume.
+Skill packages must not contain personal IDs, secrets, or workspace-only values. Runtime values belong in the caller's workspace configuration, usually `workspace.config.yaml`.
 
-Workspace-specific values such as owner identity, Google IDs, vault paths, local secrets, recursive Git exclusions, and project labels must live outside this public catalog. `task-management` and `git-sync` document how to read those values from workspace-local config.
+Vault-facing skills discover vault paths, project registry paths, and log paths from workspace config and use Obsidian MCP for vault markdown. See `lib/vault_adapter.md`.
 
 ## Contributing
 
-Pull requests welcome — but **do not include** personal context (chu.ac.kr, named individuals, KOICA, RISE, specific institutions). Skills here must be generalizable. See `CONTRIBUTING.md`.
-
-## License
+Keep skills self-contained and reusable. Do not add private identities, real credentials, institution-specific internal details, or local absolute paths to public skill packages.
 
 MIT — see `LICENSE`.
-
-## Origin
-
-Maintained by [STAI × BWLB](https://staixbwlb.com), extracted from a research workspace at Jeju Halla University. Authored skills retain their original style; some have been refactored for portability.

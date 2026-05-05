@@ -99,10 +99,10 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 
 | 상황 | 조정 |
 |------|------|
-| 학술 발표 (RISE, 논문 발표) | Section 7-A "Thought → Structure" 메타포를 강조. 인용·근거 카드 추가 |
+| 학술 발표 (regional innovation, 논문 발표) | Section 7-A "Thought → Structure" 메타포를 강조. 인용·근거 카드 추가 |
 | 기업 협력 제안 (collabs/) | Section 7-C "Cards as Capabilities"를 메인 레이아웃으로. accent blue를 파트너 브랜드 컬러로 치환 가능 |
 | 행정 보고 (admin/) | 개조식 톤 + Section 10 "Tone of Copy" 적용. 한국어 명사형 종결 |
-| KOICA·ODA 영문 발표 | 1번 항목의 primary 언어를 English로 명시적으로 override |
+| international cooperation·ODA 영문 발표 | 1번 항목의 primary 언어를 English로 명시적으로 override |
 
 ---
 

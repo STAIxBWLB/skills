@@ -109,13 +109,13 @@ Language: [언어].
 ## 사용 예시
 
 ### 예시 1 — 간단 요청
-> "RISE 2년차 결과 보고를 Canva로 10장 만들 건데 Refined Minimal Portfolio 스타일로 프롬프트 줘."
+> "regional innovation 2년차 결과 보고를 Canva로 10장 만들 건데 Refined Minimal Portfolio 스타일로 프롬프트 줘."
 
 → 1·2단계 스킵 → 3단계로 직진. 출력:
 
 ```
 Canva Prompt:
-RISE Year 2 results report for academic and government stakeholders, 10 slides.
+regional innovation Year 2 results report for academic and government stakeholders, 10 slides.
 Style: minimal, architectural, archival, grid-driven, generous whitespace.
 Palette: light gray #E9E9E9, jet black #000, charcoal #333.
 Typography: heading in Helvetica Now (English) + Korean gothic (small body).

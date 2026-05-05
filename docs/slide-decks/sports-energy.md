@@ -79,7 +79,7 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 | 스포츠 브랜드 캠페인 | Action Cut → Anthem → VS Layout → Speed Meter → Closing Sprint |
 | 챌린지·해커톤 킥오프 | Anthem → VS Layout → Stat Tower → Highlight Stripe → Closing Sprint |
 | 경쟁 분석·시장 포지셔닝 | VS Layout → Speed Meter → Stat Tower → Stadium Score → Anthem |
-| 임팩트 보고 (RISE 성과·달성률) | Stat Tower → Speed Meter → Highlight Stripe → Stadium Score → Closing Sprint |
+| 임팩트 보고 (regional innovation 성과·달성률) | Stat Tower → Speed Meter → Highlight Stripe → Stadium Score → Closing Sprint |
 
 ## 액센트 베리에이션
 

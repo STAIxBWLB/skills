@@ -1,6 +1,6 @@
 # Bundled JRE Writer — pattern, setup, troubleshooting
 
-This document describes the **self-contained Java HWPX writer** integrated into the `hwpx` skill. The pattern was lifted directly from the `tidy` macOS app (`/Users/yj.lee/workspace/work/dev/tidy/app/resources/hwpx/`) where it was used to give every user identical HWPX output regardless of which Python/Java they had installed.
+This document describes the **self-contained Java HWPX writer** integrated into the `hwpx` skill. The pattern was lifted directly from the `tidy` macOS app (`<workspace-root>/dev/tidy/app/resources/hwpx/`) where it was used to give every user identical HWPX output regardless of which Python/Java they had installed.
 
 ## Why bundle a JRE
 
@@ -49,7 +49,7 @@ bash _sys/skills/env/scripts/setup-jre.sh
 
 The script is idempotent (skips if `jre/bin/java` already runs) and tries two paths in order:
 
-1. **Donor copy**: if `/Users/yj.lee/workspace/work/dev/tidy/app/resources/hwpx/jre` exists, `cp -R` from there. This is the offline path used during initial bring-up.
+1. **Donor copy**: if `<workspace-root>/dev/tidy/app/resources/hwpx/jre` exists, `cp -R` from there. This is the offline path used during initial bring-up.
 2. **Temurin download**: otherwise, fetches the latest Temurin 21 JRE for the host OS/arch from `https://api.adoptium.net/v3/binary/latest/21/ga/{os}/{arch}/jre/hotspot/normal/eclipse` and unpacks it.
 
 Currently arm64 macOS / x64 macOS / arm64 Linux / x64 Linux are recognized. Windows is not yet wired up (PR welcome).
@@ -86,4 +86,4 @@ tidy's `ipc-handlers.js` has another ~1500 LOC of JS post-processing (`htmlToHwp
 - `references/library-landscape.md` — comparison of hwpxlib vs python-hwpx vs pyhwpx vs pyhwp.
 - `references/hwpx-structure.md` — why mimetype STORED matters.
 - `references/raw-zip-fallback.md` — pure-python HWPX manipulation when neither library is available.
-- tidy source: `/Users/yj.lee/workspace/work/dev/tidy/app/electron/ipc-handlers.js:2754–2908`, `/Users/yj.lee/workspace/work/dev/tidy/app/resources/hwpx/`.
+- tidy source: `<workspace-root>/dev/tidy/app/electron/ipc-handlers.js:2754–2908`, `<workspace-root>/dev/tidy/app/resources/hwpx/`.

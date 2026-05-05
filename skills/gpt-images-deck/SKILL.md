@@ -27,7 +27,7 @@ description: |
 | 맥락 | 우선 스타일 |
 |------|-------------|
 | AI/agent 제품·연구 비전 | Anti-Gravity |
-| 회사·연구실·RISE 결과 보고 | Refined Minimal Portfolio |
+| 회사·연구실·regional innovation 결과 보고 | Refined Minimal Portfolio |
 | 브랜드 캠페인·강연 키노트 | Blood Orange Agency |
 | 강의·튜토리얼·학과 OT | Comic Story |
 | 개발자 컨퍼런스·AI 도구 | Neo-Retro Dev |

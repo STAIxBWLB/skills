@@ -50,7 +50,7 @@ Q2C. 어떤 격식?
 │   └─ 1순위: Refined Minimal Portfolio · 2순위: Anti-Gravity
 ├─ AI·연구 사상서·정책 학술
 │   └─ 1순위: Constructivism Tech · 2순위: Refined Minimal Portfolio
-├─ RISE·KOICA 사업 결과 보고
+├─ regional innovation·international cooperation 사업 결과 보고
 │   └─ 1순위: Refined Minimal Portfolio · 2순위: Constructivism Tech
 └─ 제품·기술 비전 (calm tech)
     └─ 1순위: Anti-Gravity · 2순위: Premium Mockup
@@ -87,7 +87,7 @@ Q2C. 어떤 격식?
 | 사상서, 학술, 분석 보고 | Constructivism Tech |
 | 커뮤니티, 청년, SNS | Vitamin Pop |
 | 캠페인, 에이전시, 키노트 | Blood Orange Agency |
-| 회사 소개, 포트폴리오, RISE 결과 | Refined Minimal Portfolio |
+| 회사 소개, 포트폴리오, regional innovation 결과 | Refined Minimal Portfolio |
 | 트렌드 리포트, 청년 문화 비틂 | Sculpture Pop |
 
 ## 자주 묶이는 페어

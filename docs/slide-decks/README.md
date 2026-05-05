@@ -22,7 +22,7 @@
 | 스타일 | 파일 | 톤 | 추천 용도 |
 |--------|------|-----|----------|
 | Anti-Gravity / Living Artifact | [`anti-gravity.md`](anti-gravity.md) | Calm · airy · tech-forward · gradient accents | AI/agent 제품 소개, 연구 비전, 인프라 발표 |
-| Refined Minimal Portfolio | [`refined-minimal-portfolio.md`](refined-minimal-portfolio.md) | Architectural · archival · grid + whitespace | 회사·연구실 소개, RISE 결과 보고, 포트폴리오 |
+| Refined Minimal Portfolio | [`refined-minimal-portfolio.md`](refined-minimal-portfolio.md) | Architectural · archival · grid + whitespace | 회사·연구실 소개, regional innovation 결과 보고, 포트폴리오 |
 | Blood Orange Agency | [`blood-orange-agency.md`](blood-orange-agency.md) | Editorial · kinetic · agency portfolio · blood-orange accent | 브랜드 캠페인, 프로덕트 런치, 강연 키노트 |
 | Comic Story | [`comic-story.md`](comic-story.md) | Warm · narrative · hand-drawn · protagonist-driven | 강의, 튜토리얼, 온보딩, AI 리터러시, 학과 OT |
 | Neo-Retro Dev Deck | [`neo-retro-dev.md`](neo-retro-dev.md) | Retro-futuristic · pixel-art · grid paper · opinionated | AI 도구 소개, 개발자 컨퍼런스, 시스템 아키텍처, 진화 타임라인 |
@@ -42,7 +42,7 @@
 - 각 파일은 다음 구조를 따른다: 사용 방법 → 📋 Master Prompt(코드 블록) → 변형 가이드 → 변경 이력
 - 각 스타일 파일의 "사용 방법" 섹션은 NotebookLM 기준으로 작성됨. Canva·기타 플랫폼은 해당 스킬이 압축·재포맷
 - Master Prompt 안의 *"the language should be what users said in the prompt"* 문구는 입력 언어 자동 감지를 위한 핵심이므로 모든 스타일 파일에서 유지
-- 본 폴더는 *single-source* 위치. `notebooklm-deck`·`canva-deck`·`gpt-images-deck`과 향후 추가 스킬이 모두 여기서 읽음. 다른 곳(meeting-notes, RISE 등)에 동일 프롬프트 복제 금지
+- 본 폴더는 *single-source* 위치. `notebooklm-deck`·`canva-deck`·`gpt-images-deck`과 향후 추가 스킬이 모두 여기서 읽음. 다른 곳(meeting-notes, regional innovation 등)에 동일 프롬프트 복제 금지
 
 ## 변경 이력
 

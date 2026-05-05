@@ -90,7 +90,7 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 |------|---------------|
 | AI·연구 사상서 발표 | Cover Triple Collage → Manifesto → Technical Drawing → Geometric Connection → Radar Chart |
 | 정책·인문 학술 발표 | Plate Divider → Triple Collage → Technical Drawing → Manifesto → Radar Chart |
-| RISE 연구 분석 보고 | Cover → Technical Drawing (×2) → Radar Chart → Geometric Connection → Manifesto |
+| regional innovation 연구 분석 보고 | Cover → Technical Drawing (×2) → Radar Chart → Geometric Connection → Manifesto |
 | 박물관·전시 키노트 | Plate Divider → Triple Collage → Technical Drawing → Plate Divider → Manifesto |
 
 ## 액센트 베리에이션 (사용 시 신중)

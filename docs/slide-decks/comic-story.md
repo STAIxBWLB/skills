@@ -91,7 +91,7 @@ Protagonist / 주인공: <청중과 닮은 1명의 캐릭터를 한 줄로 묘�
 | 상황 | 추천 주인공 / 톤 |
 |------|----------------|
 | 신입생 OT, 학과 소개 | 입학 첫 주 신입생. 약간 긴장한 캠퍼스 첫날 |
-| KOICA·해외 강의 (영문) | "first-year researcher" persona, English everywhere |
+| international cooperation·해외 강의 (영문) | "first-year researcher" persona, English everywhere |
 | 행정 시스템 사용법 (학내 매뉴얼) | 본인 부서 직원 페르소나, 실제 화면 캡처를 만화 패널 안에 손그림 프레임으로 배치 |
 | AI 리터러시 강의 (학생/교수) | 시니어 교수 / 일반 학생 두 캐릭터 대화체 — 세대차 활용 |
 | 어린이·청소년 대상 | 또래 캐릭터, 큰 표정, onomatopoeia 비중 ↑ |

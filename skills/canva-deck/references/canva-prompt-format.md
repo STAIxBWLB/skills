@@ -25,9 +25,9 @@ Tone: [한 줄 톤].
 Language: [언어].
 ```
 
-**예시 (Refined Minimal Portfolio · RISE Y2 보고)**:
+**예시 (Refined Minimal Portfolio · regional innovation Y2 보고)**:
 ```
-RISE Year 2 results report for academic stakeholders, 10 slides. Minimal, architectural, archival. Light gray + jet black. Helvetica Now headings, Korean gothic body. Top-left section nav, strict grid, oversized numerals. Korean primary, English labels.
+regional innovation Year 2 results report for academic stakeholders, 10 slides. Minimal, architectural, archival. Light gray + jet black. Helvetica Now headings, Korean gothic body. Top-left section nav, strict grid, oversized numerals. Korean primary, English labels.
 ```
 
 길이: 약 240자. 한 번에 여러 템플릿 시안이 나오므로 가장 마음에 드는 것을 선택해 fine-tune.
@@ -153,4 +153,4 @@ Flat Illustration:
 - **Magic Media**: 일러스트·사진이 필요하면 별도 Magic Media 프롬프트로 생성. 텍스트 프롬프트에 이미지 묘사 통합 X
 - **템플릿 Lock**: Magic Design 결과 중 마음에 드는 시안을 골라 "Edit this template"로 시작하면 톤 일관성 유지하기 좋음
 - **Animations**: 14종 스타일에 추가 모션 적용 시 → Page → Animate → "Subtle"·"Pan"·"Rise" 권장. "Block" / "Dramatic"은 격식 발표에 부적합
-- **Export**: PDF (격식) / PPTX (회사 발표) / MP4 (소셜) — RISE·KOICA 보고는 PDF 권장
+- **Export**: PDF (격식) / PPTX (회사 발표) / MP4 (소셜) — regional innovation·international cooperation 보고는 PDF 권장

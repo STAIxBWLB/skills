@@ -94,14 +94,14 @@ HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부
 # 공문·기안문
 ./hwpx styled --preset gongmun \
   --markdown 기안문.md \
-  --header "제주한라대학교 AI학과" \
+  --header "예시대학교 AI학과" \
   --footer "- # / ## -" \
   -o out.hwpx
 
 # 사업계획서·보고서
 ./hwpx styled --preset bogoseo \
   --markdown 사업계획.md \
-  --header "2026 RISE 사업계획서" \
+  --header "2026 regional innovation 사업계획서" \
   --footer "- # -" \
   -o out.hwpx
 ```
@@ -125,8 +125,8 @@ HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부
 # 2026학년도 AI 교육센터 운영계획
 
 ## I. 추진 배경
-1. 제주 RISE 체계 전환에 따른 대학 역할 재정립 필요함
-2. KOICA-TIU 사업과 연계로 글로벌 확장성 확보 가능함
+1. 제주 regional innovation 체계 전환에 따른 대학 역할 재정립 필요함
+2. international cooperation-TIU 사업과 연계로 글로벌 확장성 확보 가능함
 
 ## II. 주요 추진 내용
 1. 교과목 개편
@@ -153,7 +153,7 @@ markdown 대신 구조화된 JSON으로 넘기려면:
 cat > plan.json <<'EOF'
 {
   "title": "2026 사업계획서",
-  "subtitle": "제주 RISE AI 인재양성",
+  "subtitle": "제주 regional innovation AI 인재양성",
   "blocks": [
     {"kind": "heading", "text": "I. 사업 개요", "level": 1},
     {"kind": "para", "text": "1. 사업명: ..."},
@@ -208,7 +208,7 @@ python-hwpx의 제약으로 font 추가는 생성 시점에서 **2개 슬롯(id=
 **방법 1 — `--kv` 플래그 (간단한 경우)**:
 ```bash
 ./hwpx fill templates/기안문_내부결재.hwpx \
-  --kv 기관명="제주한라대학교" \
+  --kv 기관명="예시대학교" \
   --kv 제목="AI 교육센터 운영계획(안)" \
   --kv 본문="1. 목적
   가. 2026학년도 AI 교육센터 운영 방향 확립함
@@ -223,7 +223,7 @@ python-hwpx의 제약으로 font 추가는 생성 시점에서 **2개 슬롯(id=
 ```bash
 cat > data.json <<'EOF'
 {
-  "기관명": "제주한라대학교",
+  "기관명": "예시대학교",
   "제목": "…",
   "본문": "1. 목적\n  가. …",
   "붙임": "…",
@@ -296,7 +296,7 @@ echo '{"제목":"테스트","본문":"본문"}' | \
 
 ## 5-A. 번들 JRE 라이터 (`write-java`, `export-html`)
 
-`python-hwpx`(Non-Commercial)와 별개로, **번들된 OpenJDK 21 + hwpxlib(Apache-2.0)** 을 통해 HWPX를 생성하는 자가완결형 경로. tidy 앱(`/Users/yj.lee/workspace/work/dev/tidy`)의 export 스택을 그대로 가져와 스킬화한 것이다.
+`python-hwpx`(Non-Commercial)와 별개로, **번들된 OpenJDK 21 + hwpxlib(Apache-2.0)** 을 통해 HWPX를 생성하는 자가완결형 경로. tidy 앱(`<workspace-root>/dev/tidy`)의 export 스택을 그대로 가져와 스킬화한 것이다.
 
 **언제 쓰나**:
 - python-hwpx가 라이선스상 부담스러운 상업 배포물에 포함될 때 (hwpxlib는 Apache-2.0).

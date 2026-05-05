@@ -91,7 +91,7 @@ Topic / Source: <여기에 주제 또는 소스 노트 명시>
 |------|---------------|
 | AI 도구·SDK 소개 | Manifesto → System Architecture → Evolution Timeline → Manifesto closer |
 | 개발자 컨퍼런스 톡 | Manifesto → Evolution Timeline → System Architecture → Demo Card Grid |
-| RISE·연구 사업 결과 보고 (개발자 톤) | System Architecture(연구 스택) → Evolution Timeline(연도별) → Result Cards |
+| regional innovation·연구 사업 결과 보고 (개발자 톤) | System Architecture(연구 스택) → Evolution Timeline(연도별) → Result Cards |
 | 학생 대상 AI 강의 | Manifesto → Evolution Timeline → System Architecture → Manifesto (call-to-action) |
 
 ## 컬러 → 의미 매핑 (확장 시 참고)
