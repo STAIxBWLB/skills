@@ -65,8 +65,8 @@ Rules:
 
 - Do not overwrite an existing outgoing file unless the user explicitly asks to
   replace it.
-- Do not add outgoing files or receipts under `shared/` to git when that root is
-  workspace-excluded.
+- Do not assume an outbox is excluded because its folder is named `shared`.
+  Workspace sync exclusions must come from runtime sync configuration.
 - Do not embed personal values in this skill. Use `workspace.config.yaml`.
 - Actual sending or upload belongs to provider skills such as `io-gws` or
   `io-mso`.
