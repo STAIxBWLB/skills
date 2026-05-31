@@ -2,8 +2,9 @@
 name: hwpx
 description: >
   한국 공문서 스타일의 HWPX 문서 작성·편집 스킬. 공문서, 기안문(내부결재/대외시행),
-  사업계획서, 보고서, 회의록 템플릿 + {{anchor}} 치환 기반 문서 생성. python-hwpx 라이브러리
-  (~/.anchor/env/.venv 기설치) 기반. 읽기·편집·검증·PDF 변환 지원. MVP는 템플릿 채우기 중심.
+  사업계획서, 보고서, 회의록 템플릿 + {{anchor}} 치환 기반 문서 생성. raw ZIP/XML 처리와
+  bundled OpenJDK + hwpxlib(Apache-2.0) writer 기반. 읽기·편집·검증·PDF 변환 지원.
+  MVP는 템플릿 채우기 중심.
   트리거: hwpx, 공문, 공문서, 기안문, 결재문서, 내부결재, 대외시행, 사업계획서, 보고서,
   회의록, 한글 문서 작성, .hwpx 생성/수정, 공문 써줘, 기안문 만들어줘, 한컴 문서
   사용하지 않음: 바이너리 .hwp (→ hwp-toolkit), .docx (→ docx 스킬), .pdf
@@ -13,16 +14,23 @@ description: >
 
 ## Overview
 
-HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부터 대한민국 정부 공문서의 법정 저장 형식이다. 내부 구조는 zip + OWPML(Open Word-Processor Markup Language, KS X 6101). 이 스킬은 `python-hwpx` 라이브러리를 사용하여 네 가지 작업 경로를 지원한다:
+HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부터 대한민국 정부 공문서의 법정 저장 형식이다. 내부 구조는 zip + OWPML(Open Word-Processor Markup Language, KS X 6101). 이 스킬은 raw ZIP/XML 처리와 bundled Java writer를 사용하여 네 가지 작업 경로를 지원한다:
 
 1. **양식 따라가기 (`styled --reference`)** — 주어진 공식 양식 파일의 폰트·여백·스타일을 그대로 사용하여 본문만 채움. 사업 공고 HWP 양식이 있을 때 최우선 경로.
 2. **보기 좋은 신규 생성 (`styled --preset`)** — 양식이 없을 때 공문서 표준에 맞춘 폰트·여백·줄간격·헤더/푸터·페이지번호로 깔끔한 문서를 생성.
 3. **템플릿 채우기 (`fill`)** — 내장 `templates/*.hwpx`의 `{{anchor}}` 치환. 기안문/사업계획서 뼈대 사용.
-4. **편집** (`edit`, `unpack`+`repack`) — 기존 문서 수정.
+4. **편집** (`edit`, `edit-section`, `unpack`+`repack`) — 기존 문서 수정.
+5. **레퍼런스 양식 복원·편집 (`analyze` → `fill`/`edit-section` → `validate` → `guard`)** — 첨부된 임의 공문 양식의 서식·구조를 보존하며 본문만 안전하게 교체하는 권장 경로. 아래 "robust 편집 엔진" 참조.
+
+### robust 편집 엔진 (`scripts/hwpx_xml.py`)
+
+`fill`/`edit`/`edit-section`은 직렬화 문자열 치환이 아니라 **lxml 트리 편집 엔진**을 쓴다. 핵심 보장:
+- **run 경계를 넘나드는 `{{anchor}}`도 매칭** (`<hp:t>` 텍스트를 연결해 치환, 앵커 밖 run·서식은 보존).
+- **`<hp:linesegarray>` 자동 삭제** — 텍스트 수정 후 줄배치 캐시를 지워 글자 겹침 방지(한글이 열 때 재계산).
+- **sec 직계자식 인덱스 기반** 섹션 경계 처리 (텍스트 검색 아님), **deepcopy 참조 단락 복제**, mimetype-first STORED 재패키징.
+- 의존성은 lxml + 번들 hwpxlib(JAR)뿐 (python-hwpx 미사용).
 
 바이너리 `.hwp`(v5 OLE2 포맷)은 별도 `hwp-toolkit` 스킬에서 처리한다. 이 스킬은 HWPX 전용.
-
-**라이선스 주의**: `python-hwpx`는 Non-Commercial 라이선스. 본교·개인·학술 용도는 문제 없으나 상업 배포물에 포함할 경우 메인테이너와 협의 필요.
 
 ## Quick Reference
 
@@ -33,11 +41,15 @@ HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부
 | 구조화 JSON | `./hwpx read <file.hwpx> --format json` |
 | **보기 좋은 생성 (양식 없음)** | `./hwpx styled --preset gongmun --markdown <md> -o <out>` |
 | **양식 따라가기** | `./hwpx styled --reference <양식.hwpx> --markdown <md> -o <out>` |
-| 템플릿 채우기 | `./hwpx fill <template> --kv key=value -o out.hwpx` |
-| find/replace | `./hwpx edit <in> <out> --replace OLD NEW` |
+| 템플릿 채우기 (run-aware) | `./hwpx fill <template> --kv key=value -o out.hwpx` |
+| find/replace (run-aware) | `./hwpx edit <in> <out> --replace OLD NEW` |
+| **편집 청사진 (sec 인덱스 맵)** | `./hwpx analyze <file.hwpx>` |
+| **본문 단락 범위 교체** | `./hwpx edit-section <file> --start N --end M --lines lines.txt -o out` |
+| **라벨-값 양식 채우기** | `./hwpx fill-form <form> --kv 성명=홍길동 --kv 소속=… -o out` |
+| **드리프트 게이트 (레이아웃 보존 검증)** | `./hwpx guard --reference <ref> --output <out>` |
 | unpack → XML 직접 편집 | `./hwpx unpack <file> <dir>` → `./hwpx repack <dir> <out>` |
 | 단순 신규 생성 | `./hwpx create <out> --title T --body "1줄\n2줄"` |
-| **번들 JRE 라이터 (Apache-2.0)** | `./hwpx write-java <out> --markdown <md>` |
+| **번들 Java 라이터 (Apache-2.0)** | `./hwpx write-java <out> --markdown <md>` |
 | **HTML → HWPX (cascade)** | `./hwpx export-html <html> <out> --template-id report` |
 | 검증 | `./hwpx validate <file.hwpx>` |
 | PDF 변환 | `./hwpx to-pdf <file.hwpx>` (LibreOffice + H2Orestart 필요) |
@@ -172,10 +184,10 @@ stdin으로도 가능: `... | ./hwpx styled --preset gongmun --stdin-json -o out
 
 프리셋 폰트가 기관 요건에 맞지 않으면 두 가지 경로:
 
-1. **양식 따라가기** (권장): 기관의 정식 양식 `.hwpx`를 `--reference`로 넘김
+1. **양식 따라가기** (권장): 기관의 정식 양식 `.hwpx`에 `{{본문}}`, `{{제목}}` 같은 slot을 넣고 `--reference`로 넘김
 2. **생성 후 수정**: Hancom Office에서 열어 `서식 → 글자 모양`으로 수정
 
-python-hwpx의 제약으로 font 추가는 생성 시점에서 **2개 슬롯(id=0, id=1)에만 매핑된다**. 세 번째 폰트가 필요하면 수동 편집 필요.
+현재 bundled writer 경로는 단락 중심 MVP다. 정교한 표·이미지·기관별 폰트/여백은 기관 양식 파일을 기준으로 slot 치환하거나 Hancom Office에서 최종 검수한다.
 
 ## 2. 템플릿 채우기 (`fill`)
 
@@ -255,14 +267,36 @@ echo '{"제목":"테스트","본문":"본문"}' | \
 
 ## 4. 편집
 
-### 단순 find/replace
+### 단순 find/replace (run-aware)
 
 ```bash
 ./hwpx edit input.hwpx output.hwpx --replace "OLD" "NEW"
 ./hwpx edit input.hwpx output.hwpx --replace "구버전" "신버전" --limit 1
 ```
 
-런(run) 경계를 넘나드는 텍스트는 매칭되지 않는 제약이 있음 — 그 경우 unpack 경로 사용.
+lxml 엔진이 `<hp:t>` 텍스트를 연결해 치환하므로 **run 경계를 넘나드는 텍스트도 매칭**되고, 수정 단락의 `linesegarray`는 자동 정리된다(이전의 "한 run으로 저장" 제약 해소).
+
+### 레퍼런스 양식 편집 워크플로우 (권장)
+
+첨부된 임의 공문 양식의 서식·구조를 보존하며 본문만 교체:
+
+```bash
+# 1) 청사진: sec 직계자식 인덱스 + 스타일 ID 확인 (텍스트가 아닌 인덱스로 경계 파악)
+./hwpx analyze 양식.hwpx
+
+# 2a) 앵커가 있으면 fill (run-aware)
+./hwpx fill 양식.hwpx --kv 제목="…" --kv 본문="…" -o 결과.hwpx
+# 2b) 본문 단락 블록을 통째 교체하려면 edit-section (analyze 인덱스 사용, 서식 복제)
+./hwpx edit-section 양식.hwpx --start 12 --end 18 --ref-index 12 --lines body.txt -o 결과.hwpx
+
+# 3) 무결성 검증
+./hwpx validate 결과.hwpx
+
+# 4) 레이아웃 보존 게이트 (필수) — 문단/표/쪽수·텍스트길이 드리프트 검사
+./hwpx guard --reference 양식.hwpx --output 결과.hwpx
+```
+
+`guard`가 FAIL이면(문단 수 변동, 텍스트 길이 과다 등) 완료로 보지 않고 본문을 압축/조정 후 재빌드한다. 여러 본문 블록을 교체할 때는 **마지막 섹션부터 역순**으로 `edit-section`을 호출해 인덱스 어긋남을 방지한다(엔진 `replace_section_body`도 동일 전제). 복잡한 in-place 편집은 `analyze` 결과를 보고 `scripts/hwpx_xml.py`의 `clone_para`/`replace_section_body`/`replace_in_paragraph`를 인라인 Python으로 직접 호출할 수 있다.
 
 ### unpack → XML 직접 편집 → repack
 
@@ -291,26 +325,25 @@ echo '{"제목":"테스트","본문":"본문"}' | \
 
 **현재 MVP 한계**:
 - markdown 파싱은 "한 줄 = 한 단락" 수준. 헤딩/리스트/표 등 포매팅 미지원.
-- 표·이미지·헤더/푸터는 python-hwpx API 직접 호출 필요 (`references/python-hwpx-cheatsheet.md` 참조).
+- 표·이미지·복잡한 헤더/푸터는 raw ZIP/XML 편집 또는 Hancom Office 기반 양식 보정 필요.
 - 복잡한 공문서는 템플릿 채우기 경로를 쓸 것.
 
-## 5-A. 번들 JRE 라이터 (`write-java`, `export-html`)
+## 5-A. 번들 Java 라이터 (`write-java`, `export-html`)
 
-`python-hwpx`(Non-Commercial)와 별개로, **번들된 OpenJDK 21 + hwpxlib(Apache-2.0)** 을 통해 HWPX를 생성하는 자가완결형 경로. tidy 앱(`<workspace-root>/dev/tidy`)의 export 스택을 그대로 가져와 스킬화한 것이다.
+**번들된 OpenJDK 21 + hwpxlib(Apache-2.0)** 을 통해 HWPX를 생성하는 자가완결형 경로. tidy 앱(`<workspace-root>/dev/tidy`)의 export 스택을 가져와 스킬화한 것이다.
 
 **언제 쓰나**:
-- python-hwpx가 라이선스상 부담스러운 상업 배포물에 포함될 때 (hwpxlib는 Apache-2.0).
 - 시스템에 별도 java/python을 설치하지 않은 환경에서 일관된 결과가 필요할 때.
 - HTML 입력(예: 에디터/뷰어에서 export)을 cascade로 안전하게 HWPX로 떨궈야 할 때.
 
 ### 사전 셋업 (1회)
 
 ```bash
-bash ~/.anchor/env/scripts/setup-jre.sh
-# → ~/.anchor/env/jre/bin/java (Temurin 21.0.10) 설치 + 동작 검증
+bash ~/.anchor/skills/_builtin/envs/default/setup.sh --target ~/.anchor/env
+# → ~/.anchor/env/jre/bin/java (Temurin 21 JDK runtime) 설치 + 동작 검증
 ```
 
-스크립트는 멱등하다: tidy 디렉토리가 있으면 그걸 복사하고, 없으면 Temurin API에서 플랫폼별 JRE 21을 다운로드한다. JRE 디렉토리(`~/.anchor/env/jre/`)는 git-ignored.
+스크립트는 멱등하다. Temurin API에서 플랫폼별 JDK 21 runtime을 다운로드한다. runtime 디렉토리(`~/.anchor/env/jre/`)는 로컬 산출물이다.
 
 ### `write-java` — 저수준 라이터
 
@@ -328,35 +361,33 @@ printf "H1:테스트\nP:본문 단락임.\nP:\nH2:중간 제목\nP:끝.\n" \
 ./hwpx write-java /tmp/out.hwpx --input notes.txt
 ```
 
-**범위**: `HwpxWriter.java`(MVP, ~80 LOC)는 단락만 출력한다. 표·이미지·다단 폰트가 필요하면 `styled` 또는 `export-html`(Stage 2 폴백)로 가야 한다.
+**범위**: `HwpxWriter.java`(MVP, ~80 LOC)는 단락만 출력한다. 표·이미지·다단 폰트가 필요하면 `styled --reference`의 slot 양식 또는 raw ZIP/XML 경로로 처리한다.
 
 ### `export-html` — HTML → HWPX cascade
 
-tidy의 `document:export-hwp` IPC 핸들러를 Python으로 직역한 경로. 세 엔진을 순차 시도하고, 처음 성공한 엔진의 결과를 반환한다.
+tidy의 `document:export-hwp` IPC 핸들러를 Python으로 옮긴 경로. 두 엔진을 순차 시도하고, 처음 성공한 엔진의 결과를 반환한다.
 
 | Stage | 엔진 | 의존 | 강점 |
 |-------|------|------|------|
-| 1 | bundled-hwpx-jre | `~/.anchor/env/jre/` + hwpxlib | 가장 빠름, 시스템 의존 0 |
-| 2 | python-hwpx-template | `~/.anchor/env/.venv` + tidy 템플릿 | 한국어 라벨 자동 매칭, 표 보존 |
-| 3 | pypandoc-hwpx | 외부 설치 시 | 마지막 폴백 |
+| 1 | bundled-hwpx-java | `~/.anchor/env/jre/` + hwpxlib | 가장 빠름, 시스템 의존 0 |
+| 2 | pypandoc-hwpx | 외부 설치 시 | 마지막 폴백 |
 
 ```bash
 ./hwpx export-html input.html /tmp/out.hwpx --template-id report
-# stdout JSON: {"engine": "bundled-hwpx-jre", "output": "..."}
+# stdout JSON: {"engine": "bundled-hwpx-java", "output": "..."}
 
-# template-id 옵션: report | gongmun | minutes | proposal | notice
-# (runtime/templates/<id>.hwpx — Stage 2에서 사용)
+# template-id 옵션은 호환을 위해 남아 있으나 현재 bundled Java/pypandoc 경로에서는 사용하지 않음
 ```
 
-Stage 1의 HTML 평탄화는 단순화된 MVP다(블록 태그 → H1:/H2:/P: 라인). 표·셀 병합·테두리 색상 등 tidy의 `htmlToHwpxBlocks`/`rewriteHwpxWithBlocks`(JS, 1500+ LOC) 후처리는 후속 작업으로 분리되어 있다. 표 충실도가 중요하면 Stage 2로 떨어지도록 `--template-id`를 명시할 것.
+Stage 1의 HTML 평탄화는 단순화된 MVP다(블록 태그 → H1:/H2:/P: 라인). 표·셀 병합·테두리 색상 등 tidy의 `htmlToHwpxBlocks`/`rewriteHwpxWithBlocks`(JS, 1500+ LOC) 후처리는 후속 작업으로 분리되어 있다.
 
 ### 라이선스 비교
 
 | 라이브러리 | 경로 | 라이선스 | 비고 |
 |-----------|------|---------|------|
-| python-hwpx v2.5 | 기존 모든 명령(`read`/`fill`/`styled`/...) | Non-Commercial | 본교·개인·학술 OK, 상업 배포 협의 필요 |
-| hwpxlib 1.0.5 | `write-java` / `export-html` Stage 1 | Apache-2.0 | 자유 |
-| pypandoc-hwpx | `export-html` Stage 3 (옵션) | 상황에 따라 | 시스템 설치 필요 |
+| raw ZIP/XML | `read` / `fill` / `edit` / `slots` / `validate` | 표준 라이브러리 + lxml | 의존 최소화 |
+| hwpxlib 1.0.5 | `write-java` / `styled` / `export-html` Stage 1 | Apache-2.0 | 자유 |
+| pypandoc-hwpx | `export-html` Stage 2 (옵션) | 상황에 따라 | 시스템 설치 필요 |
 
 상세 비교는 `references/library-landscape.md`, 패턴 설명은 `references/bundled-jre-writer.md`.
 
@@ -392,10 +423,10 @@ brew install --cask libreoffice
 
 ### 레거시 `.hwp` (바이너리)
 
-이 스킬은 HWPX만 처리한다. `.hwp` 읽기·변환은 `hwp-toolkit` 스킬로 위임:
+이 스킬은 HWPX 작성·편집 전용이나, **`./hwpx read legacy.hwp`는 자동으로 `hwp-toolkit`에 위임**하여 텍스트를 추출한다 (toolkit 탐색 순서: `$HWP_TOOLKIT` → `~/workspace/work/dev/hwp-toolkit/hwp` → PATH의 `hwp`). 변환·생성·편집은 hwp-toolkit을 직접 호출:
 
 ```bash
-~/workspace/work/dev/hwp-toolkit/hwp read legacy.hwp
+./hwpx read legacy.hwp                              # → hwp-toolkit 자동 위임 (텍스트 추출)
 ~/workspace/work/dev/hwp-toolkit/hwp convert legacy.hwp --to pdf
 ```
 
@@ -411,17 +442,18 @@ brew install --cask libreoffice
 | 증상 | 원인 | 해결 |
 |------|------|------|
 | Hancom Office에서 파일 열리지 않음 | mimetype이 zip 첫 엔트리가 아니거나 DEFLATE | `./hwpx repack`으로 다시 묶기 (수동 `zip` 명령 금지) |
-| `{{anchor}}` 치환이 0건 | anchor가 여러 run으로 쪼개짐 | 템플릿을 다시 열어 한 run으로 저장 (Hancom Office에서 전체 선택→단일 서식) |
-| 한글이 깨짐 | 생성 시 인코딩 | python-hwpx는 UTF-8 고정. 입력 JSON/텍스트도 UTF-8 확인 |
+| `{{anchor}}` 치환이 0건 | anchor 철자/공백 불일치 (run 분할은 이제 엔진이 처리) | `./hwpx slots`로 실제 앵커명 확인 후 정확히 지정 |
+| 채운 문서가 레퍼런스보다 쪽수 증가 | 본문이 원본 레이아웃 초과 | `./hwpx guard`로 드리프트 확인 → 본문 압축/조정 후 재빌드 |
+| 한글이 깨짐 | 생성 시 인코딩 | 입력 JSON/텍스트 UTF-8 확인 |
 | PDF 변환 실패 | LibreOffice에 H2Orestart 미설치 | 확장 설치 후 `soffice --headless` 1회 실행으로 캐시 빌드 |
 | 관인(직인)이 안 찍힘 | 스킬은 관인 삽입 안 함 | 정상 동작 — e-결재 시스템(온나라/K-Office)이 발송 시 자동 삽입 |
-| `.hwp` 파일에 대해 오류 | 바이너리 HWP는 지원하지 않음 | `hwp-toolkit` 스킬 사용 |
+| `.hwp` 파일 읽기 | 바이너리 HWP | `./hwpx read`가 hwp-toolkit에 자동 위임 (미발견 시 `HWP_TOOLKIT` 지정). 작성·편집은 hwpx 전용 |
 
 ## 10. 의존성
 
-- **Python**: `~/.anchor/env/.venv` (공유)
-  - `python-hwpx` (import: `hwpx`) — 기설치
-  - `lxml` — 기설치 (validate.py에서 사용)
+- **Python**: 공유 venv 또는 system `python3`
+  - `lxml` — HWPX XML 읽기/검증에 사용
+- **Bundled Java**: `~/.anchor/env/jre` + `runtime/hwpxlib-1.0.5.jar`
 - **선택**: LibreOffice + H2Orestart 확장 (PDF 변환용)
 - **선택**: Hancom Office 한/글 (템플릿 편집/검수용)
 
@@ -432,9 +464,8 @@ CLI 진입점은 `./hwpx` 래퍼가 자동으로 venv python을 사용한다.
 - `references/hwpx-structure.md` — zip 레이아웃, mimetype 규칙, 네임스페이스 표
 - `references/owpml-quickref.md` — 주요 OWPML 요소 빠른 참조
 - `references/korean-official-format.md` — 행정효율규정 기안문 구조 상세
-- `references/python-hwpx-cheatsheet.md` — 라이브러리 API 레시피
-- `references/raw-zip-fallback.md` — python-hwpx 없이 zipfile+lxml로 직접 다루기
-- `references/library-landscape.md` — python-hwpx / hwpxlib / pyhwpx / pyhwp 비교
+- `references/raw-zip-fallback.md` — zipfile+lxml로 직접 다루기
+- `references/library-landscape.md` — raw ZIP/XML / hwpxlib / pyhwpx / pyhwp 비교
 
 ## 응답 원칙
 
