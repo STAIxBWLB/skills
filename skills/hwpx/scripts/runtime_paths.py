@@ -87,7 +87,9 @@ def classpath() -> str:
 
 def assert_jre() -> None:
     """Fail fast with a helpful message if bundled Java assets are missing."""
-    missing = [str(p) for p in (JAVA_BIN, HWPXLIB_JAR, WRITER_SOURCE) if not p.exists()]
+    missing = [str(p) for p in (JAVA_BIN, HWPXLIB_JAR) if not p.exists()]
+    if not WRITER_CLASS.exists() and not WRITER_SOURCE.exists():
+        missing.append(f"{WRITER_CLASS} or {WRITER_SOURCE}")
     if missing:
         raise RuntimeError(
             "bundled Java writer 자산 누락:\n  - "

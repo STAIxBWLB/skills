@@ -2,7 +2,7 @@
 
 This module intentionally uses only repo-local code:
   - bundled Java writer for fresh HWPX generation
-  - raw ZIP/XML slot replacement for reference templates
+  - lxml slot replacement for reference templates
 
 The public CLI keeps the old `styled` shape, but no commercial-use-restricted
 Python HWPX package is imported at runtime.
@@ -10,15 +10,14 @@ Python HWPX package is imported at runtime.
 from __future__ import annotations
 
 import re
-import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable
 
+import hwpx_xml as hx
 from write_java import write_java
 
 
-XML_SUFFIXES = (".xml", ".hpf")
 COMMON_BODY_KEYS = ("본문", "내용", "BODY", "CONTENT", "body", "content")
 COMMON_TITLE_KEYS = ("제목", "문서제목", "TITLE", "DOCUMENT_TITLE", "title")
 
@@ -97,54 +96,6 @@ def _block_text(blocks: list[Block]) -> str:
     return "\n".join(lines).strip()
 
 
-def _is_xml_entry(name: str) -> bool:
-    return name.lower().endswith(XML_SUFFIXES)
-
-
-def _copy_info(src: zipfile.ZipInfo, *, compress_type: int | None = None) -> zipfile.ZipInfo:
-    info = zipfile.ZipInfo(src.filename, date_time=src.date_time)
-    info.compress_type = src.compress_type if compress_type is None else compress_type
-    info.comment = src.comment
-    info.extra = src.extra
-    info.external_attr = src.external_attr
-    info.internal_attr = src.internal_attr
-    return info
-
-
-def _rewrite_template_slots(template: Path, output: Path, replacements: dict[str, str]) -> int:
-    hits = 0
-    with zipfile.ZipFile(template, "r") as zin:
-        entries: list[tuple[zipfile.ZipInfo, bytes]] = []
-        for info in zin.infolist():
-            data = zin.read(info.filename)
-            if _is_xml_entry(info.filename):
-                text = data.decode("utf-8", errors="strict")
-                for key, value in replacements.items():
-                    anchor = "{{" + key + "}}"
-                    count = text.count(anchor)
-                    if count:
-                        hits += count
-                        text = text.replace(anchor, value)
-                data = text.encode("utf-8")
-            entries.append((info, data))
-
-    if hits == 0:
-        return 0
-
-    output.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(output, "w") as zout:
-        mimetype = next((entry for entry in entries if entry[0].filename == "mimetype"), None)
-        if mimetype is not None:
-            info = zipfile.ZipInfo("mimetype")
-            info.compress_type = zipfile.ZIP_STORED
-            zout.writestr(info, mimetype[1])
-        for src_info, data in entries:
-            if src_info.filename == "mimetype":
-                continue
-            zout.writestr(_copy_info(src_info), data)
-    return hits
-
-
 def from_preset(
     blocks: Iterable[Block],
     preset_name: str = "gongmun",
@@ -186,7 +137,8 @@ def follow_template(
         replacements[key] = title_text
 
     out = Path(output)
-    hits = _rewrite_template_slots(source, out, replacements)
+    counts = hx.edit_text(source, out, {f"{{{{{key}}}}}": value for key, value in replacements.items()})
+    hits = sum(counts.values())
     if hits == 0:
         write_java(out, _block_lines(block_list, header=header, footer=footer))
     return out
