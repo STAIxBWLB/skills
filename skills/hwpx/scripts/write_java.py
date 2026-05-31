@@ -1,4 +1,4 @@
-"""hwpx write-java — call bundled JRE + hwpxlib HwpxWriter to produce HWPX.
+"""hwpx write-java — call bundled Java + hwpxlib HwpxWriter to produce HWPX.
 
 The Java writer reads UTF-8 lines from stdin where each line is one paragraph,
 optionally prefixed with a tag:
@@ -24,7 +24,7 @@ import sys
 import zipfile
 from pathlib import Path
 
-from runtime_paths import JAVA_BIN, assert_jre, classpath
+from runtime_paths import JAVA_BIN, WRITER_CLASS, WRITER_SOURCE, assert_jre, classpath
 
 
 def _normalize_mimetype(path: Path) -> None:
@@ -74,12 +74,23 @@ def text_to_lines(txt: str) -> list[str]:
     return [f"P:{line.rstrip()}" if line.strip() else "P:" for line in txt.splitlines()]
 
 
+def _line_level(raw: str) -> str:
+    """Tag of a writer line: 'H1'..'H6' or 'P'."""
+    colon = raw.find(":")
+    if 0 < colon <= 3:
+        tag = raw[:colon].strip()
+        if re.fullmatch(r"H[1-6]|P", tag):
+            return tag
+    return "P"
+
+
 def write_java(output: Path, lines: list[str], timeout: float = 30.0) -> None:
     assert_jre()
     output.parent.mkdir(parents=True, exist_ok=True)
     payload = ("\n".join(lines) + "\n").encode("utf-8") if lines else b"P:\n"
+    main = "HwpxWriter" if WRITER_CLASS.exists() else str(WRITER_SOURCE)
     proc = subprocess.run(
-        [str(JAVA_BIN), "-cp", classpath(), "HwpxWriter", str(output)],
+        [str(JAVA_BIN), "-cp", classpath(), main, str(output)],
         input=payload,
         capture_output=True,
         timeout=timeout,
@@ -88,6 +99,18 @@ def write_java(output: Path, lines: list[str], timeout: float = 30.0) -> None:
         stderr = proc.stderr.decode("utf-8", errors="replace").strip()
         raise RuntimeError(f"HwpxWriter failed (exit {proc.returncode}): {stderr}")
     _normalize_mimetype(output)
+
+    # Heading visual hierarchy: remap H1..H6 paragraphs to larger existing
+    # charPr (best-effort — styling must never fail the write).
+    levels = [_line_level(ln) for ln in (lines or [])]
+    if any(lv != "P" for lv in levels):
+        try:
+            import hwpx_xml as hx
+
+            hx.apply_heading_styles(output, levels)
+        except Exception as e:  # styling is best-effort, must not fail the write
+            print(f"[hwpx] ⚠️  heading 스타일 적용 건너뜀: {type(e).__name__}: {e}",
+                  file=sys.stderr)
 
 
 def cli_write_java(args: argparse.Namespace) -> int:
@@ -105,14 +128,14 @@ def cli_write_java(args: argparse.Namespace) -> int:
     except RuntimeError as e:
         print(f"[hwpx] write-java 실패: {e}", file=sys.stderr)
         return 1
-    print(f"HWPX saved: {output} ({len(lines)} paragraphs, engine=bundled-hwpx-jre)")
+    print(f"HWPX saved: {output} ({len(lines)} paragraphs, engine=bundled-hwpx-java)")
     return 0
 
 
 def add_subparser(sub) -> None:
     s = sub.add_parser(
         "write-java",
-        help="번들 JRE + hwpxlib로 HWPX 생성 (저수준)",
+        help="번들 Java + hwpxlib로 HWPX 생성 (저수준)",
     )
     s.add_argument("output", help="output .hwpx path")
     src = s.add_mutually_exclusive_group()
