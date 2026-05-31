@@ -1,4 +1,4 @@
-# 문서 처리 환경 (_sys/skills/env/)
+# 문서 처리 환경 (~/.anchor/env/)
 
 HWP/HWPX/PDF 파일 처리를 위한 공유 Python 가상환경.
 Claude Code SessionStart hook이 모든 서브모듈에서 이 venv를 자동 활성화한다.
@@ -45,7 +45,7 @@ env/
 
 ```bash
 # 초기 설정 (최초 1회)
-cd ~/workspace/work/_sys/skills/env && make setup
+cd ~/.anchor/skills/env && make setup
 
 # 의존성 확인
 make verify
@@ -63,7 +63,7 @@ make sync
 ## SessionStart Hook
 
 `init-env.sh`가 Claude Code 세션 시작 시 자동 실행:
-1. 현재 디렉토리에서 상위로 탐색하여 `_sys/skills/env/.venv` 위치 탐지
+1. 현재 디렉토리에서 상위로 탐색하여 `~/.anchor/env/.venv` 위치 탐지
 2. `CLAUDE_ENV_FILE`에 `VIRTUAL_ENV`와 `PATH` 주입
 3. 이후 `python3`, `hwp5txt` 등이 공유 venv 패키지 사용
 
@@ -87,4 +87,4 @@ make sync
 ## 연관 도구
 
 - **hwp-toolkit**: `~/.claude/skills/hwp-toolkit/hwp` CLI (이 venv의 python3 사용)
-- **skills**: `_sys/skills/` submodule (inbox-processor 등이 이 환경에 의존)
+- **skills**: `~/.anchor/skills/` submodule (inbox-processor 등이 이 환경에 의존)

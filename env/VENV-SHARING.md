@@ -4,7 +4,7 @@
 repo. In the workspace checkout its path is:
 
 ```bash
-~/workspace/work/_sys/skills/env
+~/.anchor/skills/env
 ```
 
 In a standalone clone of the skills repo, the same files live at repo-local
@@ -16,7 +16,7 @@ Scripts and hooks resolve the env by walking upward from the current project or
 skill directory and checking these candidates:
 
 1. `<ancestor>/env/.venv`
-2. `<ancestor>/_sys/skills/env/.venv`
+2. `<ancestor>/~/.anchor/env/.venv`
 3. `<ancestor>/skills/env/.venv`
 
 `SKILL_PYTHON` may override discovery for one command.
@@ -24,7 +24,7 @@ skill directory and checking these candidates:
 ## Provisioning
 
 ```bash
-cd ~/workspace/work/_sys/skills/env
+cd ~/.anchor/skills/env
 make setup
 make verify
 ```

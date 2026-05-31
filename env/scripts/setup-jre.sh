@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# setup-jre.sh — install Temurin JRE 21 into _sys/skills/env/jre/
+# setup-jre.sh — install Temurin JRE 21 into ~/.anchor/env/jre/
 #
 # Used by the hwpx skill (and any other skill that needs a known-good JRE).
 # Strategy:
-#   1. If _sys/skills/env/jre/bin/java already runs → exit 0 (idempotent).
+#   1. If ~/.anchor/env/jre/bin/java already runs → exit 0 (idempotent).
 #   2. Else download Temurin 21 from api.adoptium.net for the current OS/arch.
 #
-# Output: _sys/skills/env/jre/bin/java
+# Output: ~/.anchor/env/jre/bin/java
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"          # _sys/skills/env
+ENV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"          # ~/.anchor/env
 JRE_DIR="$ENV_ROOT/jre"
 
 # 1. idempotency

@@ -28,7 +28,7 @@ This public repo is registered as a linked source:
 {
   "id": "stai-public",
   "kind": "linked",
-  "path": "~/workspace/work/_sys/skills",
+  "path": "~/.anchor/skills",
   "skillsSubdir": "skills"
 }
 ```

@@ -36,7 +36,7 @@ Ignored runtime directories: `.venv/`, `jre/`, `node_modules/`, `input/`,
 ## Verification
 
 ```bash
-cd ~/workspace/work/_sys/skills/env
+cd ~/.anchor/skills/env
 make verify
 ```
 
