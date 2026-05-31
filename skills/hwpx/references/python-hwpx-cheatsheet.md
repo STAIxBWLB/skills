@@ -1,6 +1,6 @@
 # python-hwpx API 치트시트
 
-설치된 버전 기준 (v2.5 in `_sys/skills/env/.venv`). 전체 API는 `pydoc hwpx.document.HwpxDocument`.
+설치된 버전 기준 (v2.5 in `~/.anchor/env/.venv`). 전체 API는 `pydoc hwpx.document.HwpxDocument`.
 
 ## 기본 import
 
@@ -284,7 +284,7 @@ doc.save_to_path("out.hwpx")
 
 - [python-hwpx on GitHub (airmang/python-hwpx)](https://github.com/airmang/python-hwpx)
 - PyPI: `pip install python-hwpx` (단, 이 워크스페이스 venv에 기설치)
-- 설치 경로: `_sys/skills/env/.venv/lib/python3.11/site-packages/hwpx/`
+- 설치 경로: `~/.anchor/env/.venv/lib/python3.11/site-packages/hwpx/`
 - **라이선스**: Non-Commercial — 상업 재배포 시 유의
 
 ## 버전별 차이

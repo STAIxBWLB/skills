@@ -4,7 +4,7 @@ This document describes the **self-contained Java HWPX writer** integrated into 
 
 ## Why bundle a JRE
 
-The skill already has `python-hwpx` (NC-licensed) bound through `_sys/skills/env/.venv`. Three problems pushed us toward a parallel Java path:
+The skill already has `python-hwpx` (NC-licensed) bound through `~/.anchor/env/.venv`. Three problems pushed us toward a parallel Java path:
 
 1. **License**: `python-hwpx` is Non-Commercial. `hwpxlib` (kr.dogfoot) is Apache-2.0, so commercial deliverables can ship with it.
 2. **Determinism**: tidy ships a known-good Temurin 21 + hwpxlib 1.0.5 pair so every user produces byte-identical structural output. Reusing that bundle in the skill gives the same guarantee.
@@ -13,15 +13,13 @@ The skill already has `python-hwpx` (NC-licensed) bound through `_sys/skills/env
 ## Layout
 
 ```
-_sys/
-├── .gitignore                              # excludes env/jre/ and env/.venv/
-└── env/
-    ├── scripts/setup-jre.sh                # one-shot installer (idempotent)
-    ├── jre/                                # ~35 MB, gitignored
-    │   └── bin/java                        # Temurin 21.0.10 (arm64 macOS by default)
-    └── .venv/                              # existing python-hwpx venv
+~/.anchor/env/
+├── jre/                                    # local Temurin 21 JDK runtime
+│   └── bin/java
+├── node_modules/                           # shared Node packages
+└── .venv/                                  # shared Python utilities
 
-_sys/skills/skills/hwpx/
+~/.anchor/skills/hwpx/
 ├── runtime/                                # ~1.4 MB, committed
 │   ├── HwpxWriter.java                     # source (~80 LOC)
 │   ├── HwpxWriter.class                    # compiled, Java 21 ABI
@@ -44,13 +42,12 @@ _sys/skills/skills/hwpx/
 ## Setup
 
 ```bash
-bash _sys/skills/env/scripts/setup-jre.sh
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
 ```
 
-The script is idempotent (skips if `jre/bin/java` already runs) and tries two paths in order:
-
-1. **Donor copy**: if `<workspace-root>/dev/tidy/app/resources/hwpx/jre` exists, `cp -R` from there. This is the offline path used during initial bring-up.
-2. **Temurin download**: otherwise, fetches the latest Temurin 21 JRE for the host OS/arch from `https://api.adoptium.net/v3/binary/latest/21/ga/{os}/{arch}/jre/hotspot/normal/eclipse` and unpacks it.
+The setup script is idempotent when `jre/bin/java` includes the `jdk.compiler`
+module required for Java source-file launch. It fetches the latest Temurin 21
+JDK for the host OS/arch.
 
 Currently arm64 macOS / x64 macOS / arm64 Linux / x64 Linux are recognized. Windows is not yet wired up (PR welcome).
 
@@ -70,11 +67,11 @@ with stdin = `\n`-joined `H1:/H2:/H3:/P:` lines (UTF-8). Then `_normalize_mimety
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `bundled-JRE writer 자산 누락` | `_sys/skills/env/jre/` missing or corrupt | `bash _sys/skills/env/scripts/setup-jre.sh` |
+| `bundled-JRE writer 자산 누락` | `~/.anchor/env/jre/` missing or corrupt | `bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env` |
 | `validate FAIL: mimetype이 STORED 아님` | Old build before `_normalize_mimetype` was wired | Re-run `write-java`; the post-process runs every time now |
 | `HwpxWriter failed (exit 1): NoClassDefFoundError` | classpath wrong (jar moved or renamed) | Confirm `runtime/hwpxlib-1.0.5.jar` exists; bump version pin in `runtime_paths.py` |
 | `export-html` always falls through to Stage 2 | Stage 1 raising silently | Run `./hwpx write-java <out>` directly to surface the JRE error |
-| Wrong arch ("Bad CPU type") | tidy donor was arm64 but host is x86_64 | Delete `_sys/skills/env/jre/`, re-run `setup-jre.sh` so it falls through to Temurin download for the host arch |
+| Wrong arch ("Bad CPU type") | runtime arch differs from host | Delete `~/.anchor/env/jre/`, re-run setup so it downloads for the host arch |
 | Want a newer hwpxlib | Pinned 1.0.5 in code | Drop new jar in `runtime/`, update jar path constant in `runtime_paths.py`, smoke-test `write-java`, commit |
 
 ## What was deliberately NOT ported
