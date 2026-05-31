@@ -339,7 +339,7 @@ lxml 엔진이 `<hp:t>` 텍스트를 연결해 치환하므로 **run 경계를 �
 ### 사전 셋업 (1회)
 
 ```bash
-bash ~/.anchor/skills/_builtin/envs/default/setup.sh --target ~/.anchor/env
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
 # → ~/.anchor/env/jre/bin/java (Temurin 21 JDK runtime) 설치 + 동작 검증
 ```
 

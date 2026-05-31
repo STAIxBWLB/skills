@@ -40,12 +40,12 @@ skills/skills/hwpx/
 ## Setup
 
 ```bash
-bash ~/.anchor/skills/_builtin/envs/default/setup.sh --target ~/.anchor/env
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
 ```
 
-The setup script is idempotent when `jre/bin/java` includes the `jdk.compiler` module required for Java source-file launch.
-
-It fetches the latest Temurin 21 JDK for the host OS/arch from `https://api.adoptium.net/v3/binary/latest/21/ga/{os}/{arch}/jdk/hotspot/normal/eclipse` and unpacks it.
+The setup script is idempotent when `jre/bin/java` includes the `jdk.compiler`
+module required for Java source-file launch. It fetches the latest Temurin 21
+JDK for the host OS/arch.
 
 Currently arm64 macOS / x64 macOS / arm64 Linux / x64 Linux are recognized. Windows is not yet wired up (PR welcome).
 
@@ -66,10 +66,10 @@ with stdin = `\n`-joined `H1:/H2:/H3:/P:` lines (UTF-8). Then `_normalize_mimety
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `bundled Java runtime 미설치` | `~/.anchor/env/jre/` missing or corrupt | `bash ~/.anchor/skills/_builtin/envs/default/setup.sh --target ~/.anchor/env` |
+| `bundled-JRE writer 자산 누락` | `~/.anchor/env/jre/` missing or corrupt | `bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env` |
 | `validate FAIL: mimetype이 STORED 아님` | Old build before `_normalize_mimetype` was wired | Re-run `write-java`; the post-process runs every time now |
 | `HwpxWriter failed (exit 1): NoClassDefFoundError` | classpath wrong (jar moved or renamed) | Confirm `runtime/hwpxlib-1.0.5.jar` exists; bump version pin in `runtime_paths.py` |
-| `export-html` falls through to pypandoc | Stage 1 raising silently | Run `./hwpx write-java <out>` directly to surface the JRE error |
+| `export-html` always falls through to Stage 2 | Stage 1 raising silently | Run `./hwpx write-java <out>` directly to surface the JRE error |
 | Wrong arch ("Bad CPU type") | runtime arch differs from host | Delete `~/.anchor/env/jre/`, re-run setup so it downloads for the host arch |
 | Want a newer hwpxlib | Pinned 1.0.5 in code | Drop new jar in `runtime/`, update jar path constant in `runtime_paths.py`, smoke-test `write-java`, commit |
 

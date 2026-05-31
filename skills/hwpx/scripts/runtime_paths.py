@@ -58,6 +58,7 @@ def _jre_root() -> Path:
     for base in (SKILL_ROOT, *SKILL_ROOT.parents):
         candidates.append(base / "envs" / "default" / "jre")
         candidates.append(base / "skills" / "envs" / "default" / "jre")
+        candidates.append(base / "env" / "jre")
     for c in candidates:
         if (c / "bin" / "java").exists():
             return c
@@ -75,8 +76,8 @@ WRITER_SOURCE = RUNTIME / "HwpxWriter.java"
 VENV_PY = ENV_ROOT / ".venv" / "bin" / "python3"
 
 SETUP_HINT = (
-    "bundled Java runtime 미설치. 다음을 실행:\n"
-    "  bash ~/.anchor/skills/_builtin/envs/default/setup.sh --target ~/.anchor/env"
+    "JRE 미설치. 다음을 실행:\n"
+    "  bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env"
 )
 
 
