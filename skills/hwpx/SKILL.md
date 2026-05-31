@@ -306,11 +306,11 @@ echo '{"제목":"테스트","본문":"본문"}' | \
 ### 사전 셋업 (1회)
 
 ```bash
-bash ~/.anchor/env/scripts/setup-jre.sh
-# → ~/.anchor/env/jre/bin/java (Temurin 21.0.10) 설치 + 동작 검증
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
+# → ~/.anchor/env/jre/bin/java (Temurin 21 JDK runtime) 설치 + 동작 검증
 ```
 
-스크립트는 멱등하다: tidy 디렉토리가 있으면 그걸 복사하고, 없으면 Temurin API에서 플랫폼별 JRE 21을 다운로드한다. JRE 디렉토리(`~/.anchor/env/jre/`)는 git-ignored.
+스크립트는 멱등하다. Temurin API에서 플랫폼별 JDK 21 runtime을 다운로드한다. runtime 디렉토리(`~/.anchor/env/jre/`)는 로컬 산출물이다.
 
 ### `write-java` — 저수준 라이터
 

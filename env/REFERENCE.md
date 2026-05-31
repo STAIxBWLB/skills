@@ -31,14 +31,32 @@ Ignored runtime directories: `.venv/`, `jre/`, `node_modules/`, `input/`,
 - HWP v5: `libhwp` first, then `hwp5txt`, then direct OLE parsing if needed.
 - HWPX: ZIP/XML parsing with `BeautifulSoup` and `lxml`.
 - PDF: `pymupdf` for fast text extraction, `pdfplumber` for tables, OCR tools for scanned PDFs.
-- HWPX writing: public `hwpx` skill uses repo-local `env/.venv` and optional `env/jre`.
+- HWPX writing: public `hwpx` skill uses the venv python (`~/.anchor/env/.venv`) and bundled JDK (`~/.anchor/env/jre`).
 
 ## Verification
 
 ```bash
-cd ~/.anchor/skills/env
-make verify
+# Health-check the canonical env (venv / node / jre)
+bash ~/.anchor/skills/env/setup.sh --verify --target ~/.anchor/env
 ```
 
-If system packages are missing, install them with the platform package manager
-or run `make setup`.
+If a runtime is missing, provision with:
+
+```bash
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
+```
+
+## Env resolution (canonical)
+
+Skill wrappers and `scripts/runtime_paths.py` resolve the python interpreter in
+this order:
+
+1. `$SKILL_PYTHON` (caller override)
+2. `$ANCHOR_SKILLS_ENV/.venv/bin/python3` (host-injected)
+3. `$HOME/.anchor/env/.venv/bin/python3` (canonical fixed location)
+4. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree)
+5. system `python3` (warning)
+
+Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
+venvs cannot shadow the Anchor runtime. Wrappers export `VIRTUAL_ENV`,
+`PATH`, and `NODE_PATH` after resolving the Anchor env.

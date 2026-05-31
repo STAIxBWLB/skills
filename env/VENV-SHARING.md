@@ -1,32 +1,33 @@
 # Skills Env Sharing
 
-`env/` is the reproducible runtime scaffold inside the `entelecheia/skills`
-repo. In the workspace checkout its path is:
+`env/` is the reproducible runtime scaffold. `setup.sh --target ~/.anchor/env`
+provisions it into the canonical runtime:
 
 ```bash
-~/.anchor/skills/env
+~/.anchor/env        # .venv + node_modules + jre (provisioned, not in git)
 ```
 
-In a standalone clone of the skills repo, the same files live at repo-local
-`env/`.
+The source scaffold lives in the Anchor-managed skills install at
+`~/.anchor/skills/env` or at repo-local `env/` in a standalone clone.
 
 ## Discovery
 
-Scripts and hooks resolve the env by walking upward from the current project or
-skill directory and checking these candidates:
+Scripts and hooks resolve the env in this order:
 
-1. `<ancestor>/env/.venv`
-2. `<ancestor>/~/.anchor/env/.venv`
-3. `<ancestor>/skills/env/.venv`
+1. `$SKILL_PYTHON` (caller override)
+2. `$ANCHOR_SKILLS_ENV/.venv` (host-injected)
+3. `~/.anchor/env/.venv` (canonical fixed location)
+4. repo-local walk-up: `<ancestor>/{env,envs/default,skills/envs/default}/.venv` (dev-in-tree)
+5. system `python3` (warning)
 
-`SKILL_PYTHON` may override discovery for one command.
+Ambient `$VIRTUAL_ENV` is not used for discovery. Wrappers set `VIRTUAL_ENV`
+after the Anchor env is resolved.
 
 ## Provisioning
 
 ```bash
-cd ~/.anchor/skills/env
-make setup
-make verify
+bash ~/.anchor/skills/env/setup.sh --target ~/.anchor/env
+bash ~/.anchor/skills/env/setup.sh --verify --target ~/.anchor/env
 ```
 
 The tracked source of truth is `pyproject.toml`, `uv.lock`, `package.json`, and
@@ -36,8 +37,8 @@ The tracked source of truth is `pyproject.toml`, `uv.lock`, `package.json`, and
 ## Session Hook
 
 `env/.claude/hooks/init-env.sh` is the shared SessionStart hook. It writes
-`VIRTUAL_ENV`, `PATH`, and optional `NODE_PATH` into `CLAUDE_ENV_FILE` so later
-tool calls use the same runtime.
+`ANCHOR_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH`, and `NODE_PATH` into
+`CLAUDE_ENV_FILE` so later tool calls use the same runtime.
 
 Use `env/scripts/infuse-hooks.sh --all` from the workspace checkout to refresh
 submodule-local `.claude` hooks.
