@@ -45,6 +45,10 @@ skill. The user may scope processing with `inbox-process <channel>`.
 7. Propose a route using `project-registry.yaml` and the configured scoring
    spec. Write the decision to `route.md`.
 8. Ask for confirmation before moving originals or summaries outside the inbox.
+   When filing a raw original OUT of the exempt inbox zone into a non-exempt
+   project folder, rename it to an English slug per `_sys/rules/naming-policy.md`
+   (`YYMMDD-type-description[-vX].ext`) and preserve the Korean original in the
+   item manifest `source.original_name`.
 9. Move processed items to `done/`, `failed/`, or `duplicate/` and append a
    receipt to `_state/index.jsonl`.
 
@@ -82,3 +86,5 @@ Hooks are optional and config-driven:
 
 - `references/summary-schema.md` - required summary shape
 - `references/workspace-config.md` - processing config keys
+- `_sys/rules/naming-policy.md` - English-slug naming for files moved into
+  non-exempt project folders

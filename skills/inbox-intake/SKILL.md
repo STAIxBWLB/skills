@@ -42,7 +42,10 @@ skill does not summarize, route, extract tasks, or write to a vault.
 6. Create `items/pending/<YYMMDD-channel-slug>/manifest.yaml` from
    `templates/manifest.yaml`.
 7. Copy or move raw inputs into the item `raw/` directory according to the
-   caller's explicit request. For channel-root imports, default to copy.
+   caller's explicit request. For channel-root imports, default to copy. When an
+   inbound attachment filename is Korean, write the Korean filename to manifest
+   `source.original_name` (the raw copy MAY keep the Korean name because
+   `inbox/items/**` is exempt per `_sys/rules/naming-policy.md` L63).
 8. Append one JSONL receipt to `_state/index.jsonl`.
 
 ## Rules

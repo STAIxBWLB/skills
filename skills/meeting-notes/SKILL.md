@@ -28,7 +28,10 @@ skill is provider-neutral and does not require inbox staging.
    items from the provided material.
 3. Normalize terms and people using configured local guides when available.
 4. Write the note using `templates/meeting-note.md`.
-5. File it under the configured meeting root, usually `YYYY/YYYY-MM/`.
+5. File it under the configured meeting root, usually `YYYY/YYYY-MM/`. Derive
+   `<slug>` as a lowercase English meaning-summary of the Korean topic, `[a-z0-9-]`
+   only, no spaces; keep the Korean human title in frontmatter `title` and the
+   meeting type in `type`/`tags`.
 6. If configured and explicitly requested, create task candidates with
    `task-management` or prepare vault extraction candidates. Do not write vault
    notes directly.
@@ -39,7 +42,7 @@ skill is provider-neutral and does not require inbox staging.
 - Do not transcribe raw audio unless a configured `io-*` or transcriber tool
   has already produced text.
 - Keep filename policy configurable; default to
-  `MM-DD <type> - <topic> - <detail>.md`.
+  `YYMMDD-meeting-<slug>.md`.
 - If date, participants, or topic cannot be recovered from the input, leave a
   visible placeholder and state what is missing.
 - Legal/accounting evidence meeting records are out of scope unless the user
