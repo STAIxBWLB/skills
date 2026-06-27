@@ -86,8 +86,10 @@ HWPX는 한/글(Hancom Office)의 **XML 기반 공식 포맷**이며, 2021년부
   --reference 2026_사업계획서_양식.hwpx \
   --markdown 사업계획.md \
   --footer "- # / ## -" \
-  -o 최종_사업계획서.hwpx
+  -o 260627-plan-business-final.hwpx
 ```
+
+> 출력 파일명은 비면제 구역(프로젝트 폴더)에 쓰일 때 `_sys/rules/naming-policy.md`를 따른다(영문 슬러그, 언더스코어 금지). 한글 파일명은 `shared/`(이메일 송부) 같은 면제 구역에서만 허용.
 
 양식이 `.hwp` (바이너리)이면 먼저 Hancom Office에서 열어 `.hwpx`로 저장해달라 요청하거나, `hwp-toolkit convert --to hwpx`로 변환 후 사용.
 
@@ -285,15 +287,15 @@ lxml 엔진이 `<hp:t>` 텍스트를 연결해 치환하므로 **run 경계를 �
 ./hwpx analyze 양식.hwpx
 
 # 2a) 앵커가 있으면 fill (run-aware)
-./hwpx fill 양식.hwpx --kv 제목="…" --kv 본문="…" -o 결과.hwpx
+./hwpx fill 양식.hwpx --kv 제목="…" --kv 본문="…" -o 260627-report-result.hwpx
 # 2b) 본문 단락 블록을 통째 교체하려면 edit-section (analyze 인덱스 사용, 서식 복제)
-./hwpx edit-section 양식.hwpx --start 12 --end 18 --ref-index 12 --lines body.txt -o 결과.hwpx
+./hwpx edit-section 양식.hwpx --start 12 --end 18 --ref-index 12 --lines body.txt -o 260627-report-result.hwpx
 
 # 3) 무결성 검증
-./hwpx validate 결과.hwpx
+./hwpx validate 260627-report-result.hwpx
 
 # 4) 레이아웃 보존 게이트 (필수) — 문단/표/쪽수·텍스트길이 드리프트 검사
-./hwpx guard --reference 양식.hwpx --output 결과.hwpx
+./hwpx guard --reference 양식.hwpx --output 260627-report-result.hwpx
 ```
 
 `guard`가 FAIL이면(문단 수 변동, 텍스트 길이 과다 등) 완료로 보지 않고 본문을 압축/조정 후 재빌드한다. 여러 본문 블록을 교체할 때는 **마지막 섹션부터 역순**으로 `edit-section`을 호출해 인덱스 어긋남을 방지한다(엔진 `replace_section_body`도 동일 전제). 복잡한 in-place 편집은 `analyze` 결과를 보고 `scripts/hwpx_xml.py`의 `clone_para`/`replace_section_body`/`replace_in_paragraph`를 인라인 Python으로 직접 호출할 수 있다.
