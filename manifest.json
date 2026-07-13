@@ -1,6 +1,8 @@
 {
   "version": 1,
-  "repoSlug": "STAIxBWLB/skills",
+  "repoSlug": "STAIxBWLB/maru",
+  "channelTag": "skills-channel",
+  "minAppVersion": "0.4.6",
   "skillsSubdir": "skills",
   "envSubdir": "envs/default",
   "libSubdir": "lib",
