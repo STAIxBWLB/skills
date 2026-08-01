@@ -1,0 +1,30 @@
+name: CI
+
+# Verify-only guard for pull requests. The release workflow publishes on
+# push to main; without this, a PR could merge a bundle that fails
+# verification and break the publish run (or ship something the app would
+# reject). No secrets, no signing, no publishing here.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: make skills-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22.22.3
+
+      - name: Verify skills
+        run: make skills-verify
