@@ -1,84 +1,70 @@
-# Maru Bundled Skills
+# maru-skills
 
-This directory is the T1 core skill source, deployed as a signed OTA bundle
-independently of app releases. Public/private extension skills belong in the
-Maru source checkouts under `~/.maru/skills/_sources/`.
+OTA skill bundle source for the [Maru](https://github.com/STAIxBWLB/maru) desktop app.
 
-## Deployment (skills-channel OTA)
+This repository is the single source of truth for the skills the Maru app
+ships over the air. Every push to `main` that touches bundle content
+publishes a signed, immutable bundle to the rolling
+[`skills-channel`](https://github.com/STAIxBWLB/skills/releases/tag/skills-channel)
+prerelease; running apps discover it, verify the signature, and update
+without an app release.
 
-Merging a change under `skills/**` to `main` triggers
-`.github/workflows/release-skills.yml`, which verifies (`make skills-verify`),
-packages (`make skills-package`), signs with the Tauri updater key, and
-uploads immutable assets (`maru-skills-r<run-id>-<sha>.zip` + metadata JSON +
-`.sig` files) to the fixed `skills-channel` prerelease. No app, CLI, or
-Homebrew build runs for skill-only changes.
+## Layout (bundle root = repo root)
 
-The app checks the channel at launch and applies the newest bundle
-automatically when the local copy is clean and runtime-compatible; manual
-paths are the Skills UI and `maru skills update --check|--apply`.
+- `skills/<name>/SKILL.md` — the skills themselves (36)
+- `envs/default/` — shared Python/Node runtime scaffold for skills
+- `lib/` — shared helpers (e.g. `build-graph.py`)
+- `docs/` — reference material used by skills
+- `manifest.json` — bundle manifest: `repoSlug`, `channelTag`,
+  `minAppVersion`, and the canonical skill list
+- `SKILL_INDEX.md` — human-readable index (manifest.json is authoritative)
 
-A frozen snapshot of this tree lives at `src-tauri/skills-bootstrap/` and is
-embedded in the binary ONLY as the offline first-run fallback. It is
-deliberately not synced with `skills/`; refresh it explicitly when cutting an
-app release that should seed newer skills offline.
+Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
+`README.md`, `AGENTS.md`, `LICENSE`) never ships in the bundle.
 
-## Layout
+## Add or change a skill
 
-```
-skills/<name>/SKILL.md     Maru-bundled T1 skill packages
-envs/default/              shared Python/Node runtime scaffold
-lib/build-graph.py         shared graph builder
-lib/vault_adapter.md       Obsidian MCP vault access rules
-docs/                      shared reference catalogs
-manifest.json              Maru-compatible skills manifest
-```
+1. Edit `skills/<name>/SKILL.md`. Frontmatter `name` must equal the
+   directory name; `description` is required.
+2. A new skill also needs a `manifest.json` entry
+   (`{name, path: "skills/<name>", tier, tags}`) and a `SKILL_INDEX.md` line.
+3. `make skills-verify` — manifest/directory agreement, frontmatter,
+   tracked-inventory rules (NFC filenames, no symlinks, no runtime junk).
+4. PR to `main`. Merge triggers the publish workflow; there is nothing
+   else to do.
 
-There is no category subdirectory split or legacy helper directory split in
-this bundle.
+## Release flow
 
-## Catalog
+`push to main` → `.github/workflows/release-skills.yml`:
+`make skills-verify` → `make skills-package REVISION=<run_id>` → minisign
+(`tauri signer sign`, same key as the Maru app updater) → upload
+`maru-skills-r<run_id>-<sha>.{zip,zip.sig,json.sig,json}` to the
+`skills-channel` prerelease. The metadata JSON uploads last so a partially
+uploaded bundle is invisible to clients.
 
-- Document toolkits: `hwpx`, `pptx-toolkit`, `xlsx-toolkit`, `md2docx`
-- Korean writing: `gaejosik`
-- Slide deck prompts: `canva-deck`, `notebooklm-deck`, `gpt-images-deck`
-- Project workflows: `business-unit-lifecycle`
-- Task and git: `task-management`, `git-sync`
-- Ideation and drafts: `ideation-drafts`, `draft-writer`
-- IO and inbox/outbox: `io-mso`, `io-gws`, `io-telegram`, `io-kakao`, `inbox-intake`, `inbox-process`, `meeting-notes`, `share-outbox`
-- Vault workflows: `vault-extract`, `vault-connect`, `vault-sync`, `vault-learn`, `vault-lint`, `vault-graph`, `vault-pipeline`, `vault-refactor`, `vault-rename`, `vault-update`, `vault-next`, `vault-remember`, `vault-rethink`, `vault-stats`
-- Skill analysis: `skill-mine`
+- **Revision** = GitHub `run_id`, globally increasing; clients apply only
+  `revision > installed`.
+- **Assets are immutable.** Never edit or delete them; publish a new
+  revision instead.
+- **`minAppVersion`** (`manifest.json`) gates which apps may apply a
+  bundle. Bump it only when a bundle genuinely needs newer app code.
+- Signing secrets (`TAURI_SIGNING_PRIVATE_KEY`,
+  `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`) are repo secrets; the public key is
+  embedded in the app's `tauri.conf.json`.
 
-## Runtime Federation
+## Client behavior (Maru app)
 
-Maru materializes this bundle into `~/.maru/skills/_builtin`, records it in
-`~/.maru/skills/registry.json`, and installs user-facing skill entrypoints as
-symlinks:
+- Auto check 3 s after launch and every 6 h; auto-applies when the update
+  is clean (no env change, builtin not dirty, app ≥ minAppVersion),
+  otherwise shows an update-available notification.
+- Manual: Settings → System → Skills (Check / Apply), or
+  `maru skills update --check|--apply`.
+- First-run/offline installs use the app-embedded bootstrap snapshot; the
+  OTA bundle supersedes it on first contact.
 
-```text
-~/.maru/skills/<name> -> ~/.maru/skills/_builtin/skills/<name>
-~/.claude/skills/<name> -> ~/.maru/skills/<name>
-```
+## History
 
-Do not install these packages by copying files manually. Use Maru's Skills UI
-or `skill_host` commands so registry state and symlinks stay consistent.
-
-Maru can bootstrap this bundle's shared runtime into its runtime root:
-
-```bash
-envs/default/setup.sh --target ~/.maru/env --dry-run
-envs/default/setup.sh --target ~/.maru/env
-```
-
-## Runtime Values
-
-Skill packages must not contain personal IDs, secrets, or workspace-only values. Runtime values belong in the caller's workspace configuration, usually `workspace.config.yaml`.
-
-Vault-facing skills discover vault paths, project registry paths, and log paths from workspace config and use Obsidian MCP for vault markdown. See `lib/vault_adapter.md`.
-
-## Contributing
-
-Keep bundled skills self-contained and reusable. Do not add private identities,
-real credentials, institution-specific internal details, or local absolute paths
-to T1 packages.
-
-MIT — see `LICENSE`.
+Split from `STAIxBWLB/maru` `skills/` on 2026-08-01 via
+`git subtree split` (full history preserved). The previous occupant of
+this repo (a Claude Code skills catalog) is archived on the
+`archive/legacy-catalog` branch.

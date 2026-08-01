@@ -1,0 +1,9 @@
+{
+  "name": "maru-skills",
+  "version": "0.0.0",
+  "private": true,
+  "description": "OTA skill bundle source for the Maru desktop app",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.0"
+  }
+}
