@@ -1,0 +1,85 @@
+name: Upstream hwp-cli drift
+
+# The hwpx skill shells out to the `hwp` binary from STAIxBWLB/hwp-cli, so every
+# hwp-cli release can silently invalidate the skill's documented CLI surface.
+# This job compares the latest upstream release against the version the skill is
+# actually verified against (skills/hwpx/upstream.json) and opens an issue when
+# they diverge.
+#
+# Notify-only by design: it never fails on drift and is not wired into ci.yml, so
+# an unrelated PR is never blocked by an upstream release. Both repos are public,
+# so the default GITHUB_TOKEN can read hwp-cli releases and write issues here --
+# no PAT, no secret to rotate.
+
+on:
+  schedule:
+    # Daily at 00:00 UTC. Worst-case notice on a new release is ~24h.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    name: compare hwpx pin against latest hwp-cli release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Open an issue when the pinned version is stale
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          pin=skills/hwpx/upstream.json
+          repo=$(jq -r .repo "$pin")
+          pinned=$(jq -r .verified_release "$pin")
+          cli_ref=$(jq -r .cli_reference "$pin")
+          gaps=$(jq -r .feature_gaps "$pin")
+          latest=$(gh api "repos/$repo/releases/latest" --jq .tag_name)
+
+          echo "upstream=$repo  latest=$latest  verified=$pinned"
+
+          if [ "$latest" = "$pinned" ]; then
+            echo "hwpx is verified against the current release; nothing to do."
+            exit 0
+          fi
+
+          title="hwpx: sync to hwp-cli $latest"
+
+          # Idempotent: the daily cron must not reopen the same conversation, and
+          # must not duplicate an issue a human already filed under this title.
+          if gh issue list --state open --search "$title in:title" \
+               --json title --jq '.[].title' | grep -Fxq "$title"; then
+            echo "Issue already open: $title"
+            exit 0
+          fi
+
+          {
+            echo "\`skills/hwpx\` is verified against hwp-cli **$pinned**, but the current release is **$latest**."
+            echo
+            echo "Upstream release notes: https://github.com/$repo/releases/tag/$latest"
+            echo
+            echo "The skill shells out to the \`hwp\` binary, so a release can change or add CLI surface the skill does not know about. Review against the upstream sources of truth:"
+            echo
+            echo "- CLI reference: https://github.com/$repo/blob/$latest/$cli_ref"
+            echo "- Feature gaps: https://github.com/$repo/blob/$latest/$gaps"
+            echo
+            echo "Typical places that drift:"
+            echo
+            echo "- \`skills/hwpx/SKILL.md\` -- documented subcommands, flags, and the \`사용하지 않음\` list"
+            echo "- \`skills/hwpx/references/capability-matrix.md\` -- supported/unsupported table"
+            echo "- \`skills/hwpx/scripts/hwpx_cli.py\` -- hardcoded \`--to\` choices and version gates"
+            echo
+            echo "When the sync lands, bump \`verified_release\` to \`$latest\` in \`$pin\` in the same PR. That bump is what silences this alert."
+            echo
+            echo "_Filed automatically by \`.github/workflows/upstream-hwp-cli.yml\`._"
+          } > /tmp/upstream-issue.md
+
+          gh issue create --title "$title" --label upstream --body-file /tmp/upstream-issue.md

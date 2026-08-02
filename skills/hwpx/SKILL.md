@@ -663,6 +663,11 @@ v0.3.0에서 `<hp:equation>` + `hp:sz`/`hp:pos`/`hp:script` 방출로 스크립�
   **CLI 표면 정본**: `~/workspace/work/dev/hwp-cli/docs/manual/cli-reference.md`
   (clap 정의에서 자동 생성, CI가 코드-문서 동기화를 강제). 플래그가 이 SKILL.md와 어긋나면
   그쪽이 맞다.
+
+  **업스트림 동기화**: 이 스킬이 검증된 hwp-cli 릴리스는 `upstream.json`의
+  `verified_release`에 기록한다. `.github/workflows/upstream-hwp-cli.yml`이 매일 최신 릴리스와
+  비교해 어긋나면 `upstream` 라벨로 이슈를 연다(알림만 하고 CI는 막지 않는다). 스킬을 새 릴리스에
+  맞춘 PR에서 `verified_release`를 함께 올려야 알림이 멎는다.
 - **선택**: LibreOffice + H2Orestart 확장 (`to-pdf --engine soffice` 벡터 PDF용; 기본 hwp-cli 경로엔 불필요)
 - **선택**: Hancom Office 한/글 (템플릿 편집/검수용)
 
