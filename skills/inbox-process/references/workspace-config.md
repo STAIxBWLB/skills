@@ -40,7 +40,13 @@ inbox:
     vault_extract_skill: vault-extract
     vault_connect_skill: vault-connect
     digest_output: _state/digests
+    ideation_target: scratchpad/ideation/seeds
 ```
+
+`ideation_target` is the workspace-relative directory where seeds distilled from
+an `ideation`-classified item belong. It is a handoff destination proposed to the
+user, never a path this skill writes to. When the key is absent, default to
+`scratchpad/ideation/seeds`.
 
 Project classification must read the paths configured under `ssot`.
 
