@@ -77,7 +77,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    In Maru review mode (see *Maru Run Contract*), do not move anything
    yourself — defer the move to Maru's confirmation step.
    When filing a raw original OUT of the exempt inbox zone into a non-exempt
-   project folder, rename it to an English slug per `_sys/rules/naming-policy.md`
+   project folder, rename it to an English slug per `_meta/rules/naming-and-placement.md` §A4
    (`YYMMDD-type-description[-vX].ext`) and preserve the Korean original in the
    item manifest `source.original_name`.
 9. Move processed items to `done/`, `failed/`, or `duplicate/` and append a
@@ -246,8 +246,8 @@ Hooks are optional and config-driven:
 - `references/summary-schema.md` - required summary shape
 - `references/workspace-config.md` - processing config keys
 - `ssot.rules`/`folder-placement.md` - destination subfolder resolution
-- `_sys/rules/naming-policy.md` - English-slug naming for files moved into
+- `_meta/rules/naming-and-placement.md` §A4 - English-slug naming for files moved into
   non-exempt project folders
   (kind→category→`tree_map`/`_incoming`); never route to a bare project root
-- `ssot.context_enrichment` (`_sys/rules/context-enrichment.md`) - entity
+- `ssot.context_enrichment` (`_meta/rules/context-enrichment.md`) - entity
   resolution for weak routes + transcript handoff (when `hooks.enrichment` set)
