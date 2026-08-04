@@ -40,13 +40,14 @@ inbox:
     vault_extract_skill: vault-extract
     vault_connect_skill: vault-connect
     digest_output: _state/digests
-    ideation_target: scratchpad/ideation/seeds
 ```
 
-`ideation_target` is the workspace-relative directory where seeds distilled from
-an `ideation`-classified item belong. It is a handoff destination proposed to the
-user, never a path this skill writes to. When the key is absent, default to
-`scratchpad/ideation/seeds`.
+`ideation` handoff destinations are not configured here. The scratchpad already
+declares its own root and collection names under `paths.scratchpad` and
+`scratchpad.*_subdir`; resolve them through `~/.maru/skills/_builtin/lib/scratchpad_adapter.md`
+rather than adding an `inbox`-side key that names the same directory twice.
+Those destinations are proposed to the user for confirmation, never written by
+this skill.
 
 Project classification must read the paths configured under `ssot`.
 

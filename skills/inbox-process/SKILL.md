@@ -23,7 +23,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
 3. Load `inbox-intake/references/manifest-schema.md` before changing item
    state.
 4. Load `references/summary-schema.md` before creating a summary.
-5. Load `ssot.rules`/`folder-placement.md` before proposing a route — it governs
+5. Load `ssot.rules`/`naming-and-placement.md` §C before proposing a route — it governs
    destination subfolder selection inside the target project.
 
 ## Workflow
@@ -58,18 +58,19 @@ skill. The user may scope processing with `inbox-process <channel>`.
    a long memo carrying several unscoped ideas at once), do not route it as a
    normal item. Emit `recommendedAction: "handoff"` with
    `requiresConfirmation: true` and propose two destinations in `note`:
-   the raw original to `scratchpad/memos/` and the distilled one-idea-per-file
-   seeds to `inbox.hooks.ideation_target` (default
-   `scratchpad/ideation/seeds/`). Do not write the seeds yourself; a person
-   confirms and the split follows the three-way triage in
-   `scratchpad/ideation/README.md` §인테이크, which separates idea from
-   already-committed task from scope decision.
+   the raw original to the memos collection and the distilled one-idea-per-file
+   seeds to `seeds/` under the ideation collection. Resolve both through
+   `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` (`paths.scratchpad` plus `memos_subdir` /
+   `ideation_subdir`); do not join a literal `scratchpad/` segment. Do not write
+   the seeds yourself; a person confirms and the split follows the three-way
+   triage in the ideation collection's `README.md` §인테이크, which separates
+   idea from already-committed task from scope decision.
 7. Propose a route using `project-registry.yaml` and the configured scoring
    spec. When the top score is weak (< 3) and `hooks.enrichment` is set, run the
    context-enrichment §2 entity resolution and `search_notes` to disambiguate
    before leaving the item pending, and attach the matched `vault_note` /
    `relatedMeetings` to the proposal. Resolve the destination **subfolder** (not
-   just the project) per `folder-placement.md` — map the item kind to the
+   just the project) per `naming-and-placement.md` §C — map the item kind to the
    project's matching subfolder (`<project>/.maru/bu-config.yaml` `tree_map` →
    existing `NN-`/`N-` subfolder → `_incoming/` fallback; never the bare project
    root). Write the decision to `inbox.naming.route_file`.
@@ -127,7 +128,7 @@ sets `reviewFlow: true`), process **every** selected item in one run and:
       "channel": "kakao",
       "classification": "action|schedule|info|ideation|noise",
       "project": "project id or null",
-      "destination": "workspace-relative destination SUBFOLDER for raw originals (kind-matched per folder-placement.md; _incoming/ when ambiguous; never a bare project root), or null",
+      "destination": "workspace-relative destination SUBFOLDER for raw originals (kind-matched per naming-and-placement.md §C; _incoming/ when ambiguous; never a bare project root), or null",
       "confidence": "high|medium|low",
       "summaryPreview": "2-3 sentence preview",
       "requiresConfirmation": true,
@@ -227,7 +228,7 @@ Hooks are optional and config-driven:
 ## Routing Rules
 
 - Use `project-registry.yaml` as the first source of truth for the target project.
-- Resolve the destination **subfolder** per `folder-placement.md`: classify the
+- Resolve the destination **subfolder** per `naming-and-placement.md` §C: classify the
   item's kind, then map kind → subfolder (`<project>/.maru/bu-config.yaml`
   `tree_map` → existing `NN-`/`N-` subfolder → default kind→category). Never drop
   files at the bare project root.
@@ -238,14 +239,16 @@ Hooks are optional and config-driven:
   defer whole new business-unit trees to `business-unit-lifecycle`.
 - Do not overwrite existing destination files.
 - `ideation` items are exempt from project routing. They exit to the scratchpad
-  (`scratchpad/memos/` for the raw original, `inbox.hooks.ideation_target` for
-  the seeds), never into a project tree, and always behind confirmation.
+  (memos collection for the raw original, ideation collection's `seeds/` for the
+  seeds), never into a project tree, and always behind confirmation.
 
 ## References
 
 - `references/summary-schema.md` - required summary shape
 - `references/workspace-config.md` - processing config keys
-- `ssot.rules`/`folder-placement.md` - destination subfolder resolution
+- `ssot.rules`/`naming-and-placement.md` §C - destination subfolder resolution
+- `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` - scratchpad path resolution for
+  `ideation` handoffs
 - `_meta/rules/naming-and-placement.md` §A4 - English-slug naming for files moved into
   non-exempt project folders
   (kind→category→`tree_map`/`_incoming`); never route to a bare project root
