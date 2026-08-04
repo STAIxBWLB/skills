@@ -54,6 +54,16 @@ skill. The user may scope processing with `inbox-process <channel>`.
    If the item is `kind: transcript` — or a record that is clearly a meeting —
    propose handing it to `meeting-notes` rather than finalizing it here; do not
    write the meeting note yourself.
+   If the item classifies as `ideation` (dictation, idea-conversion output, or
+   a long memo carrying several unscoped ideas at once), do not route it as a
+   normal item. Emit `recommendedAction: "handoff"` with
+   `requiresConfirmation: true` and propose two destinations in `note`:
+   the raw original to `scratchpad/memos/` and the distilled one-idea-per-file
+   seeds to `inbox.hooks.ideation_target` (default
+   `scratchpad/ideation/seeds/`). Do not write the seeds yourself; a person
+   confirms and the split follows the three-way triage in
+   `scratchpad/ideation/README.md` §인테이크, which separates idea from
+   already-committed task from scope decision.
 7. Propose a route using `project-registry.yaml` and the configured scoring
    spec. When the top score is weak (< 3) and `hooks.enrichment` is set, run the
    context-enrichment §2 entity resolution and `search_notes` to disambiguate
@@ -227,6 +237,9 @@ Hooks are optional and config-driven:
   extends the project's structure; do NOT invent ad-hoc one-off folders, and
   defer whole new business-unit trees to `business-unit-lifecycle`.
 - Do not overwrite existing destination files.
+- `ideation` items are exempt from project routing. They exit to the scratchpad
+  (`scratchpad/memos/` for the raw original, `inbox.hooks.ideation_target` for
+  the seeds), never into a project tree, and always behind confirmation.
 
 ## References
 
