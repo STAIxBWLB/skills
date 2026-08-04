@@ -141,7 +141,7 @@ scope별 추가:
 1. `Glob work/**/*` 결과에서 파일명 또는 경로에 `[가-힣]` 포함 여부
 2. 있으면 → 위반
 3. 예외 (§Legacy Exemptions 참조): `trips/**`, legacy 계약/MOU/연구 과제 경로
-4. `meetings/**` 는 **무조건 면제하지 않는다**. 날짜 게이트 적용 (`_sys/rules/naming-policy.md` L66/L67 권위):
+4. `meetings/**` 는 **무조건 면제하지 않는다**. 날짜 게이트 적용 (`_meta/rules/naming-and-placement.md` §A4 권위):
    legacy 회의록(mtime/파일명 날짜가 2026-05-26 이전, 또는 신규 `YYMMDD-meeting-<slug>.md` 패턴에 맞지 않는 한글 파일)만 면제하고,
    영문화 대상(2026-05-26 이후 신규 생성 또는 마이그레이션 대상)인 한글 회의록 파일명은 여전히 위반으로 플래그한다.
 
@@ -345,7 +345,7 @@ append는 fs 직접 append(`>>`)로 수행. `vault/log`는 plain logfile(확장�
 
 ## 관련 문서
 
-- `_sys/rules/ingest-chain.md` — 체인 전체 그림과 log 포맷
+- `_meta/rules/ingest-chain.md` — 체인 전체 그림과 log 포맷
 - `~/.maru/skills/_builtin/lib/vault_adapter.md` — vault 접근·스키마 정책
 - `~/.maru/skills/inbox-process/SKILL.md` — inbox processing skill
 - `work/project-registry.yaml` — 프로젝트 id 단일 소스
