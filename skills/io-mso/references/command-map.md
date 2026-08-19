@@ -25,7 +25,7 @@ CLI's. Placeholders to replace: `<upn>`, `<siteUrl>`, `<folderUrl>`, `<chatId>`,
 
 | Operation | Command | Delegated scope | State |
 |---|---|---|---|
-| List messages (fast) | `m365 request --url "https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages?$top=25"` | `Mail.ReadBasic` | verified |
+| List messages (fast) | `m365 request --url 'https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages?$top=25'` | `Mail.ReadBasic` | verified |
 | List messages (native) | `m365 outlook message list --folderName Inbox` | `Mail.ReadBasic` | verified |
 | Read one message | `m365 outlook message get --id <id>` | `Mail.ReadBasic` | verified |
 | Move a message | `m365 outlook message move --id <id> --targetFolderName Archive` | `Mail.ReadWrite` | verified |
@@ -37,6 +37,10 @@ CLI's. Placeholders to replace: `<upn>`, `<siteUrl>`, `<folderUrl>`, `<chatId>`,
 `outlook message list` has no paging flag, so it walks the whole folder and can
 take 120 s+. Use the `request --url` form with `$top` for listing.
 
+**Single-quote every OData URL.** A shell expands `$top` / `$filter` / `$select`
+inside double quotes, so `"...?$top=25"` reaches `m365` as `...?=25` — the request
+either fails or silently loses its limit.
+
 ## Outlook calendar
 
 **There is no calendar event command.** `m365 outlook calendargroup list` lists
@@ -46,8 +50,8 @@ mailboxes. Events go through Graph passthrough.
 | Operation | Command | Delegated scope | State |
 |---|---|---|---|
 | List calendar groups | `m365 outlook calendargroup list` | `Calendars.Read` | inferred |
-| List events | `m365 request --url "https://graph.microsoft.com/v1.0/me/events?$top=25"` | `Calendars.Read` | inferred |
-| Create an event | `m365 request --method post --url "https://graph.microsoft.com/v1.0/me/events" --body '{...}'` | `Calendars.ReadWrite` | inferred |
+| List events | `m365 request --url 'https://graph.microsoft.com/v1.0/me/events?$top=25'` | `Calendars.Read` | inferred |
+| Create an event | `m365 request --method post --url 'https://graph.microsoft.com/v1.0/me/events' --body '{...}'` | `Calendars.ReadWrite` | inferred |
 
 ## OneDrive (personal files)
 
@@ -57,9 +61,9 @@ through Graph passthrough, and site-hosted files through `file *` / `spo *`.
 
 | Operation | Command | Delegated scope | State |
 |---|---|---|---|
-| List my files | `m365 request --url "https://graph.microsoft.com/v1.0/me/drive/root/children"` | `Files.Read` | inferred |
-| Download a file | `m365 request --url "https://graph.microsoft.com/v1.0/me/drive/items/<id>/content"` | `Files.Read` | inferred |
-| Upload / replace | `m365 request --method put --url ".../me/drive/root:/<path>:/content" ...` | `Files.ReadWrite` | inferred |
+| List my files | `m365 request --url 'https://graph.microsoft.com/v1.0/me/drive/root/children'` | `Files.Read` | inferred |
+| Download a file | `m365 request --url 'https://graph.microsoft.com/v1.0/me/drive/items/<id>/content'` | `Files.Read` | inferred |
+| Upload / replace | `m365 request --method put --url '.../me/drive/root:/<path>:/content' ...` | `Files.ReadWrite` | inferred |
 | List tenant OneDrive sites (admin) | `m365 onedrive list` | `Sites.Read.All` | inferred |
 
 ## SharePoint / site files

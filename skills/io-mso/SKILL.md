@@ -51,8 +51,17 @@ default. Check before running, not after failing.
 3. If a scope is missing, **do not attempt the command.** Stop and report the
    missing scope name plus the config key to check.
 
-`Access is denied` means **insufficient scope, not failed authentication**. Do
-not re-run login and do not retry the command; report the gap.
+`Access is denied` is **not** a failed login, so do not re-run login and do not
+retry the command. It has two distinct causes, and they need different answers:
+
+- **Missing token scope** — the delegated scope in the map was never granted, or
+  the token predates the grant. Report the scope name and the config key.
+- **Resource-level authorization** — the scope is present but the signed-in user
+  has no access to that particular site, team, chat, plan, or mailbox. Report it
+  as a membership/ACL problem on the named resource, not as a scope gap.
+
+Separate them before reporting: check whether the granted-scope list already
+contains the scope the map names. If it does, the failure is resource-level.
 
 Scopes marked `inferred` in the map were not confirmed against the CLI. Say so
 when one gates a request that needs tenant-admin consent.
@@ -67,6 +76,9 @@ disagree, the auth status wins.
   so a URL carrying `$top` or `$filter` only works from a direct shell
   invocation. Prefer a native command; use `m365 request` from a real shell when
   there is none.
+- In that shell, **single-quote the URL**. Double quotes let the shell expand
+  `$top` / `$filter` / `$select` to nothing, so the request silently loses its
+  OData parameter.
 - `m365 outlook message list` has no paging flag and walks the whole folder
   (120 s+). List through `m365 request --url` with `$top`.
 - A token issued before a scope was granted does not carry it. After a consent
