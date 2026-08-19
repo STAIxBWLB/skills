@@ -188,8 +188,12 @@ Parsing rules the block must satisfy:
 
 - The heading is matched case-insensitively on the `## destination` prefix, and
   the block ends at the next `##` heading. Emit exactly `## Destination (schema)`.
-- Each line is `- key: value`. Keys are `[A-Za-z_]+`; the first occurrence of a
-  key wins; one level of surrounding backticks is stripped from the value.
+- Each line is `- key: value`. Keys are `[A-Za-z_]+`, and one level of
+  surrounding backticks is stripped from the value.
+- Scalar keys are single-valued: repeat one and the **first occurrence wins**.
+- `filed_as` is the exception — it is repeatable, and every line **accumulates**
+  into the rename map. A bundle with three files needing slugs carries three
+  `filed_as` lines, and all three apply.
 - Unknown keys are ignored, so the block stays forward-compatible.
 
 | Key | Rule |
@@ -199,7 +203,7 @@ Parsing rules the block must satisfy:
 | `classification` | `action`, `schedule`, `info`, `ideation`, or `noise`. Recorded on the receipt. |
 | `confidence` | `high`, `medium`, or `low`. Only `high` and `medium` are applicable without a person deciding. Use `low` whenever the top registry score is weak (`< 3`), the kind is ambiguous, or the item is `noise`/`handoff`. |
 | `rationale` | Free text. Parsed but never acted on — it is where doubt belongs, for the human reading the proposal. |
-| `filed_as` | Rename map, one line per raw file that needs an English slug. Repeatable. |
+| `filed_as` | Rename map, one line per raw file that needs an English slug. Repeatable and accumulated, unlike the scalar keys above. |
 
 Two ways to say "do not file this anywhere":
 
