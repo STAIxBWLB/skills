@@ -35,7 +35,7 @@ LEARN PROPOSAL
 topic: <topic>
 type: insight | observation | decision
 domain: research | projects | teaching | operations | people | ai-practice
-confidence: experimental (new research) | validated (consensus + sources)
+confidence: experimental (new research, default) | likely (consensus) | proven (verified sources) — schema values only (vault/CLAUDE.md §Schema)
 
 Option A (NEW note):
   - path: notes/<prose-title>.md

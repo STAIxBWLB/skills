@@ -10,7 +10,7 @@ sync with it.
 - `lib/build-graph.py` — shared graph builder used by `vault-graph` and `skill-mine`.
 - `lib/vault_adapter.md` — shared vault access policy for Obsidian MCP workflows.
 
-## Skills (35)
+## Skills (36)
 
 - Document toolkits: `hwpx`, `pptx-toolkit`, `xlsx-toolkit`, `md2docx`
 - Korean writing: `gaejosik`
