@@ -737,6 +737,13 @@ def export_report(report: str, out_path: Path):
 
 
 _TREND_ROW_RE = re.compile(r"^\| \d{4}-\d{2}-\d{2} \|")
+_TREND_SEED = (
+    "---\ntype: report\nkind: graph-trend\n---\n\n# Graph Trend (vault layer)\n\n"
+    "빌드별 그래프 규모 추이 — 빌드마다 행 1개. 최신 `graph-report-YYMMDD.md` 전문은 1개만 보관한다. "
+    "Communities 수·번호는 빌드 간 비교 대상이 아니다.\n\n"
+    "| 빌드 | Nodes | Edges | Communities | Density | Top hub (degree 1위) |\n"
+    "|---|---|---|---|---|---|\n"
+)
 
 
 def prune_reports_and_append_trend(out_dir: Path, report_path: Path, G: nx.Graph,
@@ -748,8 +755,8 @@ def prune_reports_and_append_trend(out_dir: Path, report_path: Path, G: nx.Graph
         if old != report_path:
             old.unlink()
     trend = out_dir / "graph-trend.md"
-    if not trend.exists():
-        return
+    if not trend.exists():  # first build of a vault: seed the trend table before history is pruned
+        trend.write_text(_TREND_SEED, encoding="utf-8")
     today = datetime.now().strftime("%Y-%m-%d")
     top = f"`{god_nodes[0]['id']}`" if god_nodes else "-"
     row = (f"| {today} | {G.number_of_nodes()} | {G.number_of_edges()} | "
@@ -757,8 +764,11 @@ def prune_reports_and_append_trend(out_dir: Path, report_path: Path, G: nx.Graph
     lines = [l for l in trend.read_text(encoding="utf-8").splitlines()
              if not l.startswith(f"| {today} |")]
     idx = [i for i, l in enumerate(lines) if _TREND_ROW_RE.match(l)]
-    if not idx:  # ponytail: assumes >=1 existing row; otherwise leave the file alone
-        return
+    if not idx:  # no rows yet: insert after the table header separator
+        idx = [i for i, l in enumerate(lines) if l.startswith("|---")]
+    if not idx:  # no table at all: append a fresh one
+        lines += ["", *_TREND_SEED.splitlines()[-2:]]
+        idx = [len(lines) - 1]
     lines.insert(idx[-1] + 1, row)
     trend.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
