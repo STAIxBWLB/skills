@@ -130,10 +130,9 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 - User selects which proposals to execute
 - For each confirmed proposal:
   1. Read the source document fully
-  2. Extract insights per /vault-extract methodology
-  3. Create vault note(s)
-  4. Update relevant MOCs
-  5. Show created note for review
+  2. **create** proposals: extract insights per `/vault-extract` methodology → create vault note(s) → update relevant MOCs
+  3. **update** proposals: hand off to the `/vault-update` procedure (MCP `patch_note`/`write_note` with the original insight preserved, `## Update YYYY-MM-DD` section, `/vault-lint note=` afterwards) — this skill does not carry its own update path
+  4. Show created/updated note for review
 
 ### Step 3.5: R4 Sibling Merge — Method Evidence 자동 갱신 (M10, 2026-04-24 도입)
 

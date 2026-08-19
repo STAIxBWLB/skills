@@ -8,6 +8,8 @@ description: Query→Wiki 환원 — research a topic (or promote a conversation
 
 Promote a research finding or conversation answer into the vault graph **only after explicit user approval**. Implements the Query→Wiki 환원 루프 defined in `<workspace-root>/CLAUDE.md` §"Query→Wiki 환원 루프".
 
+**Not for**: observations about how the vault/methodology itself is working (friction, surprises, process notes) — those go to `ops/observations/` via `/vault-remember` (no approval gate, no LEARN line; they feed `/vault-rethink`). `/vault-learn` writes knowledge into `notes/`.
+
 ## When to invoke
 
 1. **Automatic trigger**: user question required cross-referencing 2+ work/ files and synthesizing a conclusion

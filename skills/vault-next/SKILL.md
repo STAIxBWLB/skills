@@ -6,7 +6,7 @@ description: Recommend the highest-value next action for the vault
 
 # /vault-next
 
-Analyze vault state and recommend the most valuable next action.
+Analyze vault state and recommend the most valuable next action. Recommendation only; the raw numbers are `/vault-stats`.
 
 ## Process
 
