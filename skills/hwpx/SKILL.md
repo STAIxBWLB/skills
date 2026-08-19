@@ -59,7 +59,7 @@ hwp <커맨드> --help                   # 플래그 정본
 - 한국 공문서 작성 규정·개조식 기호 사다리 (§한국 공문서 작성 규정, §개조식 기호 사다리)
 - `templates/*.hwpx` 6종과 공통 슬롯 명 (§2)
 - 공문서 스타일 후처리 `scripts/style_pass.py` (§1, §5-A)
-- 레이아웃 드리프트 게이트 `scripts/page_guard.py` (`./hwpx guard`, §4)
+- 구조 드리프트 게이트 `scripts/page_guard.py` (`./hwpx guard`, §4)
 - lxml run-aware 슬롯·섹션 편집 `scripts/hwpx_xml.py` (§4)
 - `./hwpx` 래퍼와 바이너리 탐색 규칙 (§10)
 
@@ -92,7 +92,7 @@ MCP에 없는 lxml 경로이기 때문이다. 서버는 항상 `--root <작업�
 | **편집 청사진 (sec 인덱스 맵)** | `./hwpx analyze <file.hwpx>` |
 | **본문 단락 범위 교체** | `./hwpx edit-section <file> --start N --end M --lines lines.txt -o out` |
 | **라벨-값 양식 채우기** | `./hwpx fill-form <form> --kv 성명=홍길동 --kv 소속=… -o out` |
-| **드리프트 게이트 (레이아웃 보존 검증)** | `./hwpx guard --reference <ref> --output <out>` |
+| **드리프트 게이트 (구조 보존 검증)** | `./hwpx guard --reference <ref> --output <out>` (렌더 안 함 — 실제 쪽수는 `hwp render --report`) |
 | unpack → XML 직접 편집 | `./hwpx unpack <file> <dir>` → `./hwpx repack <dir> <out>` |
 | 단순 신규 생성 | `./hwpx create <out> --title T --body "1줄\n2줄"` (→ hwp-cli new) |
 | markdown → HWPX (레거시 별칭) | `./hwpx write-java <out> --markdown <md>` (→ hwp-cli new) |
@@ -433,7 +433,7 @@ hwp edit 결재.hwpx -o 날인.hwpx --seal "(인)=>seal.png@18mm"     # 크기 �
 # 3) 무결성 검증
 ./hwpx validate 결과.hwpx
 
-# 4) 레이아웃 보존 게이트 (필수) — 문단/표/쪽수·텍스트길이 드리프트 검사
+# 4) 보존 게이트 (필수) — 문단/표/명시적 쪽나눔·텍스트길이 드리프트 검사(구조 기준, 렌더 안 함)
 ./hwpx guard --reference 양식.hwpx --output 결과.hwpx
 ```
 
@@ -584,7 +584,7 @@ hwp edit legacy.hwp -o out.hwp --replace "구=>신"    # .hwp 직접 편집(hwp-
 |------|------|------|
 | Hancom Office에서 파일 열리지 않음 | mimetype이 zip 첫 엔트리가 아니거나 DEFLATE | `./hwpx repack`으로 다시 묶기 (수동 `zip` 명령 금지) |
 | `{{anchor}}` 치환이 0건 | anchor 철자/공백 불일치 (run 분할은 이제 엔진이 처리) | `./hwpx slots`로 실제 앵커명 확인 후 정확히 지정 |
-| 채운 문서가 레퍼런스보다 쪽수 증가 | 본문이 원본 레이아웃 초과 | `./hwpx guard`로 드리프트 확인 → 본문 압축/조정 후 재빌드 |
+| 채운 문서가 레퍼런스보다 쪽수 증가 | 본문이 원본 레이아웃 초과 | 실제 쪽수는 `hwp render --report`의 `total_pages`로 확인(guard는 렌더 안 함) → `./hwpx guard`로 문단·텍스트 길이 드리프트 확인 → 본문 압축/조정 후 재빌드 |
 | 한글이 깨짐 | 생성 시 인코딩 | 입력 JSON/텍스트 UTF-8 확인 |
 | to-pdf `--engine soffice` 실패 | LibreOffice에 H2Orestart 미설치 | 확장 설치 후 `soffice --headless` 1회 실행으로 캐시 빌드. 또는 기본 엔진(hwp-cli, LibreOffice 불필요) 사용 |
 | render-pdf 빈/깨진 페이지 | 함초롬(HCR) 등 CJK 폰트 미해결 | `HWP_FONT_DIR=<폰트 디렉토리>` 지정 (`~/.maru/env/fonts` 또는 `~/Library/Fonts`), 또는 `--font-dir` 플래그 (v0.3.0+는 `convert`도 지원) |
