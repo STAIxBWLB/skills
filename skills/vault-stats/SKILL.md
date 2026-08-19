@@ -13,7 +13,7 @@ Display comprehensive vault statistics.
 1. **Size**: total notes, by type, by domain
 2. **MOCs**: domain MOC note counts, topic MOC list
 3. **Connections**: average links per note, orphan count/ratio
-4. **Inbox**: current count, WIP status
+4. **Sync lag**: days since `ops/sessions/last-sync-timestamp`
 5. **Activity**: recently created/modified notes
 6. **Growth**: notes per week/month trend
 7. **Quality**: schema compliance rate
@@ -23,7 +23,7 @@ Display comprehensive vault statistics.
 1. Scan vault/notes/ for all .md files
 2. Parse frontmatter for type, domain, topics
 3. Count wiki links (incoming and outgoing)
-4. Check inbox/ and ops/queue/ sizes
+4. Read `ops/sessions/last-sync-timestamp`
 5. Calculate metrics
 
 ## Output
