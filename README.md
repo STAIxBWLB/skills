@@ -68,3 +68,9 @@ Split from `STAIxBWLB/maru` `skills/` on 2026-08-01 via
 `git subtree split` (full history preserved). The previous occupant of
 this repo (a Claude Code skills catalog) is archived on the
 `archive/legacy-catalog` branch.
+
+## HWPX authoring migration
+
+Retired HWPX authoring content is unified in the released `hwp` CLI's exported
+`hwp/` skill tree. The minimum supported release is `v0.12.0`; select a
+versioned released binary rather than a checkout or unversioned PATH binary.
