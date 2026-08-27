@@ -53,15 +53,6 @@
       ]
     },
     {
-      "name": "hwpx",
-      "path": "skills/hwpx",
-      "tier": "core",
-      "tags": [
-        "document",
-        "hwp"
-      ]
-    },
-    {
       "name": "draft-writer",
       "path": "skills/draft-writer",
       "tier": "core",

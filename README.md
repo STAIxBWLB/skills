@@ -11,7 +11,7 @@ without an app release.
 
 ## Layout (bundle root = repo root)
 
-- `skills/<name>/SKILL.md` — the skills themselves (36)
+- `skills/<name>/SKILL.md` — the skills themselves (35)
 - `envs/default/` — shared Python/Node runtime scaffold for skills
 - `lib/` — shared helpers (e.g. `build-graph.py`)
 - `docs/` — reference material used by skills
@@ -74,3 +74,5 @@ this repo (a Claude Code skills catalog) is archived on the
 Retired HWPX authoring content is unified in the released `hwp` CLI's exported
 `hwp/` skill tree. The minimum supported release is `v0.12.0`; select a
 versioned released binary rather than a checkout or unversioned PATH binary.
+See [the retirement migration guide](docs/hwpx-retirement.md) for the native
+command crosswalk, stale-install ownership checks, and rollback boundary.
