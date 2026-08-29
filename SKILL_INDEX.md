@@ -10,14 +10,14 @@ sync with it.
 - `lib/build-graph.py` — shared graph builder used by `vault-graph` and `skill-mine`.
 - `lib/vault_adapter.md` — shared vault access policy for Obsidian MCP workflows.
 
-## Skills (35)
+## Skills (36)
 
 - Document toolkits: `pptx-toolkit`, `xlsx-toolkit`, `md2docx`
 - Korean writing: `gaejosik`
 - Slide deck prompts: `canva-deck`, `notebooklm-deck`, `gpt-images-deck`
 - Project workflows: `business-unit-lifecycle`
 - IO and inbox/outbox: `io-mso`, `io-gws`, `io-telegram`, `io-kakao`, `inbox-intake`, `inbox-process`, `meeting-notes`, `share-outbox`
-- Task and git: `task-management`, `git-sync`
+- Task and git: `task-management`, `git-sync`, `ship`
 - Ideation and drafts: `ideation-drafts`, `draft-writer`
 - Vault workflows: `vault-extract`, `vault-connect`, `vault-sync`, `vault-learn`, `vault-lint`, `vault-graph`, `vault-pipeline`, `vault-refactor`, `vault-rename`, `vault-update`, `vault-next`, `vault-remember`, `vault-rethink`, `vault-stats`
 - Skill analysis: `skill-mine`
