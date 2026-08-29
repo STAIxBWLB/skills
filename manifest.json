@@ -44,6 +44,15 @@
       ]
     },
     {
+      "name": "ship",
+      "path": "skills/ship",
+      "tier": "core",
+      "tags": [
+        "git",
+        "release"
+      ]
+    },
+    {
       "name": "gpt-images-deck",
       "path": "skills/gpt-images-deck",
       "tier": "core",
