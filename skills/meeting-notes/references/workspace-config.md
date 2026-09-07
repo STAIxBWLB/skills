@@ -20,5 +20,9 @@ and the `context.*` lookup paths (people/glossary fast caches plus the canonical
 vault MOCs) to resolve entities and assemble the project context bundle before
 drafting. See `_meta/rules/context-enrichment.md`.
 
+The skill also reads `io.providers` to pick a calendar command for the
+work-schedule lookup (workflow step 3). Provider names are runtime values;
+any of them may be absent, in which case the lookup is skipped and noted.
+
 The public skill must not store participant lists, private project names, or
 workspace-specific account values.
