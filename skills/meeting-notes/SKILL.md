@@ -21,7 +21,9 @@ skill is provider-neutral and does not require inbox staging.
 4. If `meeting_notes.hooks.enrichment` is set, read `ssot.context_enrichment`
    (the context-enrichment procedure) and the `context.*` lookup paths it names
    (people/glossary fast caches plus the canonical vault MOCs).
-5. If the input is an inbox item, read its `manifest.yaml` and `extracted.md`.
+5. Read `io.providers` to learn which calendar provider commands are available
+   for the schedule lookup in workflow step 3.
+6. If the input is an inbox item, read its `manifest.yaml` and `extracted.md`.
 
 ## Workflow
 
@@ -29,7 +31,16 @@ skill is provider-neutral and does not require inbox staging.
    with `kind: transcript`.
 2. Identify meeting date, type, topic, participants, venue, decisions, and action
    items from the provided material.
-3. **Context enrichment (`[phase:normalize]`, Vault-First T2).** When
+3. **Work-schedule lookup (`[phase:normalize]`, required before drafting).**
+   Search the configured calendars (`io.providers`, e.g. `io-gws`
+   `calendar.event.search` or `io-mso`) for the meeting date and match the
+   event for this meeting. Take its title, attendees, start/end time, and
+   location as the primary metadata for the note, and read the same day's
+   adjacent events for context the transcript cannot carry — the meeting's
+   formal name, attendees who never spoke, and the preceding/follow-up
+   meetings it belongs to. A calendar that is unreachable or has no matching
+   event never blocks the draft: state that in the note and continue.
+4. **Context enrichment (`[phase:normalize]`, Vault-First T2).** When
    `hooks.enrichment` is set, resolve people, orgs, and the project per the
    context-enrichment procedure §2 (fast cache → project-registry → vault
    `people.md`/`glossary.md` MOC; on conflict the vault MOC wins). Assemble the
@@ -38,7 +49,7 @@ skill is provider-neutral and does not require inbox staging.
    cross-check facts and enrich the draft. Surface unresolved entities as
    uncertainties; never invent a canonical name or a wiki-link. Without the
    hook, fall back to normalizing against the local guides only.
-4. Draft the note using `templates/meeting-note.md`. Fill the frontmatter
+5. Draft the note using `templates/meeting-note.md`. Fill the frontmatter
    `title` with a human-readable meeting title so the display name does not
    depend on the filename alone — Maru resolves the shown label as
    `title -> name -> filename` and also reads `date`, `type`, `topic`, `tags`,
@@ -49,13 +60,13 @@ skill is provider-neutral and does not require inbox staging.
    `source_doc`. Emit a wiki-link only for entities §2 actually resolved (never
    a guessed link). Structure action items as `{assignee, task, due}` rather
    than bare checkboxes so they can seed pre-filled task candidates.
-5. Propose filing it under the configured meeting root, usually
+6. Propose filing it under the configured meeting root, usually
    `YYYY/YYYY-MM/`; Maru applies the write only after user approval. The
    meeting root holds the **canonical** note. When a partner/project also needs a
    copy or reference, place it in that project's meeting subfolder per
    `_meta/rules/naming-and-placement.md` §C (e.g. the partner's `*-meetings/` or
    `04-operations/meetings/YYYY/`), never the project's bare root.
-6. If configured and explicitly requested, prepare task candidates for
+7. If configured and explicitly requested, prepare task candidates for
    `task-management` or vault extraction candidates. Pre-fill each task
    candidate from the structured action items (`title`, `assignee`, `due`) and
    add a `meetingSourcePath` backref to this meeting note so the task links back
@@ -135,6 +146,9 @@ unknown fields, so existing `maru_meeting_review_v1` consumers are unaffected.
 ## Rules
 
 - Do not assume a specific transcript vendor.
+- Never draft from the transcript alone when a calendar is configured: the
+  matching calendar event is the meeting's primary metadata, and the note
+  must say so when no event was found.
 - Do not transcribe raw audio unless a configured `io-*` or transcriber tool
   has already produced text.
 - Keep filename policy configurable; default to
