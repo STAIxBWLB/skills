@@ -152,6 +152,15 @@
       ]
     },
     {
+      "name": "meeting-source-review",
+      "path": "skills/meeting-source-review",
+      "tier": "core",
+      "tags": [
+        "meeting",
+        "review"
+      ]
+    },
+    {
       "name": "notebooklm-deck",
       "path": "skills/notebooklm-deck",
       "tier": "core",
