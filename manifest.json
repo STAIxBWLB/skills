@@ -2,7 +2,7 @@
   "version": 1,
   "repoSlug": "STAIxBWLB/skills",
   "channelTag": "skills-channel",
-  "minAppVersion": "0.4.6",
+  "minAppVersion": "1.1.6",
   "skillsSubdir": "skills",
   "envSubdir": "envs/default",
   "libSubdir": "lib",
@@ -149,6 +149,15 @@
       "tags": [
         "meeting",
         "notes"
+      ]
+    },
+    {
+      "name": "meeting-source-review",
+      "path": "skills/meeting-source-review",
+      "tier": "core",
+      "tags": [
+        "meeting",
+        "review"
       ]
     },
     {
