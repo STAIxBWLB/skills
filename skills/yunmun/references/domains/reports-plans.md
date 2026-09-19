@@ -18,7 +18,7 @@ A report written by the person who did the work leads with the result and the de
 | Sourceless round numbers and invented statistics | Real figure with source and date. Missing: leave `〔확인필요〕` or ask. Never fill in |
 | Problems described without an owner: `미흡한 부분이 있었음`, `개선이 필요함` | What failed, why, who fixes it, by when |
 | 향후 계획 as aspiration: `지속적으로 노력`, `적극 검토`, `긴밀히 협력` | Action, owner, date. If undecided, say what decision is pending and with whom |
-| Inflation vocabulary stacked in one line (`ko.md` §2 row 10) | The fact the adjective stands in for |
+| Inflation vocabulary stacked in one line (`ko.md` §2 rows 5 and 22) | The fact the adjective stands in for |
 | A closing 종합 or 결론 that restates the body | End at the last decision or schedule item |
 
 ## Rules

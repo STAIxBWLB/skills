@@ -15,7 +15,7 @@ Academic prose is formal, dense and conventional by design, and none of that is 
 | Related work as a list: `A는 ~를 제안하였다. B는 ~를 제안하였다.` | Group by approach and state how each group relates to this work |
 | Results narrated without numbers, or numbers without conditions | Value, unit, dataset, baseline, variance or interval |
 | Limitations that limit nothing: `향후 다양한 데이터로 확장할 필요가 있다` | The specific threat to validity and its likely direction |
-| Hedge on every sentence (`ko.md` §2 row 7) or on none | Hedge where the evidence is genuinely weaker |
+| Hedge on every sentence, or on none | Report it. Where a hedge sits is the author's claim: on refactor vary the form of a repeated ending (`ko.md` §2 row 19) but never add or remove a hedge (`ko.md` §7) |
 | Abstract that is a table of contents: `본 논문에서는 ~를 살펴보고 ~를 논의한다` | Problem, method, main result with a number, implication |
 | English: the `style-pass.md` §3 vocabulary (delve, underscore, pivotal, intricate) in clusters | Plain verbs |
 

@@ -1,6 +1,6 @@
 # Per-model fingerprints
 
-**Prose layer (vendor guidance, unmeasured).** What a model's own vendor says its current release does at the sentence level, taken from the vendor's prompting documentation and tagged with the exact release the page names. Loaded at the style-pass step only. Upstream sepia also carries measured narrative layers for fiction; this skill covers professional prose and does not port them.
+**Prose layer (vendor guidance, unmeasured).** What a model's own vendor says its current release does at the sentence level, taken from the vendor's prompting documentation and tagged with the exact release the page names. Loaded at the vocabulary and syntax scan, whether or not `style-pass.md` is loaded. Upstream sepia also carries measured narrative layers for fiction; this skill covers professional prose and does not port them.
 
 Stable source identities live in the upstream sepia research ledger (see `ATTRIBUTION.md`); the alias V = vendor guidance is file-local. Corrections are inferences of this skill unless a source explicitly tested the intervention.
 

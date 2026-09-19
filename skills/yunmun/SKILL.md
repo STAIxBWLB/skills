@@ -4,9 +4,9 @@ description: >
   Public-safe de-AI writing skill (윤문) for professional prose in Korean and
   English. Makes AI-assisted text read as written by the person whose name is on
   it: checks structure, density, stance and specificity before word choice, then
-  applies a Korean calibration for both failure poles, padded (comma-by-rule,
-  connective stacking, translationese, hedged endings, inflation vocabulary) and
-  compressed (dropped particles and endings, noun strings, metaphor-swapped words),
+  applies a Korean calibration built on two measured corpora, for both failure
+  poles: padded (comma-by-rule, `A가 아니라 B` antithesis, cleft framing, generic
+  policy verbs) and compressed (dropped particles and endings, noun strings),
   or the English lists. Routes by document
   type: 보고서·계획서, 사업계획서·제안서, 이메일·메신저, 논문·초록, release notes, PR and
   issue replies, postmortems, tickets, technical articles, journalism. Four
@@ -54,7 +54,7 @@ A bare request ("이 메일 좀 자연스럽게", "de-AI this") maps to `refacto
 | Any other prose | `references/professional-pass.md` + `references/style-pass.md` |
 | Fiction, poetry, personal literary essays | Out of scope. Say so and stop |
 
-Every route ends with the closing checks in `references/professional-pass.md` (sentence rhythm, deletion and reversion tests, whitelists). Load `references/style-pass.md` itself only for an English target, for a long piece (article, paper, postmortem, proposal narrative), or on the "any other prose" row; a short Korean piece does not need it.
+Every route ends with the closing checks in `references/professional-pass.md` (sentence rhythm, deletion and reversion tests, rewriter gates, whitelists). Load `references/style-pass.md` itself only for an English target, for a long piece (article, paper, postmortem, proposal narrative), or on the "any other prose" row; a short Korean piece does not need it.
 
 **Language rule.** Decide the language of the target, not of the request. Korean target: load `references/languages/ko.md`; decide its pole first (padded or compressed, `ko.md` §2); it replaces the English-only lists in `style-pass.md` §2–4 and gives the Korean forms of professional-pass checks 1, 2, 6, 7 and 10. English target: use `style-pass.md` §2–4 as written. Mixed text: judge passage by passage. Another language: apply only the language-neutral checks and say so in the report.
 
@@ -68,7 +68,7 @@ Every route ends with the closing checks in `references/professional-pass.md` (s
 |---|---|
 | **write** | New content. Read the domain file *before* drafting: structure and register decisions come first and cannot be retrofitted cheaply. Sample the venue corpus when one is available. |
 | **review** | Diagnose only, no edits. Run the checklist one check at a time, produce findings with quoted evidence in the report format of `references/professional-pass.md`, and stop. Apply nothing until asked. |
-| **refactor** | Minimal in-place revision preserving structure, voice and intent. Two stages: the full review report first, then fix item by item, deepest layer first (relevance and stance before words). Skew replace and delete over insert (measured editor ratio 74/18/8). Before finishing, run the deletion test on what you added and the reversion test on what you replaced (`references/professional-pass.md`, closing check 2). Show the changes as a diff or a before/after list. Attended run with a missing fact or an unclear ask: finish the edit, place `〔확인필요: what is needed〕` at the spot, and list the questions after the change list; never invent the answer. Unattended: use the `Deferred:` line. |
+| **refactor** | Minimal in-place revision preserving structure, voice and intent. Two stages: the full review report first, then fix item by item, deepest layer first (relevance and stance before words). Skew replace and delete over insert (measured editor ratio 74/18/8). Before finishing, run the deletion test on what you added and the reversion test on what you replaced (`references/professional-pass.md`, closing check 2), then the rewriter gates (closing check 3): your own edit must not plant the tells it removed elsewhere. Show the changes as a diff or a before/after list. Attended run with a missing fact or an unclear ask: finish the edit, place `〔확인필요: what is needed〕` at the spot, and list the questions after the change list; never invent the answer. Unattended: use the `Deferred:` line. |
 | **recreate** | Full rewrite. Extract facts, claims and intent from the original into a bare list, verify nothing is invented, then write fresh under the domain rules. Use when defects are structural and the text is short enough that surgery costs more than rebuilding. |
 
 The two-stage protocol is not optional for refactor and recreate: paraphrasing without a defect list makes AI fingerprints more visible, not less.
@@ -84,7 +84,7 @@ The two-stage protocol is not optional for refactor and recreate: paraphrasing w
 ## Hard guardrails
 
 - **Never invent specifics.** Versions, numbers, dates, amounts, names, results, citations and quotations come from the actual source. Missing information means ask the user or leave an explicit marker (`TODO`, `〔확인필요〕`), never fill. A confident wrong fact is itself a top-tier tell.
-- **Meaning is protected.** Facts, amounts, dates, names, titles, article numbers, indicator values and commitments are not edited. Report a suspected error; do not correct it silently.
+- **Meaning is protected.** Facts, amounts, dates, names, titles, article numbers, indicator values and commitments are not edited. Modality is meaning: a hedge (`~할 수 있다`, may) is never turned into an assertion and an obligation (`~해야 한다`, must) is never softened or dropped; vary the form, keep the force. Report a suspected error; do not correct it silently.
 - **Deletion beats addition** (74% replace / 18% delete / 8% insert). Text may grow only for real specificity or to repair a broken sentence. In Korean, restoring dropped particles, endings and omitted constituents on compressed text is repair (`references/languages/ko.md` §2B), and the text will get longer. No register drift: a rewrite must not come out more promotional than its source.
 - **Respect the author's voice and the venue's corpus.** Extract habits from the user's samples or the venue's recent artifacts before editing, and edit toward that profile. Do not remove a mannerism the author actually uses.
 - **Quoted material and protected ranges are load-bearing.** Quotations are protected without being declared. A caller may declare protected ranges (`file:line` or `file:start-end`); resolve them against the target as received, and inside one do not edit, reflow or merge. A defect found there is reported on the `Protected:` line, never fixed.

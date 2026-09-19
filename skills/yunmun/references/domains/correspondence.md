@@ -2,6 +2,8 @@
 
 Covers work email, official email to outside bodies, and messenger messages (KakaoTalk, Telegram, Slack, Teams). Run with `professional-pass.md` (short-answer weighting) and `languages/ko.md`.
 
+**공문·시행문·협조 요청.** Item numbering (`1.` `가.`), the greeting item, `붙임` and `끝.` belong to the official template. Rules 1–2 below and the formatting tells do not apply to them; check only the content inside the form.
+
 ## Human baseline
 
 People write the request first and stop when it is made. Length tracks the relationship and the stakes: a line to a colleague, a few short paragraphs to an outside body. Greetings and closings are conventional in formal external mail and absent between close colleagues. Messenger text is shorter again, often without a greeting, split across several messages.

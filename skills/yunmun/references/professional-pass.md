@@ -17,7 +17,7 @@ Run these one at a time (a combined pass goes blind — measured on this very ta
 | 1 | Chatbot residue | "Great question", "Thanks for raising this!", "I hope this helps", "Certainly!", "You're absolutely right", offers of further help, apology openers, "Let's dive in". Delete — a colleague doesn't talk like a support desk. |
 | 2 | Density | Could this say the same at half the length? Generic statements true in any context ("in today's fast-paced world", "it's important to note") carry zero information — cut. Length must be proportional to stakes, in both directions: a trimmed answer that lost a required caveat or the next step fails too. |
 | 3 | Relevance | Does every paragraph serve *the reader's task* — the thing they came to find out? Background the reader already has, restated questions, and scope tours are filler. |
-| 4 | Stance | Where a judgment is required, commit to one. Absent subjectivity is a measured slop dimension (S): a review without a verdict, a comparison without a recommendation, a postmortem without an admitted mistake. Hedge once per genuinely fragile claim, not per sentence. |
+| 4 | Stance | Where a judgment is required, the author must commit to one. On review, report the missing verdict; on refactor never manufacture it by deleting the author's hedges (closing check 3). Absent subjectivity is a measured slop dimension (S): a review without a verdict, a comparison without a recommendation, a postmortem without an admitted mistake. Hedge once per genuinely fragile claim, not per sentence. |
 | 5 | Specificity | Versions, numbers, file:line, commands, error text verbatim, names — present and **real**. Never pad with invented specifics; a wrong fact stated confidently is itself a top-tier tell (R). Missing info → ask or leave an explicit TODO. |
 | 6 | Formatting tells | Bold-mini-heading bullet lists where prose would do; emoji as decoration; Title Case headings; every section the same length; lists of exactly three, everywhere; a heading restated by its first sentence; fractal summaries (announce → say → recap at every level) (W). The absence of these is not evidence of a human: which formatting a model over- or under-uses changes with its release (see the prose layers in `model-fingerprints.md`). |
 | 7 | Conclusion residue | "In conclusion/summary" sections, restating what was said, generic future outlook ("we will continue to improve…"). End when the content ends. |
@@ -52,15 +52,16 @@ Prose layer: author=<operative | prior | none> executor=<operative | prior | non
 Venue corpus: <artifacts sampled, or "none — using domain baseline">
 Style scan: <English: style-pass §2–3 hits; Korean: ko.md §2 hits cited as ko-r<row>; plus rhythm hits; each with quoted evidence, or none>
 Failed: <#n check-name — quoted evidence>   (one line per failed check; #n is a checklist number, never a ko.md row)
-Missing: <facts the text needs and does not contain: figure, date, owner, source | none>   (absent facts are not slop; never fill them; an unrecoverable omitted constituent, ko-r21, goes on both the Style scan and the Missing line)
+Missing: <facts the text needs and does not contain: figure, date, owner, source | none>   (absent facts are not slop; never fill them; an unrecoverable omitted constituent, ko-r30, goes on both the Style scan and the Missing line)
 Notes: <suspected factual or consistency errors, convention mismatches (ko.md §0), quoted; reported, never fixed | none>
 Deferred: <#n check-name — quoted evidence — needs human | none>   (unattended runs only; omitted otherwise)
 Protected: <#n check-name — quoted evidence | none>   (only when ranges were declared, omitted otherwise; the passage is identified by its quoted words, never by a number the model derives — the caller already holds its own ranges)
 Passed: <check numbers only>
+Gates: <refactor and recreate stage 2 only, printed after the edit: hedges before/after, obligations before/after, hunted-pattern counts source → result, share of characters changed, sentences touched>
 Verdict: <clean / isolated hits / cluster> → <ship / ship (resolve Notes first) / refactor / recreate / recreate (blocked: needs <list from Missing>)>
 ```
 
-Choosing the verdict: isolated hits → refactor. A cluster inside a sound structure → refactor. A cluster where relevance, stance or structure fails (checks 3, 4, 8) and the text is short → recreate. When the facts a rewrite needs are on the `Missing:` line, the verdict is blocked: report, ask, and do not produce a skeleton of markers. Blocked applies to recreate only; refactor proceeds and places `〔확인필요〕` markers at the gaps. Clean text with an error on the `Notes:` line is `ship (resolve Notes first)`.
+Choosing the verdict: a single hit → clean (one hit means nothing). Isolated hits (two or more rows, or one row repeated) → refactor. A cluster inside a sound structure → refactor. A cluster where relevance, stance or structure fails (checks 3, 4, 8) and the text is short → recreate. When the facts a rewrite needs are on the `Missing:` line, the verdict is blocked: report, ask, and do not produce a skeleton of markers. Blocked applies to recreate only; refactor proceeds. Place a `〔확인필요〕` marker only where a flagged defect could not be fixed without the missing fact; every other gap goes to the question list after the change list. Clean text with an error on the `Notes:` line is `ship (resolve Notes first)`.
 
 ## Closing checks — every route
 
@@ -68,7 +69,8 @@ These three are language-neutral and close every route, so a short piece does no
 
 1. **Sentence rhythm** (`style-pass.md` §5). Look for runs of three or more adjacent sentences of about the same length, counted in one consistent unit (words; 어절 for Korean). A run is a candidate signal that counts only beside other hits. Fix by moving words, never by adding them: split one, merge two, or delete a clause. Text with no running prose of paragraph length (a one-line reply, a list, a table, a 개조식 block) reports `none`.
 2. **Deletion and reversion tests** (refactor and recreate; `style-pass.md` §4, last paragraph). On every word you added: strike it; if the sentence still parses and says the same thing, it was filler. On every replacement: put the old wording back; if it was sound and shorter, keep the old. Repair stays: the words a broken or split sentence needs, the verb that replaces a nominalization, and in Korean the particles, endings and constituents restored under `ko.md` §2B.
-3. **Whitelists.** The table below, `style-pass.md` §7 when loaded, and `ko.md` §4–5 for Korean.
+3. **Rewriter gates** (refactor and recreate). Your edit must not change the claim or plant new tells. Hedges and obligations are counted before and after and must match; polarity, causal direction and the conclusion are unchanged; numbers, dates, names and quotations are byte-identical; the result holds no more of the hunted patterns than the source did; and a refactor that changed more than about half the text was a recreate, so say so. Korean markers and the full table: `ko.md` §7.
+4. **Whitelists.** The table below, `style-pass.md` §7 when loaded, and `ko.md` §4–5 for Korean.
 
 ## Whitelist — conventional ≠ slop
 
