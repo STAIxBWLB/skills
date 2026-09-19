@@ -2,7 +2,7 @@
 
 Covers government and foundation grant applications, business plans, project proposals, and statements of work. Run with `professional-pass.md` (article-like weighting) and `languages/ko.md`.
 
-**The call for proposals is the venue corpus.** Read the 공고문, the evaluation criteria and their weights, and the required form before anything else. Section order, headings, page limits and fixed tables come from the form and are never "fixed". Where the form is 개조식, form belongs to `gaejosik`.
+**The call for proposals is the venue corpus.** When the caller supplies or permits them, read the 공고문, the evaluation criteria and their weights, and the required form before anything else. Without them, say so in the report and work from this file's baseline. Section order, headings, page limits and fixed tables come from the form and are never "fixed". Where the form is 개조식, form belongs to `gaejosik`.
 
 ## Human baseline
 

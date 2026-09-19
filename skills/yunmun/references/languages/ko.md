@@ -28,7 +28,7 @@ A mismatch here is a register or notation error to fix when the venue demands it
 | Quotation | Direct speech " ", quotation inside a quotation or emphasis ' ' | Do not swap a writer's consistent choice |
 | Titles of works | 「 」『 』 or " " ' ' ; one system per document | Flag only mixed systems |
 | 가운뎃점 and comma | 가운뎃점 binds paired or grouped items (`한·미`, `금·은·동메달`) and is conventional in Korean official enumeration; comma for looser lists | Keep a consistent writer or venue choice |
-| Ellipsis and dash | 줄임표 may be `……` or `...`; the dash is rare in Korean prose | A dash in every paragraph is a §2 hit, a single dash is not |
+| Ellipsis and dash | 줄임표 may be `……` or `...`; the dash is rare in Korean prose | Row 36 applies where a dash leaves the relation between its two sides unstated; a dash whose relation is clear is not a hit |
 | Sentence ending register | One of 합쇼체(-습니다), 해요체(-어요), 해라체(-다), or 개조식 noun endings per document or section | Mixed registers are a fluency finding. 개조식 form belongs to `gaejosik` |
 | List items | Items of one list end the same way (all sentences, or all noun endings) | Flag a mixed list |
 | First person and honorifics | One of 저희 / 우리 / 본 연구 · 필자, and one way of naming each person or body | Flag drift only when it confuses reference |
@@ -42,7 +42,7 @@ All comma metrics are sentence-level values averaged per text; lengths are in mo
 
 | Feature | Human (essay / poem / abstract) | LLM | Reading |
 |---|---|---|---|
-| Sentences containing a comma | 26.31% / 27.01% / 47.48% | 61.03% / 42.90% / 65.21% | LLMs comma most sentences |
+| Sentences containing a comma | 26.31% / 27.01% / 47.48% | 61.03% / 42.90% / 65.21% | Higher in all three genres; a majority of sentences in essays and abstracts |
 | Commas per morpheme | 1.13% / 2.61% / 1.73% | 2.56% / 4.84% / 2.40% | Roughly double in essays and poems |
 | **Comma right after a connective ending** (-고, -며, -지만, -아서/어서, -는데) | 4.10% / 4.68% / 13.27% | 19.83% / 15.57% / 28.01% | The sharpest single Korean feature: the ending already marks the boundary |
 | Comma position in the sentence (0 = start) | 0.09 / 0.14 / 0.20 | 0.18 / 0.28 / 0.25 | LLM commas sit later, closing long clauses |
@@ -56,11 +56,11 @@ Rates per 1,000 어절 unless noted.
 
 | Finding | AI | Human | Reading |
 |---|---|---|---|
-| **Negative antithesis `A가 아니라 B`** | 5.8 | 0.6 | 9.2×, G² 41.7, all three model families. The strongest, most portable signal |
+| **Negative antithesis `A가 아니라 B`** | 5.8 | 0.6 | 9.2×, G² 41.7, in all three model families sampled. The strongest signal in that sample |
 | Cleft framing `필요한 것은 X다` · `문제는/핵심은/관건은 ~다` | 0.92 | 0.09 | About 10×; `필요한 것은` had 0 human uses; holds under task matching |
 | Paragraph closing on an obligation (`~해야 한다` as the last sentence, repeatedly) | 13.51 | 1.87 | 7.22× in a 24-pair control |
 | Generated metaphor with a sensory verdict (`진단은 서늘하다`), counted as a family | 1.46 | 0.34 | 4.3×; single metaphors are too rare to judge alone |
-| Convergence on plain policy verbs (확대·강화·개선·구축·마련 and the like, 9 words) | 31.3 /10k chars | 9.3 | 3.4×. Old bureaucratic Sino-Korean (제고·도모·박차) showed **no** gap |
+| Convergence on plain policy verbs (확대·강화·개선·구축·마련 and the like, 9 words) | 31.3 per 10,000 characters | 9.3 per 10,000 characters | 3.4×. Old bureaucratic Sino-Korean (제고·도모·박차) showed **no** gap |
 | Passive progressive `심화되고 있다` | 3.44 | 1.38 | Specific to the passive: active `~하고 있다` shows no gap (1.28×) |
 | Comma excess | 49.1 | 33.4 | 1.5×, same direction as K |
 | Emphasis in quotation marks | — | — | 2.4× more in AI once tasks are matched |
@@ -101,20 +101,20 @@ Decide the pole first. **Fixing one pole must not push the text to the other.** 
 | 2 | Negative antithesis | `A가 아니라 B` · `단순히 X가 아니라 Y` · `X를 넘어 Y로` as a slogan | State B. If A is itself a claim the author makes (a rejected option, a denied cause), keep it in a non-slogan form (`A 대신 B`, or its own clause); never drop it. Keep one antithesis where a real misconception is being corrected | I |
 | 3 | Cleft framing and signposting | `필요한 것은 X다` · `문제는/핵심은/관건은 ~다` · `중요한 것은` · `주목할 점은` | Direct statement: `방향이 필요하다` | I |
 | 4 | Paragraph closing on an obligation | `~해야 한다` · `~할 필요가 있다` as the last sentence of two or more paragraphs | Move the obligation sentence off the paragraph end. Never delete it, merge it, or weaken `해야 한다` into something else: the obligation is content. Stop when at most one paragraph ends on an obligation. If moving would change what an anaphor points to, or would need new content, leave it and say so | I |
-| 5 | Generic policy verbs | 확대 · 강화 · 개선 · 구축 · 마련 · 추진 · 제고, and all-purpose 설계 · 구조 · 기준, converging in one passage | The concrete action: `지원 대상을 1인 가구까지 넓힌다`. Only if the source says what the action is | I |
+| 5 | Generic policy verbs | 확대 · 강화 · 개선 · 구축 · 마련, and all-purpose 설계 · 구조 · 기준, converging in one passage. Old bureaucratic words (제고 · 도모 · 박차) are not this row: they showed no gap | The concrete action: `지원 대상을 1인 가구까지 넓힌다`. Only if the source says what the action is | I |
 | 6 | Placard and closure formulas | `과제도 남아 있다` · `한계도 분명하다` standing alone; `결국 ~로 이어진다` · `~하는 이유다` · `~라는 뜻이다` · `~인 셈이다` | State the actual issue or the causal path, or delete | I |
 | 7 | Outlook openers in the closing part | `향후` · `앞으로` · `중장기적으로` opening sentences in the last third | Delete, or use the real date if the source has one | I |
-| 8 | Passive progressive | `심화되고 있다` · `확산되고 있다` three or more times in a paragraph | `심해졌다` · `퍼지고 있다`. Isolated uses stay; the active progressive is not a signal | I |
+| 8 | Passive progressive | `심화되고 있다` · `확산되고 있다` three or more times in a paragraph | The active progressive, which keeps the aspect: `심해지고 있다` · `퍼지고 있다`. Never turn it into a past or completed form. Isolated uses stay; the active progressive is not a signal | I |
 | 9 | Generated metaphor | A sensory verdict on an abstraction (`진단은 서늘하다`, `숫자는 차갑다`); one metaphor root recurring three or more times | The literal proposition; keep at most one. See also row 35 | I |
 | 10 | Emphasis in quotation marks | Five or more scare-quoted phrases in a piece (`'옥석 가리기'`) | Quotation marks for real quotation and first-use terms | I |
-| 11 | No long sentence | Every sentence short; none of 100+ characters in running prose of several paragraphs | Join two adjacent sentences with a connective ending or a modifier clause. **Adding content is forbidden** | I |
+| 11 | No long sentence | Every sentence short across several paragraphs, so that relations between adjacent statements (cause, condition, contrast) are left for the reader to supply. The 100-character figure in §1.2 is a corpus observation, not a cutoff for any passage | Where two adjacent sentences leave their relation unstated, join them with a connective ending or a modifier clause that names it. **Adding content is forbidden**, and sentences are not joined to reach a length | I (direction only) |
 | 12 | Uniform sentence length | Runs of three or more adjacent sentences of about the same 어절 count | `professional-pass.md` closing check 1; count in 어절 | measured in other languages, inference here |
 
 **Quality edits (N, D, H). Worth making, not AI signals.** Rows 13–17 are documented faults that human bureaucratic writing is full of. They count toward a cluster only beside measured rows.
 
 | # | Shape | Korean form | Fix | Class |
 |---|---|---|---|---|
-| 13 | Light-verb padding | `검토를 진행하다` · `분석을 수행하다` · `개선을 실시하다` · `경쟁력을 가지고 있다` | 검토하다 · 분석하다 · 개선하다 · `경쟁력이 강하다` | N, D |
+| 13 | Light-verb padding | `검토를 진행하다` · `분석을 수행하다` · `개선을 실시하다` · `경쟁력을 가지고 있다` | 검토하다 · 분석하다 · 개선하다 · `경쟁력이 있다`. The fix removes the wrapper and adds no degree | N, D |
 | 14 | Double passive and agentless passive | `되어지다` · `보여지다`; `~된다` throughout with no actor | Double passives are always wrong. Name the actor where the source gives one | N |
 | 15 | `의` chains and stacked postpositions | `AI 기반의 교육 시스템의 개발의 필요성`; `~에서의` · `~으로의` · `~으로부터의` three or more times | Drop `의`, put a verb back, or split | N |
 | 16 | Abstract noun wrappers | `~적 N` chains (`전략적 함의`, `실천적 기반`) three or more per paragraph; `~라는 점에서` · `~와 관련하여` · `~에 기반하여` · `~의 경우` | Unpack: `빨라서 효율적이다`, `보안을 강화한다`, `데이터로 결정한다` | D, H |
@@ -126,7 +126,7 @@ Decide the pole first. **Fixing one pole must not push the text to the other.** 
 | 22 | Inflation vocabulary | 혁신적인 · 획기적인 · 체계적인 · 핵심적인 · 새로운 패러다임 · 시너지 · 극대화 | The fact the adjective stands in for, or delete | H |
 | 23 | Chatbot residue (check 1) | `좋은 질문입니다` · `물론입니다` · `도움이 되셨기를 바랍니다` · `추가로 궁금한 점이 있으시면` · `아래와 같이 정리해 보았습니다` | Delete | H |
 | 24 | Empty framing (check 2) | `오늘날 급변하는 환경에서` · `4차 산업혁명 시대를 맞아` · `~는 아무리 강조해도 지나치지 않다` | Start where the content starts | H |
-| 25 | Conclusion residue (check 7) | `이상으로` · `앞으로도 지속적으로 노력하겠습니다` · `~할 것으로 기대된다` closing every section | End when the content ends. One expected-effect statement per document, with a number | H |
+| 25 | Conclusion residue (check 7) | `이상으로` · `앞으로도 지속적으로 노력하겠습니다` · `~할 것으로 기대된다` closing every section | End when the content ends. Flag expected-effect lines that are repeated or have no basis in the document. Distinct effects stay, qualitative ones included; a number is used only when the source has it | H |
 | 26 | Formatting tells (check 6) | Bold lead-in on every bullet, `소제목: 설명` colon headings and `다음과 같습니다:` lead-ins in prose, emoji headings, every section the same length, a closing 요약 that repeats the body | Prose where prose would do; vary depth by importance | H |
 | 27 | Unsayable Korean (check 10) | `해당 사항에 대한 확인이 필요한 상황입니다` | Speech-shaped: `이 부분은 확인이 필요합니다` | H |
 
@@ -136,11 +136,11 @@ The cost here is meaning, not style: the reader has to reconstruct what the writ
 
 | # | Shape | Korean form | Fix | Class |
 |---|---|---|---|---|
-| 28 | Dropped particles and endings (전보체) | `설정 변경 후 서버 재시작 필요. 캐시 영향 없음 확인.` in a paragraph of prose | Restore particles, endings and auxiliaries: `설정을 변경한 뒤에는 서버를 다시 시작해야 합니다. 캐시에는 영향이 없다는 점도 확인했습니다.` | F |
+| 28 | Dropped particles and endings (전보체) | `설정 변경 후 서버 재시작 필요.` in a paragraph of prose | Restore particles, endings and auxiliaries: `설정을 변경한 뒤에는 서버를 다시 시작해야 합니다.` Restore only relations the source fixes. `캐시 영향 없음 확인` does not say whether the check was done or is still to do: ask, or mark `〔확인필요〕`; do not pick a tense for the writer | F |
 | 29 | Sentence ending on a noun phrase or a connective ending | `이 방식은 비용이 낮은 편.` · `일정이 촉박해서.` | Close with a predicate and a final ending | F |
 | 30 | Omitted constituent | `그러면 경고가 붙습니다` with no statement of where or to what | State it if the source allows; otherwise mark `〔확인필요〕`. Ellipsis is for what the reader already holds | F |
 | 31 | `의` standing in for a predicate | `사본의 문구` · `작업의 상황` hiding `사본에 적힌` · `작업이 진행되는` | Put the verb back. The reverse of row 15 | F |
-| 32 | Noun strings without relations | `지출 비용 추론 용도 토큰 계산 함수 오류 상황` | Apt Sino-Korean words joined by particles and endings: `지출한 비용을 추론하는 토큰 계산 함수에 오류가 발생하면` | F |
+| 32 | Noun strings without relations | `토큰 계산 함수 오류 발생 시 비용 추정 중단` | Apt Sino-Korean words joined by particles and endings: `토큰 계산 함수에서 오류가 발생하면 비용 추정을 중단합니다`. When the string does not fix which noun modifies which (`지출 비용 추론 용도 함수`), ask or mark; do not choose a reading | F |
 | 33 | Short sentences only | No complex sentence anywhere; every relation left to the reader | Join with connective endings and modifier clauses (row 11 seen from this pole) | F, I |
 | 34 | Rare dictionary words | Correct but uncommon words where a common one exists | The word people use | F |
 | 35 | Workshop metaphor for the plain word | `코드로 박다` · `기능을 얹다` · `규칙을 녹이다` · `정책이 갈리는 자리` · `논의의 결` | The literal verb or noun: 명시하다 · 추가하다 · 반영하다 · 달라지는 지점. Keep an idiom the field actually uses | F |
@@ -157,7 +157,7 @@ Restore to the degree the venue and the author's voice allow. Restoring is not p
 | Fewer commas | Let connective endings do the work (row 1) |
 | A long sentence | Join adjacent sentences; no new content (row 11) |
 | Sentence-length spread | One short sentence among long ones, or the reverse; move words, never add them |
-| The apt word | The precise word for the context, native or Sino-Korean, joined by particles and endings. It beats both light-verb padding and a vague native verb that loses meaning (`쓴 비용` for `지출한 비용`) |
+| The apt word | The precise word for the context, native or Sino-Korean, joined by particles and endings. It beats both light-verb padding and a vague native verb that loses meaning (`쓴 비용` for `지출 비용`) |
 | Particles, endings, auxiliaries | On compressed text, restore 조사 · 어미 · 보조 용언 · 보조사 until every relation is stated. This is repair |
 | Subject and topic ellipsis, within limits | Drop `저는` · `우리는` when the reader already holds the referent. Never drop a constituent that carries meaning (row 30), and never delete pronouns by quota |
 | Plain causal links | `~해서` · `~니까` · `그래서` where a closure formula stood (row 6) |
@@ -170,7 +170,8 @@ Restore to the degree the venue and the author's voice allow. Restoring is not p
 
 | Reported tell | What it actually is | Treatment |
 |---|---|---|
-| `~에 대한` · `~를 통해` · `~것이다` · pronouns · three-item lists | Constructions humans use as much or more (§1.2) | Row 19–21 density limits only |
+| `~에 대한` · `~를 통해` · `~것이다` · three-item lists | Constructions humans use as much or more (§1.2) | Rows 19–21 density limits only |
+| Third-person pronouns `그는` · `그의` · `그들은` | Humans use them more in native prose (§1.2) | Preserve. Rework only in text translated from another language, and never by quota |
 | Frequent `~습니다` formality, uniform endings | Register, set by venue | Not a tell. Check only register drift |
 | High share of Sino-Korean words | Register; old bureaucratic words show no human–AI gap (§1.2) | Not a tell. Replace only a word that is imprecise |
 | Em dash or colon in a sentence | Release-specific habit (`model-fingerprints.md`) and rare in Korean | Counts only in clusters |
@@ -183,6 +184,7 @@ Restore to the degree the venue and the author's voice allow. Restoring is not p
 Do not flag these, and do not "fix" them:
 
 - Uniform line length, noun endings, `항목: 내용` colon labels and parallel item phrasing in 개조식 documents. That form is prescribed, and it belongs to `gaejosik`. Row 26 and professional-pass check 8 do not apply inside it.
+- One conventional greeting and one closing line in formal external mail (`안녕하십니까` · `감사합니다` · `~드림`). Venue convention.
 - Fixed official-document phrases and words: `귀 기관의 무궁한 발전을 기원합니다` · `붙임` · `끝.` · `~하고자 합니다` · `본` · `해당`. Venue convention.
 - A high share of Sino-Korean vocabulary in academic, legal or administrative text.
 - The honorific level itself, or the absence of colloquial endings in formal text.
@@ -191,7 +193,7 @@ Do not flag these, and do not "fix" them:
 
 ## 6 Evidence boundary
 
-K covers three genres (student essays, poetry, computer-science abstracts), fully human against fully generated text, and four models from 2024; its human side is mostly student and amateur writing. I has 60 pieces per side, opinion, essay and analysis genres only, corpora not topic-matched, and a human side of edited professional prose: against a personal-blog subset its gaps shrank sharply (long sentences from 11× to about 4×), so read its multipliers conservatively and its directions as firm. Neither measured business documents, official documents, email, or human-edited machine text, which is most of what this skill edits. No row licenses a per-passage cutoff or a verdict that a text is machine-written. F, D and H rows have no published measurement behind them, and §2B describes a failure of clarity that human note-takers also produce. Treat a future measurement as superior to any of them.
+K covers three genres (student essays, poetry, computer-science abstracts), fully human against fully generated text, and four models from 2024; its human side is mostly student and amateur writing. I has 60 pieces per side, opinion, essay and analysis genres only, corpora not topic-matched, and a human side of edited professional prose: against a personal-blog subset its gaps shrank sharply (long sentences from 11× to about 4×), so read its multipliers conservatively. Its directions are what that sample showed; whether they carry over to the business genres this skill edits has not been tested. Neither measured business documents, official documents, email, or human-edited machine text, which is most of what this skill edits. No row licenses a per-passage cutoff or a verdict that a text is machine-written. F, D and H rows have no published measurement behind them, and §2B describes a failure of clarity that human note-takers also produce. Treat a future measurement as superior to any of them.
 
 ## 7 Rewriter gates — check your own edit
 
@@ -199,7 +201,7 @@ A rewrite leaves its own traces, and I measured the rewriter creating new tells.
 
 | Gate | Test |
 |---|---|
-| Modality preserved | Count epistemic hedges (`~할 수 있다` meaning *may* · `~로 보인다` · `~일 가능성`) and obligations (`~해야 한다` · `~할 필요가 있다`) before and after. The counts must match. `~할 수 있다` meaning ability or permission (`확인할 수 있다`) is not a hedge, but leave it unchanged too. Turning a hedge into an assertion, or an obligation into a description, changes the claim. Restore any sentence that lost its marker |
+| Modality preserved | Count epistemic hedges (`~할 수 있다` meaning *may* · `~로 보인다` · `~일 가능성`) and obligations (`~해야 한다` · `~할 필요가 있다`) before and after, proposition by proposition: every claim keeps its own certainty, obligation and polarity. The totals are a cross-check, not the test. Restoring a compressed obligation (`재시작 필요` → `다시 시작해야 합니다`) keeps the force it already had and is not a new obligation. Never add a hedge, an emphatic or a negation for effect. `~할 수 있다` meaning ability or permission (`확인할 수 있다`) is not a hedge, but leave it unchanged too. Turning a hedge into an assertion, or an obligation into a description, changes the claim. Restore any sentence that lost its marker |
 | Polarity and direction preserved | No negative turned positive (`더 이상 ~ 않다` stays negative), no cause and effect reversed, no conclusion changed |
 | No reverse injection | The result must not contain more commas, `A가 아니라 B`, `결국`, `~하는 이유다`, `~로 이어진다` or cleft openers than the source. Editors add exactly the tells they were removing elsewhere |
 | Protected content identical | Numbers, dates, amounts, names, quotations, legal and regulatory text, and declared protected ranges are byte-identical |

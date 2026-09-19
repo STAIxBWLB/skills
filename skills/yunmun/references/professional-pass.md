@@ -40,7 +40,7 @@ Which checks dominate depends on document shape (measured: S):
 
 Weighting sets the order and depth of attention, not an exemption: a short reply drowning in filler still fails density.
 
-For long-form (articles, postmortems), also run the outline test and QUD check in `discourse-pass.md` §1–3: extract first sentences per paragraph; a clean-summary outline and a briefing→justification→consequences→reflection question-sequence are both machine shapes.
+For long-form (articles, postmortems), also run `discourse-pass.md` §1–3. It looks for redundant paragraphs, material the reader did not need, and a body that only elaborates the opening. A first-sentence outline that reads as a clean summary is conventional structure and passes.
 
 ## Report format (review; refactor stage 1 prints the same report before editing)
 
@@ -61,15 +61,15 @@ Gates: <refactor and recreate stage 2 only, printed after the edit: hedges befor
 Verdict: <clean / isolated hits / cluster> → <ship / ship (resolve Notes first) / refactor / recreate / recreate (blocked: needs <list from Missing>)>
 ```
 
-Choosing the verdict: a single hit → clean (one hit means nothing). Isolated hits (two or more rows, or one row repeated) → refactor. A cluster inside a sound structure → refactor. A cluster where relevance, stance or structure fails (checks 3, 4, 8) and the text is short → recreate. When the facts a rewrite needs are on the `Missing:` line, the verdict is blocked: report, ask, and do not produce a skeleton of markers. Blocked applies to recreate only; refactor proceeds. Place a `〔확인필요〕` marker only where a flagged defect could not be fixed without the missing fact; every other gap goes to the question list after the change list. Clean text with an error on the `Notes:` line is `ship (resolve Notes first)`.
+Choosing the verdict. Two kinds of finding are judged separately. **Substantive failures** (checks 2–5: a dropped caveat or next step, irrelevant content, a missing required judgment, a wrong or unsupported fact) count singly: one is enough for refactor. **Style signals** (checks 1, 6–10 and every vocabulary, syntax and rhythm hit) are cumulative: a single hit → clean, because one hit means nothing; isolated hits (two or more rows, or one row repeated) → refactor. A cluster inside a sound structure → refactor. A cluster where relevance, stance or structure fails (checks 3, 4, 8) and the text is short → recreate. When the facts a rewrite needs are on the `Missing:` line, the verdict is blocked: report, ask, and do not produce a skeleton of markers. Blocked applies to recreate only; refactor proceeds. Place a `〔확인필요〕` marker only where a flagged defect could not be fixed without the missing fact; every other gap goes to the question list after the change list. Clean text with an error on the `Notes:` line is `ship (resolve Notes first)`.
 
 ## Closing checks — every route
 
-These three are language-neutral and close every route, so a short piece does not need `style-pass.md` opened for them. Long pieces and English targets load `style-pass.md` in full.
+These four are language-neutral and close every route, so a short piece does not need `style-pass.md` opened for them. Long pieces and English targets load `style-pass.md` in full.
 
 1. **Sentence rhythm** (`style-pass.md` §5). Look for runs of three or more adjacent sentences of about the same length, counted in one consistent unit (words; 어절 for Korean). A run is a candidate signal that counts only beside other hits. Fix by moving words, never by adding them: split one, merge two, or delete a clause. Text with no running prose of paragraph length (a one-line reply, a list, a table, a 개조식 block) reports `none`.
 2. **Deletion and reversion tests** (refactor and recreate; `style-pass.md` §4, last paragraph). On every word you added: strike it; if the sentence still parses and says the same thing, it was filler. On every replacement: put the old wording back; if it was sound and shorter, keep the old. Repair stays: the words a broken or split sentence needs, the verb that replaces a nominalization, and in Korean the particles, endings and constituents restored under `ko.md` §2B.
-3. **Rewriter gates** (refactor and recreate). Your edit must not change the claim or plant new tells. Hedges and obligations are counted before and after and must match; polarity, causal direction and the conclusion are unchanged; numbers, dates, names and quotations are byte-identical; the result holds no more of the hunted patterns than the source did; and a refactor that changed more than about half the text was a recreate, so say so. Korean markers and the full table: `ko.md` §7.
+3. **Rewriter gates** (refactor and recreate). Your edit must not change the claim or plant new tells. Each claim keeps its own certainty, obligation and polarity (hedge and obligation totals before and after are a cross-check); no hedge, emphatic or negation is added for effect; polarity, causal direction and the conclusion are unchanged; numbers, dates, names and quotations are byte-identical; the result holds no more of the hunted patterns than the source did; and a refactor that changed more than about half the text was a recreate, so say so. Korean markers and the full table: `ko.md` §7.
 4. **Whitelists.** The table below, `style-pass.md` §7 when loaded, and `ko.md` §4–5 for Korean.
 
 ## Whitelist — conventional ≠ slop

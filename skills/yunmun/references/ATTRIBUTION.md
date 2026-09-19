@@ -8,7 +8,7 @@ Parts of this skill are adapted from **sepia** v0.11.0 by Nanako Tsai, <https://
 |---|---|---|
 | `professional-pass.md` | `skills/sepia/references/professional-pass.md` | Renamed report header, added Korean venue rows, the form-ownership whitelist row, and pointers to `languages/ko.md` |
 | `style-pass.md` | `skills/sepia/references/style-pass.md` | Fiction-only vocabulary rows removed; English-only scope note added |
-| `discourse-pass.md` | `skills/sepia/references/discourse-pass.md` | Sections 1–3 only |
+| `discourse-pass.md` | `skills/sepia/references/discourse-pass.md` | Sections 1–3 only, rewritten for professional prose: conventional structure is not a defect, fiction rows removed, fixes never add material |
 | `model-fingerprints.md` | `skills/sepia/references/model-fingerprints.md` | Prose layers only; narrative (fiction) layers removed; header rewritten |
 | `domains/release-notes.md`, `dev-replies.md`, `postmortems.md`, `tickets.md`, `tech-articles.md` | same paths upstream | Name references only |
 | `domains/journalism.md` | `skills/sepia/references/domains/journalism.md` | Rewritten: language-neutral rules kept, Taiwan-corpus rows replaced by Korean examples marked as editorial inference |

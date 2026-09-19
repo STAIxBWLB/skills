@@ -27,6 +27,6 @@ People write the request first and stop when it is made. Length tracks the relat
 2. **One message, one ask**, with a date. Several asks become a numbered list because they are enumerable.
 3. **Unknown relationship:** keep one courtesy phrase and one closing line, and say in the change list that the relationship was assumed formal.
 4. **Register follows the thread.** Sample the recipient's and the author's earlier messages when available; match them, not a generic polite voice.
-5. **Conventional greetings and closings are venue convention** in formal external mail (`ko.md` §5). Keep one of each; cut the rest.
+5. **Conventional greetings and closings are venue convention** in formal external mail (`ko.md` §5, first bullet on greetings). Keep one of each; cut the rest.
 6. **Attachments and links are named**: what the file is and what the recipient should do with it.
 7. **Names, titles, dates, amounts and quoted text are protected.** Flag a suspected error; do not correct it silently.

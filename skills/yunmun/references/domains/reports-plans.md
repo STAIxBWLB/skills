@@ -14,17 +14,17 @@ A report written by the person who did the work leads with the result and the de
 |---|---|
 | Background and 추진 배경 longer than the result | Result and requested decision first; background is what the reader does not already know |
 | Every section the same depth, every item the same length | Depth follows importance; an item with nothing to report gets one line or is cut |
-| Expected effects with no number: `업무 효율성 제고`, `역량 강화 기대`, `시너지 창출` | The measured or targeted figure with its baseline, or delete the line |
+| Expected effects with no basis: `업무 효율성 제고`, `역량 강화 기대`, `시너지 창출` | The figure and baseline when the source has them. Otherwise keep the claim, report it on `Missing:`, and delete only a line that repeats another |
 | Sourceless round numbers and invented statistics | Real figure with source and date. Missing: leave `〔확인필요〕` or ask. Never fill in |
 | Problems described without an owner: `미흡한 부분이 있었음`, `개선이 필요함` | What failed, why, who fixes it, by when |
 | 향후 계획 as aspiration: `지속적으로 노력`, `적극 검토`, `긴밀히 협력` | Action, owner, date. If undecided, say what decision is pending and with whom |
-| Inflation vocabulary stacked in one line (`ko.md` §2 rows 5 and 22) | The fact the adjective stands in for |
+| Inflation adjectives stacked in one line (`ko.md` §2 row 22); generic policy verbs with no stated action (row 5) | The fact the adjective stands in for; the action the source actually names, otherwise `Missing:` |
 | A closing 종합 or 결론 that restates the body | End at the last decision or schedule item |
 
 ## Rules
 
 1. **Result first.** The first screen answers: what happened, what it means, what the reader must decide.
-2. **Every claim of effect has a number and a baseline, or it goes.**
+2. **Claims of effect are checked, not culled.** Flag an effect that is repeated or has no basis in the document. Keep distinct effects, qualitative ones included. A number and its baseline are used when the source has them; when it does not, report it on the `Missing:` line and never supply one.
 3. **Schedule and ownership are concrete**: date, owner, deliverable. Tables are correct for these.
 4. **Admit the miss.** A report with no deviation from plan, in a project that had one, fails stance (check 4).
 5. **Attachments carry the detail.** Link or attach rather than restating.

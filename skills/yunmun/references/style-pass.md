@@ -46,7 +46,7 @@ Merged ban list (R Table 12 + P excess-vocab + L signature phrases). A single hi
 
 ## 4 What to add back — the underused human register
 
-Instruct-tuned models systematically suppress these (P: usage 13–80% of human rate). Restore them *to the degree the genre and the author's voice allow* — sprinkled, not poured:
+Instruct-tuned models systematically suppress these (P: usage 13–80% of human rate). Restore them *to the degree the genre and the author's voice allow* — sprinkled, not poured. This table concerns register when **writing** or when a refactor removed filler; it never licenses changing a claim. A hedge, an emphatic or a negation is not added to a proposition that did not carry it (`professional-pass.md`, closing check 3):
 
 | Restore | Examples |
 |---|---|
