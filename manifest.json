@@ -36,6 +36,16 @@
       ]
     },
     {
+      "name": "linkedin-manager",
+      "path": "skills/linkedin-manager",
+      "tier": "core",
+      "tags": [
+        "linkedin",
+        "social",
+        "writing"
+      ]
+    },
+    {
       "name": "business-unit-lifecycle",
       "path": "skills/business-unit-lifecycle",
       "tier": "core",
