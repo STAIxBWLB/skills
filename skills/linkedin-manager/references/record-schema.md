@@ -69,6 +69,24 @@ source did not give; extra fields keep the label the user or the export used.
 The file moves between lifecycle directories as `status` changes and keeps its
 name. `dropped` files stay where they were.
 
+## Source inventory
+
+`references/source-inventory.md` uses `type: linkedin-source-inventory`,
+`created`, and `source` (the legacy source root), and
+records each legacy source with its path, event-date evidence, publication URL
+evidence, exact publication date (or null), metric-date evidence (or null),
+duplicate matches, and an uncertainty note. A filename date or URL never
+supplies an unverified publication or measurement timestamp.
+
+## Profile proposal
+
+`profile/proposals/YYMMDD-profile.md` uses `type: linkedin-profile-proposal`,
+`status: proposed`, `created`, `language`, and `source` (the primary CV path).
+It contains proposed sections such as Headline and About. It is distinct from
+`profile/current.md`, which is only a user-supplied snapshot of live LinkedIn
+text. Setup never creates `profile/current.md` from a CV, biography, or failed
+profile read.
+
 ## Imported posts
 
 An imported record uses the post schema with these rules:
@@ -92,6 +110,14 @@ An imported record uses the post schema with these rules:
   offset, set `timezoneResolved: false`, and file the record under the year of
   the raw date. Never assume a zone.
 - `pillar`, `why`, `targetMonth`, `scheduledFor`, `relatedTask` stay null.
+- Loose files are imported as published only when publication evidence is
+  attributable to the owner and includes an absolute publication date, such as
+  the owner's export timestamp or a supplied own-post URL and publication date.
+  A third-party original-post URL is not proof the owner reposted it. Relative
+  times without a capture anchor and event dates cannot fill `publishedAt`.
+  Metrics without a reading date stay as inventory evidence, not snapshots.
+  Otherwise keep them in the source inventory as uncertain and do not change
+  an existing record's status.
 - Every other export column goes under one `importFields:` mapping, as quoted
   strings under the export's own labels. Nothing from an export may set or
   override a schema key such as `status`, `source` or `metrics`.
@@ -111,6 +137,10 @@ Body: a table of slots (`date`, `pillar`, `working title`, `record`, `state`)
 followed by the dates and events the plan was built around. `record` is the
 **filename** of the post that fills the slot, or empty; never a path, because
 posts move between directories.
+
+For on-demand plans use `cadence: on_demand`; new idea rows have an empty date.
+Row order is priority (an optional priority column can make that explicit).
+Keep past rows and dates already recorded for scheduled or published posts.
 
 ## Review (`reviews/YYMM-review.md`, or `reviews/YYQn-review.md` for a quarter)
 

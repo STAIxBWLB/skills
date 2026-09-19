@@ -33,8 +33,10 @@ change nothing without the user's word.
    (the cut-off is approximate and varies by device), quoted. Say
    whether it states what the post is about. Do not rewrite it for hook value.
 4. **Facts to confirm**: every name, title, number, date, amount and quotation
-   in the post, as a list for the user to tick. Mark any that came from neither
-   the brief nor the configured CV source.
+   in the post, as a list for the user to tick. Mark the source for each factual
+   group; approved website, blog, project, or other configured sources may
+   support a claim, but do not override the CV for career facts. Mark anything
+   that came from neither the brief nor an approved configured source.
 5. **Mentions**: each person and organization to tag, as the user should type
    them. The user confirms each; tagging is the user's act.
 6. **Hashtags**: as they stand in the final text (the body is authoritative;
@@ -44,9 +46,10 @@ change nothing without the user's word.
    or text-heavy images without a text equivalent are reported.
 8. **Link**: when the post contains a URL, note that the user may prefer the
    link in the first comment and let them choose. Make no claim about reach.
-9. **Language**: when `linkedin.languages` has more than one entry and the post
-   exists in only one, ask whether a second version is wanted. Do not translate
-   unasked.
+9. **Language**: follow the requested language or `linkedin.default_language`.
+   Multiple entries in `linkedin.languages` are supported choices, not a
+   requirement to translate. With no settled preference, ask whether a second
+   version is wanted; do not translate unasked.
 10. **When**: the agreed `scheduledFor`. If it conflicts with the plan or with
     another scheduled post on the same day, say so.
 

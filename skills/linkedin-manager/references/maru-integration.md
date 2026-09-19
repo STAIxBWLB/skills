@@ -15,7 +15,9 @@ Maru can treat the configured LinkedIn root as a local-first data source.
 ├── reviews/
 ├── profile/
 │   ├── current.md
+│   ├── proposals/
 │   └── history/
+├── references/
 └── engagement/
 ```
 
@@ -23,12 +25,16 @@ Maru can treat the configured LinkedIn root as a local-first data source.
 
 - Read markdown files with YAML frontmatter; `type` distinguishes record kinds
   (`linkedin-post`, `linkedin-plan`, `linkedin-review`, `linkedin-profile`,
+  `linkedin-profile-proposal`, `linkedin-source-inventory`,
   `linkedin-engagement`).
 - Preserve unknown frontmatter keys.
 - Resolve the display label as `title -> filename`.
 - For a post, `status` is authoritative; the directory mirrors it. When they
   disagree, report it and trust `status`. `dropped` is the one exception: a
   dropped post stays in the directory it was in, and that is not a mismatch.
+- A legacy `published` status without a valid `publishedAt` is unresolved
+  archive evidence, not a dated publication. Preserve the record, surface the
+  gap, and exclude it from period totals as specified in `review-report.md`.
 - In a post body, only the text before the first line that is exactly
   `## Working notes` is the post.
 - A plan's `record` column holds a post filename; resolve it by searching the
@@ -67,6 +73,8 @@ proposal object:
   it for a terminal run. Never propose a `status` change that would leave the
   record in a directory that contradicts it.
 - `commands` stays empty: this skill runs no command against an outside service.
+- Setup proposals may describe pending YAML/config changes in `summary` and
+  `risks`, but must not emit YAML writes, shell commands, or external actions.
 - No dedicated review object is defined for this skill yet. Put what the user
   must confirm (mentions, facts to confirm, missing values) in `risks`, and
   repeat it in plain text after the JSON.
