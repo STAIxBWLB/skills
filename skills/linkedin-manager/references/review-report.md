@@ -19,17 +19,26 @@
   language.
 - Sums and means over measured posts, per field, with `n` stated.
 - Engagement rate only when the user asks or has used it before, defined
-  exactly as `(reactions + comments + reposts) / impressions`, per post, and
-  only for posts that have all four numbers.
-- Ranking of the user's own posts within the period, and comparison with the
-  previous period's review when that file exists.
+  exactly as `(reactions + comments + reposts) / impressions`, per post, only
+  for posts that have all four numbers and impressions above zero. State it as
+  a percentage with the inputs beside it.
+- Ranking of the user's own posts within the period, **only among posts whose
+  snapshot ages are within seven days of each other**. Posts outside that window
+  are shown with their values and left out of the ranking, and their numbers do
+  not enter a mean alongside the others without the age difference stated.
+- Comparison with the previous period uses that period's review file as it
+  stands, cited with its `generatedAt` and `revision`, and is subject to the
+  same age rule.
 - Show the inputs next to every derived figure so the user can check it.
 
 ## What the report may not do
 
 - Cite an outside benchmark, an industry average, or a platform "rule".
-- Explain a result causally from one or two posts. With fewer than about eight
-  measured posts, describe and do not generalize; say the sample is small.
+- Attribute a result to a cause at any sample size. These are observational
+  records: say which posts did better, never why, unless the user supplies the
+  reason. With fewer than about eight measured posts overall, or fewer than
+  three in a subgroup, give the values and say the sample is too small to
+  compare; the threshold is a reading convention, not a statistical test.
 - Estimate, interpolate or round away a missing value.
 - Report on followers, profile views or search appearances unless the user
   supplied those numbers for the period.

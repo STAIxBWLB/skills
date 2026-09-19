@@ -28,7 +28,10 @@ Maru can treat the configured LinkedIn root as a local-first data source.
 - Resolve the display label as `title -> filename`.
 - For a post, `status` is authoritative; the directory mirrors it. When they
   disagree, report it and trust `status`.
-- In a post body, only the text above the first `---` separator is the post.
+- In a post body, only the text before the first line that is exactly
+  `## Working notes` is the post.
+- A plan's `record` column holds a post filename; resolve it by searching the
+  lifecycle directories.
 
 ## App Fields
 
@@ -56,10 +59,11 @@ proposal object:
 
 - `operation` is `create` for a new record and `replace` for a changed one,
   with the full new content.
-- A status change that implies a directory move is proposed as a `replace` of
-  the file where it is, with the new `status`; name the intended move in
-  `risks`. The move itself happens on the approved-execution path, not as a
-  proposal file write.
+- The proposal object has no move operation. So propose as file writes only
+  what moves nothing: a new idea, a metrics snapshot, a profile record, a plan
+  or a review. Describe a transition that moves a file in `summary` and leave
+  it for a terminal run. Never propose a `status` change that would leave the
+  record in a directory that contradicts it.
 - `commands` stays empty: this skill runs no command against an outside service.
 - No dedicated review object is defined for this skill yet. Put what the user
   must confirm (mentions, facts to confirm, missing values) in `risks`, and

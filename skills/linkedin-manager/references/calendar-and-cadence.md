@@ -36,6 +36,7 @@ when the user asks for it. This skill reads no calendar service on its own.
 ## Reminders
 
 For each accepted slot, offer one reminder through `linkedin.skills.tasks` as a
-proposed handoff: title, date, and the path of the record. The task skill owns
+proposed handoff: title, date, and the filename of the record (not its path,
+which changes as the post moves). The task skill owns
 the task file and any calendar write. When it returns a task path, store it in
 the post's `relatedTask`.

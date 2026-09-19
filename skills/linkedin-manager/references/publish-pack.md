@@ -16,8 +16,9 @@ Character counts include spaces, line breaks, hashtags and emoji.
 | Experience description, per position | 2,000 |
 | Text shown before "see more" | roughly 140 on mobile, 210 on desktop |
 
-Source and date: third-party LinkedIn limit guides, read 2026-09. LinkedIn does
-not publish one canonical table and changes these without notice. Report the
+These are the values commonly reported by third-party LinkedIn guides as of
+2026-09; this file could not confirm them against one canonical LinkedIn
+table, and LinkedIn changes them without notice. Treat them as working values. Report the
 count and the limit; when a count is within 5% of a limit, tell the user to
 check it in the LinkedIn editor, which is the authority.
 
@@ -28,7 +29,8 @@ change nothing without the user's word.
 
 1. **Final text**, in a code block so line breaks and spacing survive the copy.
 2. **Count**: characters used and the limit.
-3. **Opening**: the text that shows before "see more" on mobile, quoted. Say
+3. **Opening**: an estimate of the text that shows before "see more" on mobile
+   (the cut-off is approximate and varies by device), quoted. Say
    whether it states what the post is about. Do not rewrite it for hook value.
 4. **Facts to confirm**: every name, title, number, date, amount and quotation
    in the post, as a list for the user to tick. Mark any that came from neither

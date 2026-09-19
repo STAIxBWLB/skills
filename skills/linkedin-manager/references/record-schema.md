@@ -2,7 +2,10 @@
 
 Every record is a markdown file with YAML frontmatter. Always write a
 human-readable `title`. Preserve keys you do not know. Dates are ISO
-(`YYYY-MM-DD`), times ISO with offset in the configured timezone.
+(`YYYY-MM-DD`). `scheduledFor` and `publishedAt` written by this skill carry the
+offset of `linkedin.timezone`; when no timezone is configured, ask before
+writing a time. The one exception is an imported timestamp whose timezone is
+unknown (§Imported posts).
 
 ## Post (`ideas/`, `drafts/`, `scheduled/`, `published/YYYY/`)
 
@@ -26,15 +29,16 @@ hashtags: []            # mirrors the hashtags in the body; the body is what get
 media: []               # file paths or descriptions, each with alt text
 source: null            # idea source link or path; for imports, the export file
 relatedTask: null       # set only when the task skill reports one
+readySkipped: false     # true when a post was recorded as published without `ready`
 metrics: []             # appended by `metrics`, never rewritten
 ---
 
 Post text exactly as it will be, or was, published, hashtags included. Every
 character count is taken from this text. An idea leaves it empty.
 
----
+## Working notes
 
-Working notes, alternatives, the brief. Not part of the post.
+Alternatives, the brief, earlier versions. Not part of the post.
 ```
 
 A metrics snapshot:
@@ -49,7 +53,14 @@ metrics:
     source: user            # user | export:<file>; written by the skill
 ```
 
-Rules: `source` is the only field the skill adds on its own. One snapshot per reading, appended in date order; omit a field the
+The post text is everything before the first line that is exactly
+`## Working notes`. That line is the only boundary: a `---` inside a post is
+post text. If a post itself must contain that exact line, indent it by one
+space in the record and say so in the notes.
+
+Rules: `source` is the only field the skill adds on its own. A correction is a
+new snapshot with the same `date`, `corrects: true` and `reason`; the last
+snapshot for a date is the effective one. One snapshot per reading, appended in date order; omit a field the
 source did not give; extra fields keep the label the user or the export used.
 The file moves between lifecycle directories as `status` changes and keeps its
 name. `dropped` files stay where they were.
@@ -58,47 +69,62 @@ name. `dropped` files stay where they were.
 
 An imported record uses the post schema with these rules:
 
-- Filename date is the publish date, not the import date.
+- Filename date is the publish date, not the import date. Apply the collision
+  rule: two posts on one day with the same slug get `-2`, `-3`.
+- `importKey`: the raw export timestamp, a `|`, and the first 60 characters of
+  the text. It identifies the post when the export has no `url`.
 - `title` is the first line of the text, cut at about 60 characters; `<slug>`
   is derived from it in lowercase ASCII, or `post-N` when nothing usable remains.
 - `created` equals the publish date. `language` is detected from the text.
 - `format`: `image`, `video` or `document` when the export shows media, `text`
   otherwise; a shared link stays `text` with the link kept in the body or under
   the export's own column label.
-- `publishedAt`: LinkedIn exports carry no timezone. Ask the user which
-  timezone the export uses; when unanswered,
-  write the value as given without an offset and say so. Never assume one.
+- `publishedAtRaw`: the timestamp exactly as the export gives it.
+- `publishedAt`: look at how this export writes its timestamps. When it states
+  an offset or zone, convert to `linkedin.timezone`. When it does not, ask the
+  user which zone the export uses; unanswered, copy the raw value without an
+  offset, set `timezoneResolved: false`, and file the record under the year of
+  the raw date. Never assume a zone.
 - `pillar`, `why`, `targetMonth`, `scheduledFor`, `relatedTask` stay null.
-- Other export columns are kept under their own labels.
+- Every other export column goes under one `importFields:` mapping, as quoted
+  strings under the export's own labels. Nothing from an export may set or
+  override a schema key such as `status`, `source` or `metrics`.
 
-## Plan (`calendar/YYMM-plan.md`)
+## Plan (`calendar/YYMM-plan.md`, or `calendar/YYQn-plan.md` for a quarter)
 
 ```yaml
 ---
 title: LinkedIn plan 2026-01
 type: linkedin-plan
-period: 2026-01
+period: 2026-01         # or 2026-Q1
 cadence: 1 per week
 ---
 ```
 
 Body: a table of slots (`date`, `pillar`, `working title`, `record`, `state`)
 followed by the dates and events the plan was built around. `record` is the
-path of the idea or draft that fills the slot, or empty.
+**filename** of the post that fills the slot, or empty; never a path, because
+posts move between directories.
 
-## Review (`reviews/YYMM-review.md`)
+## Review (`reviews/YYMM-review.md`, or `reviews/YYQn-review.md` for a quarter)
 
 ```yaml
 ---
 title: LinkedIn review 2026-01
 type: linkedin-review
-period: 2026-01
+period: 2026-01         # or 2026-Q1
+generatedAt: 2026-02-03
+revision: 1
 posts: 4
 measured: 3
 ---
 ```
 
-## Profile (`profile/current.md`, `profile/history/YYMMDD-profile.md`)
+A quarterly review reads the quarter's plan file when it exists, otherwise the
+three monthly plans. A replaced report is kept as
+`reviews/history/<name>-r<revision>.md`.
+
+## Profile (`profile/current.md`, `profile/history/YYMMDD-profile.md`; a second copy on one day gets `-2`)
 
 ```yaml
 ---
