@@ -26,6 +26,16 @@
       ]
     },
     {
+      "name": "yunmun",
+      "path": "skills/yunmun",
+      "tier": "core",
+      "tags": [
+        "korean",
+        "english",
+        "writing"
+      ]
+    },
+    {
       "name": "business-unit-lifecycle",
       "path": "skills/business-unit-lifecycle",
       "tier": "core",
