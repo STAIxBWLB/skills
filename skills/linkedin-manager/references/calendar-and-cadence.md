@@ -15,7 +15,9 @@ when the user asks for it. This skill reads no calendar service on its own.
 ## Building the plan
 
 - Fill dated slots first (a post tied to an event goes near the event), then
-  spread the rest across preferred days at the configured cadence.
+  spread the rest across preferred days at the configured cadence. When there
+  are more preferred days than posts per week, propose the first preferred day
+  and let the user change it.
 - Rotate pillars when pillars are configured; say so when the open ideas cannot
   support a rotation rather than inventing topics to fill it.
 - An empty slot is a valid result. List it as open and suggest capturing ideas;

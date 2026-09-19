@@ -50,8 +50,9 @@ file's top-level key is still `linkedin`. When both exist, the main config wins.
 
 ## Runtime Rules
 
-- Expand `~` before using paths. Relative `cv_source` resolves from the
-  directory of `workspace.config.yaml`.
+- Expand `~` before using paths. A relative `root` or `cv_source` resolves from
+  the directory of `workspace.config.yaml`, also when the section was read
+  through a pointer file that lives elsewhere.
 - Every key except `root` is optional. A missing `cadence` means the plan asks
   the user for one; missing `pillars` means posts carry no pillar; a missing
   `skills.*` entry means that handoff is not offered.

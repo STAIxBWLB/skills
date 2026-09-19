@@ -60,8 +60,9 @@ proposal object:
 - `operation` is `create` for a new record and `replace` for a changed one,
   with the full new content.
 - The proposal object has no move operation. So propose as file writes only
-  what moves nothing: a new idea, a metrics snapshot, a profile record, a plan
-  or a review. Describe a transition that moves a file in `summary` and leave
+  what moves nothing, for example a new idea, a metrics snapshot, a profile
+  record, a plan or a review, an in-place drop or restore, a `url` or
+  `publishedAt` correction. `files` may be empty. Describe a transition that moves a file in `summary` and leave
   it for a terminal run. Never propose a `status` change that would leave the
   record in a directory that contradicts it.
 - `commands` stays empty: this skill runs no command against an outside service.

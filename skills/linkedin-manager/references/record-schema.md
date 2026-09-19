@@ -2,7 +2,8 @@
 
 Every record is a markdown file with YAML frontmatter. Always write a
 human-readable `title`. Preserve keys you do not know. Dates are ISO
-(`YYYY-MM-DD`). `scheduledFor` and `publishedAt` written by this skill carry the
+(`YYYY-MM-DD`). `scheduledFor` may be a date alone. A time written by this skill
+(`publishedAt`, or `scheduledFor` when the user gave a time) carries the
 offset of `linkedin.timezone`; when no timezone is configured, ask before
 writing a time. The one exception is an imported timestamp whose timezone is
 unknown (§Imported posts).
@@ -30,7 +31,7 @@ media: []               # file paths or descriptions, each with alt text
 source: null            # idea source link or path; for imports, the export file
 relatedTask: null       # set only when the task skill reports one
 readySkipped: false     # true when a post was recorded as published without `ready`
-metrics: []             # appended by `metrics`, never rewritten
+metrics: []             # `metrics` adds snapshots in date order; existing ones are never edited
 ---
 
 Post text exactly as it will be, or was, published, hashtags included. Every
@@ -56,11 +57,14 @@ metrics:
 The post text is everything before the first line that is exactly
 `## Working notes`. That line is the only boundary: a `---` inside a post is
 post text. If a post itself must contain that exact line, indent it by one
-space in the record and say so in the notes.
+space in the record and say so in the notes. A record with no `## Working notes`
+line is all post text; when such a record looks as if it holds notes below a
+bare `---`, report it and ask before treating any of it as notes.
 
 Rules: `source` is the only field the skill adds on its own. A correction is a
-new snapshot with the same `date`, `corrects: true` and `reason`; the last
-snapshot for a date is the effective one. One snapshot per reading, appended in date order; omit a field the
+new snapshot with the same `date`, `corrects: true` and `reason`, repeating the
+whole reading with the corrected values and the unretracted fields copied over;
+the last snapshot written for a date is the effective one. One snapshot per reading, appended in date order; omit a field the
 source did not give; extra fields keep the label the user or the export used.
 The file moves between lifecycle directories as `status` changes and keeps its
 name. `dropped` files stay where they were.
@@ -72,7 +76,9 @@ An imported record uses the post schema with these rules:
 - Filename date is the publish date, not the import date. Apply the collision
   rule: two posts on one day with the same slug get `-2`, `-3`.
 - `importKey`: the raw export timestamp, a `|`, and the first 60 characters of
-  the text. It identifies the post when the export has no `url`.
+  the text with all whitespace collapsed to single spaces, written as a quoted
+  string. It identifies the post when the export has no `url`.
+- `<slug>` is at most six words. `topic` stays null unless the user supplies it.
 - `title` is the first line of the text, cut at about 60 characters; `<slug>`
   is derived from it in lowercase ASCII, or `post-N` when nothing usable remains.
 - `created` equals the publish date. `language` is detected from the text.
@@ -82,7 +88,7 @@ An imported record uses the post schema with these rules:
 - `publishedAtRaw`: the timestamp exactly as the export gives it.
 - `publishedAt`: look at how this export writes its timestamps. When it states
   an offset or zone, convert to `linkedin.timezone`. When it does not, ask the
-  user which zone the export uses; unanswered, copy the raw value without an
+  user which zone the export uses; unanswered, write the raw value in ISO form (`YYYY-MM-DDTHH:MM:SS`) without an
   offset, set `timezoneResolved: false`, and file the record under the year of
   the raw date. Never assume a zone.
 - `pillar`, `why`, `targetMonth`, `scheduledFor`, `relatedTask` stay null.

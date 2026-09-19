@@ -110,8 +110,11 @@ closest mode; when two fit, ask.
 changes nothing unless the user is correcting `url` or `publishedAt`; confirm
 the correction and note it in the working notes. Recording a post that went out
 without passing through `ready` (from `idea` or `draft`) is allowed, because the
-record must match reality: confirm once, then set `readySkipped: true`. Any
-other transition is refused with the legal options listed.
+record must match reality: confirm once, set `readySkipped: true`, and say so in
+the working notes. Any other transition is refused with the legal options
+listed; for a published record say that the only changes left are a `url` or
+`publishedAt` correction and new metrics. Drop and restore each leave a dated
+line in the working notes.
 
 ### idea
 
@@ -122,7 +125,9 @@ the user's note, and ask when it is mixed or when `linkedin.languages` has
 several entries and the note does not settle it. Record a `source` path or link
 exactly as given and say when it does not resolve; do not open it to mine facts
 unless the user asks. Do not draft: the post text (everything before `## Working
-notes`) stays empty. If the note carries several ideas, split them and say so.
+notes`) stays empty. `title` is a short label taken from the note and the slug
+is derived from it, at most six words. Before writing, look for an open idea
+or draft on the same topic and show it instead of silently creating a second. If the note carries several ideas, split them and say so.
 
 ### plan
 
@@ -134,7 +139,8 @@ write it. For each planned slot, offer a reminder as a handoff to
 
 ### draft
 
-Promote an idea to `drafts/`. When `linkedin.skills.writer` is configured and
+Promote an idea to `drafts/`. With neither a brief nor a usable writer, ask for
+the brief first and do not move the file. When `linkedin.skills.writer` is configured and
 installed, hand off with the idea file as the brief and store the returned text
 in the record body. Otherwise draft plainly from the brief per
 `references/publish-pack.md` §Without a writer skill. Then offer the polish
@@ -149,7 +155,8 @@ appear before "see more", hashtags, the mention list for confirmation, media
 and alt-text checklist, and the link-in-first-comment note when the post
 carries a link. Work in this order: (1) show the pack, (2) list the open
 questions and issues, fixing nothing silently, (3) wait for the user's go, (4)
-only then write `scheduledFor`, set `status: scheduled` and move the file to
+only then write `scheduledFor` (a date alone is fine; add a time and offset only
+when the user gives a time), set `status: scheduled` and move the file to
 `scheduled/`. Remind the user that posting is theirs to do.
 
 ### published
@@ -158,9 +165,11 @@ The user supplies the post URL and the posting date and time. Record `url` and
 `publishedAt` with the offset of `linkedin.timezone` (ask when no timezone is
 configured), set `status: published`, and move the file to `published/YYYY/`,
 where `YYYY` is the year of `publishedAt` in that timezone, never the year of
-the filename or of today. Ask whether the text that went out differs from the
+the filename or of today. Accept the URL as given, but say so when it is not a
+full `https://` LinkedIn link, and question a `publishedAt` that lies in the
+future or before `created`. Ask whether the text that went out differs from the
 record. If it does, replace only the post text with what was posted, move the
-previous text into the working notes under a dated line, and leave the rest of
+previous text into the working notes under a line dated today, and leave the rest of
 the notes intact.
 
 ### metrics
@@ -169,8 +178,10 @@ Append one snapshot per reading: `{date, impressions, reactions, comments,
 reposts}` plus any other fields the user supplies, with the user's own labels.
 Never overwrite an earlier snapshot, never fill an omitted field, never
 estimate. To fix a mistyped reading, append a new snapshot with the same `date`,
-`corrects: true` and a `reason`; for any date the last snapshot written is the
-effective one and earlier ones stay as history. A late reading for an earlier
+`corrects: true` and a `reason`. A correction repeats the whole reading: the
+corrected fields take the new values and every field the user did not retract
+is copied from the snapshot it corrects. For any date the last snapshot written
+is the effective one and earlier ones stay as history. A late reading for an earlier
 date is inserted in date order. From an analytics export, read `.xlsx` through the workspace's
 spreadsheet skill and `.csv` directly, show the rows you matched to posts by
 URL, and ask before writing.
@@ -238,11 +249,13 @@ composing record content, `[phase:proposal]` when preparing the JSON object,
 or `[phase:error]`. Return exactly one
 `maru_skill_proposal_v1` object with the markdown file writes; items the user
 must confirm go in its `risks` and are repeated in plain text. Only writes that
-move no file are proposed as file writes (a new idea, a metrics snapshot, a
-profile record, a plan or review). A transition that moves a file is described
+move no file are proposed as file writes: for example a new idea, a metrics
+snapshot, a profile record, a plan or review, an in-place drop or restore, a
+`url` or `publishedAt` correction. A transition that moves a file is described
 in `summary` and left for a terminal run; do not propose a status change that
-would leave a record in the wrong directory. Shape, how a
-status change is proposed, and allowed handoffs: `references/maru-integration.md`. Terminal use of this skill is unchanged by
+would leave a record in the wrong directory. An empty `files` list is valid when
+nothing can be written. Shape and allowed handoffs:
+`references/maru-integration.md`. Terminal use of this skill is unchanged by
 this section.
 
 ## References

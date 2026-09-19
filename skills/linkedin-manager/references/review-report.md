@@ -5,7 +5,8 @@
 ## Selection
 
 - Posts with `status: published` and `publishedAt` inside the period.
-- For each post use its **latest** snapshot. Give the snapshot's date and its
+- For each post use its **latest** snapshot: the latest `date`, and when that
+  date has several snapshots (a correction), the last one written. Give the snapshot's date and its
   age in days since posting: readings taken at different ages are not
   comparable, and the report says so where ages differ by more than a week.
 - A post with no snapshot is **unmeasured**. It appears in the table with empty
@@ -56,7 +57,7 @@ difference among the user's own posts, stated with its n>
 | Date | Title | Pillar | Format | Impressions | Reactions | Comments | Reposts | Snapshot age |
 
 ## By pillar and format
-<counts and means with n; omit a grouping that has one member>
+<counts and means with n; leave out a pillar or format that has only one post>
 
 ## Plan versus actual
 <slots planned, published, dropped, still open, from the period's plan file>
