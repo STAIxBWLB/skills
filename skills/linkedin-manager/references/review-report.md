@@ -5,6 +5,10 @@
 ## Selection
 
 - Posts with `status: published` and `publishedAt` inside the period.
+- Legacy records with a missing/invalid `publishedAt` cannot be assigned to a
+  period. List them separately as unresolved archive records and exclude them
+  from published counts, metrics, and rankings. Never infer a date from the
+  directory or filename, and never silently change their status.
 - For each post use its **latest** snapshot: the latest `date`, and when that
   date has several snapshots (a correction), the last one written. Give the snapshot's date and its
   age in days since posting: readings taken at different ages are not

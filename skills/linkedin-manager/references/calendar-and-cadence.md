@@ -14,6 +14,13 @@ when the user asks for it. This skill reads no calendar service on its own.
 
 ## Building the plan
 
+When `linkedin.cadence.mode` is `on_demand`, keep the same table but leave the
+`date` column empty for new ideas and order rows by source readiness and user
+priority. The period is a planning label only. Preserve past rows and recorded
+scheduled/published dates. Do not infer new posting dates or times. A later
+user-supplied posting date may be recorded without changing the channel's
+cadence. When the mode is missing or `weekly`, use the weekly behavior below.
+
 - Fill dated slots first (a post tied to an event goes near the event), then
   spread the rest across preferred days at the configured cadence. When there
   are more preferred days than posts per week, propose the first preferred day
@@ -37,8 +44,8 @@ when the user asks for it. This skill reads no calendar service on its own.
 
 ## Reminders
 
-For each accepted slot, offer one reminder through `linkedin.skills.tasks` as a
+For each accepted, dated slot, offer one reminder through `linkedin.skills.tasks` as a
 proposed handoff: title, date, and the filename of the record (not its path,
 which changes as the post moves). The task skill owns
 the task file and any calendar write. When it returns a task path, store it in
-the post's `relatedTask`.
+the post's `relatedTask`. Undated on-demand rows have no reminder handoff.
