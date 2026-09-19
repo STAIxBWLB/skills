@@ -27,7 +27,8 @@ Maru can treat the configured LinkedIn root as a local-first data source.
 - Preserve unknown frontmatter keys.
 - Resolve the display label as `title -> filename`.
 - For a post, `status` is authoritative; the directory mirrors it. When they
-  disagree, report it and trust `status`.
+  disagree, report it and trust `status`. `dropped` is the one exception: a
+  dropped post stays in the directory it was in, and that is not a mismatch.
 - In a post body, only the text before the first line that is exactly
   `## Working notes` is the post.
 - A plan's `record` column holds a post filename; resolve it by searching the

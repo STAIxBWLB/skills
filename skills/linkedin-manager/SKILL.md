@@ -66,8 +66,10 @@ the source of truth; LinkedIn itself is only ever touched by the user.
   Resolve each through `linkedin.paths`, falling back to the name itself.
 - Preserve unknown frontmatter keys. Never delete or overwrite a record; a post
   that will not run gets `status: dropped`.
-- **Never write over an existing file.** Before every create or move, check the
-  destination. On a collision keep the existing file and give the new one a
+- **Never write over an existing file.** Before every create, look for the
+  filename in **every** lifecycle directory (`ideas/`, `drafts/`, `scheduled/`,
+  every `published/YYYY/`), not only the destination; before every move, check
+  the destination. On a collision keep the existing file and give the new one a
   numeric suffix before the extension (`-2`, `-3`). Filenames are unique across
   all lifecycle directories, so a filename identifies a post wherever it sits.
 - **Refer to posts by filename, not by path**, in plans, reminders and logs;
