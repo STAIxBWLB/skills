@@ -45,8 +45,14 @@ skill. The user may scope processing with `inbox-process <channel>`.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
-   - `.pdf`, `.docx`, `.pptx`, `.xlsx`, `.hwpx`, `.hwp`, `.txt`, `.md`, and
-     `.csv` should use the closest installed public toolkit or platform reader.
+   - Prefer the native route when its tool is installed: `.hwp`/`.hwpx` via
+     `hwp cat --format markdown` (keeps tables, merged cells and image
+     positions), `.xlsx` via `xlsx-toolkit`, `.pptx` via `pptx-toolkit`.
+     `.docx`, `.txt`, `.md`, and `.csv` use the closest installed public
+     toolkit or platform reader.
+   - Formats with no native route (`.pdf`, `.epub`, `.msg`, `.html`, images)
+     fall back to `markitdown <file>` when it is installed. It is a read-only
+     text extractor here; never use it to generate or convert documents.
    - Unsupported binaries stay pending with a clear `failed` reason.
 5. Create `inbox.naming.summary_file` with the required frontmatter and
    exactly three body sections: `## 요약`, `## 핵심`, `## 실행`.
