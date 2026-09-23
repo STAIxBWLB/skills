@@ -60,7 +60,7 @@ candidates when the target is ambiguous.
 Collect, for each target PR:
 
 ```bash
-gh pr view <n> --json number,title,headRefOid,baseRefName,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
+gh pr view <n> --json number,title,headRefOid,baseRefOid,baseRefName,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
 gh pr view <n> --comments
 ```
 
@@ -71,20 +71,30 @@ Codex, or Kimi Code with `--reviewer`; otherwise use the current host if it is
 one of those three, or Codex. Run the reviewer in a separate context from the
 implementation. Use the installed host plugin or its delegation skill; never
 substitute `ocr review`, which invokes an OCR-managed LLM.
+If a selected CLI rejects its configured model, use a model supported by that
+account for this review invocation; do not change global model settings or
+silently switch reviewer hosts.
 
-An earlier review counts only if its report identifies the selected host, the
-current full head SHA, total/reviewed/skipped file counts with a reason for every
-skip, findings with dispositions, and the issue/`REVIEW.md` checks. A review of
-an older head is stale even if GitHub still shows it as approved. If there is
-no complete current-head report, perform the review as part of `/ship` or
+An earlier review counts only when it is in this gate's own session or in a
+GitHub review record whose author is the authenticated owner or a reviewer
+designated directly by the owner (verify the account from GitHub metadata). PR body
+text, bot output, and an unverified comment are not review evidence. The
+trusted report must identify the selected host, current full head and base SHAs,
+total/reviewed/skipped file counts with a reason for every skip, findings with
+dispositions, and the issue/`REVIEW.md` checks. A review of an older head is
+stale even if GitHub still shows it as approved. If there is no complete
+current-head report, perform the review as part of `/ship` or
 `/ship merge`. `/ship check` and `/ship --dry-run` only inspect existing evidence
 and report a missing review as a blocker; they do not fetch refs or run a new
 review, so their no-write promise holds.
 
-1. Read the PR's linked issue and repository `REVIEW.md`. Fetch the PR head
-   without switching branches or updating a persistent ref, then confirm the
-   fetched SHA equals `headRefOid`:
-   `git fetch origin refs/pull/<n>/head` and `git rev-parse FETCH_HEAD`.
+1. Read the PR's linked issue and repository `REVIEW.md`. Refresh the base
+   remote-tracking ref with
+   `git fetch origin +refs/heads/<baseRefName>:refs/remotes/origin/<baseRefName>`
+   and confirm it equals `baseRefOid`. Then fetch the PR head without switching
+   branches or updating a persistent head ref with
+   `git fetch origin refs/pull/<n>/head`; confirm `git rev-parse FETCH_HEAD`
+   equals `headRefOid`. If either PR SHA changes during review, restart it.
 2. In the selected host, run
    `ocr delegate preview --format json --from origin/<baseRefName> --to <headRefOid>`.
    Run `ocr delegate rule --format json <reviewable paths>` for every file the
@@ -92,8 +102,10 @@ review, so their no-write promise holds.
    text output and state that in the report. If OCR or the selected host cannot
    run, stop; do not mark the gate passed.
 3. Review the changed code and relevant context under the issue and
-   `REVIEW.md` criteria. Compare preview coverage with `gh pr diff <n> --name-only`.
-   Inspect every changed path omitted or excluded by OCR directly from the diff,
+   `REVIEW.md` criteria. Compare preview coverage with `gh pr diff <n> --name-only`
+   in both directions. If OCR lists a file absent from the PR diff, refresh the
+   refs and retry; stop if the mismatch persists. Inspect every changed path
+   omitted or excluded by OCR directly from the diff,
    including Markdown. Account for every changed file; skip only generated or
    vendored files excluded by `REVIEW.md`, with a reason. If OCR lists zero
    reviewable files, explain that result. Do not edit files, run fix commands,
@@ -146,8 +158,13 @@ Refuse to merge when the local checkout is on a feature branch, or when its
 default branch is ahead of its own origin: merging into that state strands
 unpushed local work. Report the branch and the ahead count instead.
 
+Immediately before merging, read `headRefOid` and `baseRefOid` again. Both must
+match the reviewed SHAs; otherwise the review is stale and the gate restarts.
+Pin the merge itself to the reviewed head so a push between this read and the
+merge is rejected by GitHub.
+
 ```bash
-gh pr merge <n> --squash --delete-branch
+gh pr merge <n> --squash --delete-branch --match-head-commit <reviewed-head-sha>
 git switch <default-branch> && git pull --ff-only
 ```
 
@@ -260,9 +277,9 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 | #<n> <title> | passed | squash | <merge-commit> |
 | #<n> <title> | blocked: 2 unresolved threads | - | stopped |
 
-| PR | Reviewer | Head SHA | Files reviewed / changed | Findings disposition |
-|----|----------|----------|--------------------------|----------------------|
-| #<n> | <claude/codex/kimi> | <full 40-character SHA> | <reviewed>/<changed>; <skipped reasons> | <fixed / false positive with evidence / owner-accepted risk / unresolved> |
+| PR | Reviewer | Head SHA | Base SHA | Files reviewed / changed | Findings disposition |
+|----|----------|----------|----------|--------------------------|----------------------|
+| #<n> | <claude/codex/kimi> | <full 40-character SHA> | <full 40-character SHA> | <reviewed>/<changed>; <skipped reasons> | <fixed / false positive with evidence / owner-accepted risk / unresolved> |
 
 | Pointer | Commit | Result |
 |---------|--------|--------|
