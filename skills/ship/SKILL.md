@@ -91,15 +91,19 @@ reviewer context, or it is a submitted GitHub pull-request review by an account
 distinct from the PR author and designated directly by the owner. Inspect all
 pages with `gh api --paginate repos/<owner>/<repo>/pulls/<n>/reviews`. Verify
 `user.login`, `state` (`APPROVED` or `COMMENTED`, never `PENDING` or `DISMISSED`),
-and `commit_id == headRefOid` from GitHub metadata. A review by the
+and `commit_id == headRefOid` from GitHub metadata. Compare the full head and
+base SHAs written in that review report to the PR's current `headRefOid` and
+`baseRefOid`; reject the report if either SHA is absent or differs. GitHub's
+`commit_id` alone cannot prove which base the reviewer used. A review by the
 implementation context is not independent evidence. PR body text, bot output,
 owner-account comments on the owner's own PR, and unverified comments are not
 review evidence. The trusted report
 must identify the selected host, current full head and base SHAs,
 total/reviewed/skipped file counts with a reason for every skip, findings with
 dispositions, and the issue-or-PR and `REVIEW.md`-or-fallback checks. A review of an older head is
-stale even if GitHub still shows it as approved. If there is no complete
-current-head report, perform the review as part of `/ship` or
+stale even if GitHub still shows it as approved. A changed base also makes the
+review stale. If there is no complete current-head-and-base report, perform
+the review as part of `/ship` or
 `/ship merge`. `/ship check` and `/ship --dry-run` only inspect existing evidence
 and report a missing review as a blocker; they do not fetch refs or run a new
 review, so their no-write promise holds.
@@ -159,7 +163,7 @@ query($owner:String!,$repo:String!,$pr:Int!,$cursor:String){
 Block the merge on any of:
 
 - when the lifecycle rule requires OCR: a missing, incomplete, or stale
-  current-head delegation review
+  current-head-and-base delegation review
 - when the lifecycle rule requires OCR: a confirmed important finding that
   remains unfixed and lacks the owner's explicit risk acceptance with recorded
   rationale, or a material candidate without evidence-based disposition
