@@ -60,7 +60,7 @@ candidates when the target is ambiguous.
 Collect, for each target PR:
 
 ```bash
-gh pr view <n> --json number,title,headRefOid,baseRefOid,baseRefName,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
+gh pr view <n> --json number,title,author,headRefOid,baseRefOid,baseRefName,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
 gh pr view <n> --comments
 ```
 
@@ -69,26 +69,34 @@ current full `headRefOid` before merge. This applies to every development PR,
 including small fixes and documentation PRs. The owner may choose Claude Code,
 Codex, or Kimi Code with `--reviewer`; otherwise use the current host if it is
 one of those three, or Codex. Run the reviewer in a separate context from the
-implementation. Use the installed host plugin or its delegation skill; never
+implementation, in the host's read-only or plan mode when available (Claude Code
+`--permission-mode plan`, Codex `-s read-only`, Kimi Code `--plan`). Use the
+installed host plugin or its delegation skill; never
 substitute `ocr review`, which invokes an OCR-managed LLM.
 If a selected CLI rejects its configured model, use a model supported by that
 account for this review invocation; do not change global model settings or
 silently switch reviewer hosts.
 
 An earlier review counts only when it is in this gate's own session or in a
-GitHub review record whose author is the authenticated owner or a reviewer
-designated directly by the owner (verify the account from GitHub metadata). PR body
-text, bot output, and an unverified comment are not review evidence. The
-trusted report must identify the selected host, current full head and base SHAs,
+GitHub pull-request review by an account distinct from the PR author and
+designated directly by the owner. Verify the review's author and `commit_id`
+through `gh api repos/<owner>/<repo>/pulls/<n>/reviews`; `commit_id` must equal
+`headRefOid`. PR body text, bot output, owner-account comments on the owner's
+own PR, and unverified comments are not review evidence. The trusted report
+must identify the selected host, current full head and base SHAs,
 total/reviewed/skipped file counts with a reason for every skip, findings with
-dispositions, and the issue/`REVIEW.md` checks. A review of an older head is
+dispositions, and the issue-or-PR and `REVIEW.md`-or-fallback checks. A review of an older head is
 stale even if GitHub still shows it as approved. If there is no complete
 current-head report, perform the review as part of `/ship` or
 `/ship merge`. `/ship check` and `/ship --dry-run` only inspect existing evidence
 and report a missing review as a blocker; they do not fetch refs or run a new
 review, so their no-write promise holds.
 
-1. Read the PR's linked issue and repository `REVIEW.md`. Refresh the base
+1. Read the PR's linked issue if present; otherwise use the PR description as
+   the Light-tier contract. Read repository `REVIEW.md`. If a Light-tier repo
+   has no `REVIEW.md`, use Bugs/Security/Compliance passes and its local agent
+   instructions; missing `REVIEW.md` alone neither skips nor blocks review.
+   Refresh the base
    remote-tracking ref with
    `git fetch origin +refs/heads/<baseRefName>:refs/remotes/origin/<baseRefName>`
    and confirm it equals `baseRefOid`. Then fetch the PR head without switching
@@ -101,8 +109,8 @@ review, so their no-write promise holds.
    preview lists. If the installed OCR version lacks `--format json`, use its
    text output and state that in the report. If OCR or the selected host cannot
    run, stop; do not mark the gate passed.
-3. Review the changed code and relevant context under the issue and
-   `REVIEW.md` criteria. Compare preview coverage with `gh pr diff <n> --name-only`
+3. Review the changed code and relevant context under the issue and applicable
+   review criteria. Compare preview coverage with `gh pr diff <n> --name-only`
    in both directions. If OCR lists a file absent from the PR diff, refresh the
    refs and retry; stop if the mismatch persists. Inspect every changed path
    omitted or excluded by OCR directly from the diff,
@@ -113,12 +121,13 @@ review, so their no-write promise holds.
 4. Independently check each important candidate against the issue, PR evidence,
    and code. Record confirmed findings, evidence-backed false positives, and
    unresolved questions separately. A finding is not an automatic veto or fix.
-   Put the review host, head SHA, coverage, and dispositions in the gate report.
+   Put the review host, head/base SHAs, OCR output mode, coverage, issue-or-PR
+   and `REVIEW.md`-or-fallback checks, and dispositions in the gate report.
 
 Block merge when that review is missing, incomplete, or stale; when a confirmed
-important finding remains unfixed; or when a material candidate remains
-unadjudicated. An accepted risk requires the owner's explicit decision and a
-recorded rationale. Review completion alone never grants merge authorization.
+important finding remains unfixed and unaccepted by the owner with recorded
+rationale; or when a material candidate remains unadjudicated. Review
+completion alone never grants merge authorization.
 
 Then list review threads, paginating while `hasNextPage` is true:
 
@@ -136,7 +145,8 @@ query($owner:String!,$repo:String!,$pr:Int!,$cursor:String){
 Block the merge on any of:
 
 - a missing, incomplete, or stale current-head delegation review
-- a confirmed important finding that remains unfixed, or a material candidate
+- a confirmed important finding that remains unfixed and lacks the owner's
+  explicit risk acceptance with recorded rationale, or a material candidate
   without evidence-based disposition
 - a review thread with `isResolved: false`
 - `reviewDecision` of `CHANGES_REQUESTED`
@@ -277,9 +287,16 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 | #<n> <title> | passed | squash | <merge-commit> |
 | #<n> <title> | blocked: 2 unresolved threads | - | stopped |
 
-| PR | Reviewer | Head SHA | Base SHA | Files reviewed / changed | Findings disposition |
-|----|----------|----------|----------|--------------------------|----------------------|
-| #<n> | <claude/codex/kimi> | <full 40-character SHA> | <full 40-character SHA> | <reviewed>/<changed>; <skipped reasons> | <fixed / false positive with evidence / owner-accepted risk / unresolved> |
+Review receipt for #<n>:
+- Source: <current gate session or trusted GitHub review URL and commit_id>
+- Host: <claude/codex/kimi>; OCR output: <json/text>
+- Head SHA: <full 40-character SHA>; base SHA: <full 40-character SHA>
+- Files: <changed total> changed; <OCR reviewable> selected; <reviewed> reviewed;
+  <skipped> skipped with reasons
+- Issue/PR criteria: <checked items and evidence>;
+  REVIEW.md/fallback: <checked passes>
+- Findings: <fixed / evidence-backed false positive / owner-accepted risk with
+  rationale / unresolved, with location and evidence>
 
 | Pointer | Commit | Result |
 |---------|--------|--------|
