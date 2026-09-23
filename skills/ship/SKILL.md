@@ -46,6 +46,7 @@ Without a workspace config, degrade: gate, merge, and deploy still run against
 /ship <pr-number>      # scope to one pull request
 /ship --all            # every mergeable open PR, oldest first
 /ship --dry-run        # print the plan, touch nothing
+/ship <pr-number> --reviewer <claude|codex|kimi>  # select the review host
 ```
 
 With no PR number and no `--all`, resolve the PR from the current branch, and
@@ -59,9 +60,53 @@ candidates when the target is ambiguous.
 Collect, for each target PR:
 
 ```bash
-gh pr view <n> --json number,title,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
+gh pr view <n> --json number,title,headRefOid,baseRefName,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup
 gh pr view <n> --comments
 ```
+
+Require a completed, read-only Open Code Review **delegation** review of the
+current full `headRefOid` before merge. This applies to every development PR,
+including small fixes and documentation PRs. The owner may choose Claude Code,
+Codex, or Kimi Code with `--reviewer`; otherwise use the current host if it is
+one of those three, or Codex. Run the reviewer in a separate context from the
+implementation. Use the installed host plugin or its delegation skill; never
+substitute `ocr review`, which invokes an OCR-managed LLM.
+
+An earlier review counts only if its report identifies the selected host, the
+current full head SHA, total/reviewed/skipped file counts with a reason for every
+skip, findings with dispositions, and the issue/`REVIEW.md` checks. A review of
+an older head is stale even if GitHub still shows it as approved. If there is
+no complete current-head report, perform the review as part of `/ship` or
+`/ship merge`. `/ship check` and `/ship --dry-run` only inspect existing evidence
+and report a missing review as a blocker; they do not fetch refs or run a new
+review, so their no-write promise holds.
+
+1. Read the PR's linked issue and repository `REVIEW.md`. Fetch the PR head
+   without switching branches or updating a persistent ref, then confirm the
+   fetched SHA equals `headRefOid`:
+   `git fetch origin refs/pull/<n>/head` and `git rev-parse FETCH_HEAD`.
+2. In the selected host, run
+   `ocr delegate preview --format json --from origin/<baseRefName> --to <headRefOid>`.
+   Run `ocr delegate rule --format json <reviewable paths>` for every file the
+   preview lists. If the installed OCR version lacks `--format json`, use its
+   text output and state that in the report. If OCR or the selected host cannot
+   run, stop; do not mark the gate passed.
+3. Review the changed code and relevant context under the issue and
+   `REVIEW.md` criteria. Compare preview coverage with `gh pr diff <n> --name-only`.
+   Inspect every changed path omitted or excluded by OCR directly from the diff,
+   including Markdown. Account for every changed file; skip only generated or
+   vendored files excluded by `REVIEW.md`, with a reason. If OCR lists zero
+   reviewable files, explain that result. Do not edit files, run fix commands,
+   or post review comments automatically.
+4. Independently check each important candidate against the issue, PR evidence,
+   and code. Record confirmed findings, evidence-backed false positives, and
+   unresolved questions separately. A finding is not an automatic veto or fix.
+   Put the review host, head SHA, coverage, and dispositions in the gate report.
+
+Block merge when that review is missing, incomplete, or stale; when a confirmed
+important finding remains unfixed; or when a material candidate remains
+unadjudicated. An accepted risk requires the owner's explicit decision and a
+recorded rationale. Review completion alone never grants merge authorization.
 
 Then list review threads, paginating while `hasNextPage` is true:
 
@@ -78,6 +123,9 @@ query($owner:String!,$repo:String!,$pr:Int!,$cursor:String){
 
 Block the merge on any of:
 
+- a missing, incomplete, or stale current-head delegation review
+- a confirmed important finding that remains unfixed, or a material candidate
+  without evidence-based disposition
 - a review thread with `isResolved: false`
 - `reviewDecision` of `CHANGES_REQUESTED`
 - `isDraft: true`
@@ -211,6 +259,10 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 |----|------|-------|--------|
 | #<n> <title> | passed | squash | <merge-commit> |
 | #<n> <title> | blocked: 2 unresolved threads | - | stopped |
+
+| PR | Reviewer | Head SHA | Files reviewed / changed | Findings disposition |
+|----|----------|----------|--------------------------|----------------------|
+| #<n> | <claude/codex/kimi> | <full 40-character SHA> | <reviewed>/<changed>; <skipped reasons> | <fixed / false positive with evidence / owner-accepted risk / unresolved> |
 
 | Pointer | Commit | Result |
 |---------|--------|--------|
