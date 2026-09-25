@@ -3,14 +3,18 @@
 The bundled `skills/hwpx` source tree was retired in favor of the single
 official-document `hwp` skill exported by the released
 [STAIxBWLB/hwp-cli v0.12.1](https://github.com/STAIxBWLB/hwp-cli/releases/tag/v0.12.1)
-binary. The minimum supported release is `v0.12.1`, commit
-`fa2d86776af7226b34a5a6f43081e8f3adef56c8`.
+binary (commit `fa2d86776af7226b34a5a6f43081e8f3adef56c8`). The minimum supported
+release is now
+[`v0.20.2`](https://github.com/STAIxBWLB/hwp-cli/releases/tag/v0.20.2), commit
+`f2bc301cd50f09bca470ec0d633b571da5b36a01`: it refuses HWPX files nested past its
+depth bound instead of crashing on them, and lays out nested tables in polynomial
+time, both of which matter when the binary reads untrusted input.
 
 Use a versioned release asset and an absolute binary path. A checkout build or
 an unversioned PATH binary is not replacement evidence.
 
 ```sh
-HWP_BIN=/absolute/path/to/hwp-v0.12.1/hwp
+HWP_BIN=/absolute/path/to/hwp-v0.20.2/hwp
 "$HWP_BIN" --version
 "$HWP_BIN" skill export --install claude-code
 "$HWP_BIN" skill export --install codex
@@ -18,7 +22,7 @@ HWP_BIN=/absolute/path/to/hwp-v0.12.1/hwp
 
 The export installs a directory-shaped `hwp` skill tree. The native command
 crosswalk, parity boundaries, and validation commands are maintained in the
-versioned [editing recipes](https://github.com/STAIxBWLB/hwp-cli/blob/v0.12.1/skills/hwp/references/editing-recipes.md).
+versioned [editing recipes](https://github.com/STAIxBWLB/hwp-cli/blob/v0.20.2/skills/hwp/references/editing-recipes.md).
 For Korean official-document guidance, use the exported
 `hwp/references/korean-official-format.md` file. `gaejosik` references that
 same released source.
