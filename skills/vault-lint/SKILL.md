@@ -123,7 +123,7 @@ work/ + vault/ 정합성 검증 리포트 생성기. Karpathy "LLM Wiki Method"�
 **L07 — 명명 규칙**
 1. `Glob work/**/*` (서브모듈 제외, 예외 파일/경로 제외 — §Legacy Exemptions 참조)
 2. 파일명이 `YYMMDD-[a-z0-9][a-z0-9-]*\.[a-z]+` 패턴에 맞는지
-3. 예외: `README.md`, `CLAUDE.md`, `INDEX.md`, `.git*`, `_guides/*`, `_templates/*`, `templates/*`, 회의록(`YYMMDD-meeting-<slug>.md` 영문 패턴)
+3. 예외: `README.md`, `AGENTS.md`, `CLAUDE.md`, `INDEX.md`, `.git*`, `_guides/*`, `_templates/*`, `templates/*`, 회의록(`YYMMDD-meeting-<slug>.md` 영문 패턴)
 4. 패턴 위반 → 위반 (단 Legacy Exemptions 경로는 제외)
 
 **L08 — 한글 파일명**

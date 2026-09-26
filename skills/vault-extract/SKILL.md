@@ -20,7 +20,7 @@ Before writing ANY vault note, verify the source summary.md frontmatter has **al
 3. **`topics`** — array containing ≥1 `[[wiki-link]]` **AND every `[[target]]` must exist as a real note in `vault/notes/<target>.md`** (MOC enforcement — topics carry hub navigation only, not keyword tags)
    - Verify existence via `mcp__obsidian__get_notes_info(paths: [notes/<target>.md, ...])` for the full list of topic targets, or by listing `vault/notes/` and checking each
    - If any `[[target]]` is missing: **ABORT** (do NOT auto-create the MOC) — the caller (or user) must either fix the summary's topics or create the MOC note first
-   - Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`) belong in body text, NOT in `topics`. Schema is "topics = MOC only" per `vault/CLAUDE.md §Schema`.
+   - Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`) belong in body text, NOT in `topics`. Schema is "topics = MOC only" per `vault/AGENTS.md §Schema`.
 
 **Read the summary's frontmatter via `mcp__obsidian__get_frontmatter` (or equivalent YAML parse) BEFORE building the vault note body.**
 

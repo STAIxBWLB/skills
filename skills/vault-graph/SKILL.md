@@ -155,4 +155,4 @@ Options:
 - `/vault-sync` checks graph report for unconnected surprising connections
 - `/vault-lint` checks L11 (graph staleness > 7 days), L12 (island communities, reported by member list)
 - `skill-mine` imports the same builder primitives from `~/.maru/skills/_builtin/lib/build-graph.py`
-- CLAUDE.md §"Vault-First" Graph Report shortcut: T2/T3 ops read report before full vault search
+- `<workspace-root>/AGENTS.md` §"Vault-First" Graph Report shortcut: T2/T3 ops read report before full vault search

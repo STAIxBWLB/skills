@@ -21,5 +21,5 @@ For LinkedIn manager changes, also check:
 - Confirm no owner identity or workspace-specific paths are present in the
   public skill bundle.
 
-Repeated behavioral mistakes belong in `CLAUDE.md`. Findings are evidence, not
+Repeated behavioral mistakes belong in `AGENTS.md`. Findings are evidence, not
 merge authorization; merge only on user instruction.
