@@ -28,7 +28,7 @@ Review observations, tensions, and methodology drift.
 ### drift mode
 
 1. **Config ↔ Derivation 일치**: `ops/derivation.md` **§Design Dimensions 표** ↔ `ops/config.yaml` `dimensions`(8키) + `domains`(6) 를 키별로 대조. 한쪽에만 있는 키도 mismatch. 출력은 키별 match/mismatch 표 + 최종 판정(예: "8/8 dimensions + 6/6 domains match")
-2. **CLAUDE.md consistency**: vault CLAUDE.md·work CLAUDE.md 규칙이 최신 methodology와 일치하는지
+2. **AGENTS.md consistency**: vault AGENTS.md·work AGENTS.md 규칙이 최신 methodology와 일치하는지
 3. **Skill SKILL.md vs 실제 사용**: M1 (spec-practice audit)에 따라 아래 14종 중 하나를 순환 선택하여 audit — `vault-connect extract graph learn lint next pipeline refactor remember rename rethink stats sync update`
 4. **Report deviations**: drift table (Check / Status / Action)
 

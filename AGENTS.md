@@ -22,3 +22,21 @@ Guidance for AI agents working in this repository.
   app code, and is coordinated with a Maru app release.
 - Commit messages: Conventional Commits, English (e.g.
   `feat(skills): add draft-writer`).
+- Keep identity and machine-specific paths in workspace configuration, and
+  preserve unknown record fields.
+- Runtime installations are derived copies: implement changes in this source
+  repo through the issue, branch, and PR workflow.
+
+## Verification
+
+Run `make skills-verify` from the repository root. A successful run prints
+`skills-verify ok: <N> skills, <M> tracked files` and exits zero. Review
+LinkedIn setup changes against `REVIEW.md`, especially evidence boundaries,
+idempotent writes, and on-demand cadence behavior.
+
+## Common pitfalls
+
+- A source filename date is not a publication date.
+- A public URL is not evidence of the owner's action.
+- A profile proposal is not a live snapshot.
+- Preserve explicit user decisions instead of asking for them again.

@@ -26,7 +26,7 @@ TREND_DATE_RE = re.compile(r"graph-report-(\d{6})\.md$")
 TYPES = {"insight", "decision", "observation", "person", "project", "method", "moc", "reference"}
 CONFIDENCE = {"proven", "likely", "experimental"}
 STATUS = {"active", "superseded", "archived"}
-HUB_MOC = "index"  # vault/CLAUDE.md §Navigation root; exempt from L03
+HUB_MOC = "index"  # vault/AGENTS.md §Navigation root; exempt from L03
 # keep aligned with _meta/rules/ingest-chain.md §TYPE 집합 / §비표준 TYPE 처리
 CANONICAL = {"INGEST", "ROUTE", "EXTRACT", "CONNECT", "DIGEST", "LEARN", "LINT",
              "TASK", "GRAPH", "SYNC", "RETHINK", "SOURCE"}
