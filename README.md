@@ -11,7 +11,7 @@ without an app release.
 
 ## Layout (bundle root = repo root)
 
-- `skills/<name>/SKILL.md` — the skills themselves (35)
+- `skills/<name>/SKILL.md` — the skills themselves (the list is `manifest.json`)
 - `envs/default/` — shared Python/Node runtime scaffold for skills
 - `lib/` — shared helpers (e.g. `build-graph.py`)
 - `docs/` — reference material used by skills
@@ -29,7 +29,8 @@ Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
 2. A new skill also needs a `manifest.json` entry
    (`{name, path: "skills/<name>", tier, tags}`) and a `SKILL_INDEX.md` line.
 3. `make skills-verify` — manifest/directory agreement, frontmatter,
-   tracked-inventory rules (NFC filenames, no symlinks, no runtime junk).
+   tracked-inventory rules (NFC filenames, no symlinks, no runtime junk),
+   plus warnings for workspace-private references in shipped text.
 4. PR to `main`. Merge triggers the publish workflow; there is nothing
    else to do.
 
