@@ -11,7 +11,7 @@ without an app release.
 
 ## Layout (bundle root = repo root)
 
-- `skills/<name>/SKILL.md` — the skills themselves (35)
+- `skills/<name>/SKILL.md` — the skills themselves (the list is `manifest.json`)
 - `envs/default/` — shared Python/Node runtime scaffold for skills
 - `lib/` — shared helpers (e.g. `build-graph.py`)
 - `docs/` — reference material used by skills
