@@ -9,6 +9,12 @@ breach an explicit contract. Style preferences are nits; report at most three.
 Do not repeat inventory/frontmatter failures already enforced by
 `make skills-verify`, or review generated bundle assets as authored source.
 
+For SKILL.md, `references/`, `AGENTS.md`, or prompt changes, add an
+instruction-prose pass against `AGENTS.md` "Skill authoring": a prohibition
+that "do Y" alone would carry, an example the stated principle already
+covers, cases standing in for a judgment, and a new directive that names no
+failure or contract gap. These are nits unless they change runtime behavior.
+
 For LinkedIn manager changes, also check:
 
 - Verify the bundle with `make skills-verify`.
