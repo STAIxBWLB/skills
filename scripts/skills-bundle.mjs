@@ -5,7 +5,8 @@
 //   node scripts/skills-bundle.mjs package --revision <n> [--out dist-skills]
 //
 // verify: manifest/directory agreement, SKILL.md frontmatter, duplicate
-// names, tracked-file inventory (no symlinks, no deleted-but-tracked files).
+// names, tracked-file inventory (no symlinks, no deleted-but-tracked files),
+// and workspace-private references in shipped text (PRIVATE_REFERENCE_RULES).
 // package: verify + zip of exactly the git-tracked bundle files + signed-ready
 // metadata JSON (revision, commit, minAppVersion, envHash, archive sha/size,
 // per-file path/sha256/mode). Signing happens in CI via `tauri signer sign`.
@@ -28,6 +29,17 @@ import { fileURLToPath } from "node:url";
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skillsRoot = repoRoot;
 const BUNDLE_PATHS = ["skills", "envs", "lib", "docs", "manifest.json", "SKILL_INDEX.md"];
+
+// Shipped text must not point into a private workspace. Rules start at
+// "warn" and move to "fail" one at a time once the bundle is clean of them.
+const PRIVATE_REFERENCE_RULES = [
+  { label: "absolute home path", pattern: /\/Users\//, level: "warn" },
+  { label: "workspace path", pattern: /~\/workspace/, level: "warn" },
+  { label: "workspace _meta/ path", pattern: /\b_meta\//, level: "warn" },
+  { label: "secrets directory", pattern: /\.maru\/secrets/, level: "warn" },
+  // Generic on purpose: this public repo should not name the owner's domains.
+  { label: "email address", pattern: /[\w.%+-]+@[\w-]+(\.[\w-]+)*\.[A-Za-z]{2,}/, level: "warn" },
+];
 
 function fail(message) {
   console.error(`skills-bundle: ${message}`);
@@ -175,6 +187,32 @@ function verify() {
         errors.push(`skill directory not in manifest: ${prefix}`);
       }
     }
+  }
+
+  // Self-containment: scan every text line of the shipped inventory,
+  // fenced code included (config examples are where paths leak).
+  const warnings = [];
+  for (const rel of tracked) {
+    let buffer;
+    try {
+      buffer = readFileSync(join(repoRoot, rel));
+    } catch {
+      continue; // already reported as missing above
+    }
+    if (buffer.includes(0)) continue; // binary: templates, images
+    buffer
+      .toString("utf8")
+      .split("\n")
+      .forEach((line, index) => {
+        for (const rule of PRIVATE_REFERENCE_RULES) {
+          if (!rule.pattern.test(line)) continue;
+          (rule.level === "fail" ? errors : warnings).push(`${rel}:${index + 1}: ${rule.label}`);
+        }
+      });
+  }
+  for (const warning of warnings) console.warn(`skills-bundle: warning: ${warning}`);
+  if (warnings.length > 0) {
+    console.warn(`skills-bundle: ${warnings.length} private-reference warning(s) (warn-only; see AGENTS.md "Skill authoring")`);
   }
 
   if (errors.length > 0) {
