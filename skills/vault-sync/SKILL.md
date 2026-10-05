@@ -28,7 +28,7 @@ ls <workspace-root>/meetings/YYYY/YYYY-MM/
 - Cross-reference vault notes source fields to find unprocessed meetings
 - Grep vault `notes/` for `source:.*work/meetings/YYYY/YYYY-MM` to identify already-extracted
 
-#### 1B: Git Diff — Work Root + Submodules (NEW)
+#### 1B: Git Diff (Work Root + Submodules)
 ```bash
 # Work root: changes since last sync timestamp
 cd <workspace-root>
@@ -56,7 +56,7 @@ git submodule status --recursive | grep '^+' | awk '{print $2}'
     | grep -v '^\w\{7\} ' | grep -v '^$' | sort -u
   ```
 
-**Work repo submodules**: 목록은 `.gitmodules`가 정본(런타임 뷰 `_meta/config/submodules.yaml`) — 여기에 표 사본을 두지 않는다(드리프트 방지). `vault`는 스캔 대상이 아니라 목적지이고, `dev`·`sites/*`(코드 저장소)는 명시 요청 시에만 스캔한다. 그 외 work 트리는 일반 디렉토리이므로 루트 git diff 스캔이 덮는다.
+**Work repo submodules**: 목록은 `.gitmodules`가 정본(런타임 뷰 `_meta/config/submodules.yaml`). `vault`는 스캔 대상이 아니라 목적지이고, `dev`·`sites/*`(코드 저장소)는 명시 요청 시에만 스캔한다. 그 외 work 트리는 일반 디렉토리이므로 루트 git diff 스캔이 덮는다.
 
 ### Step 1.5: Filter & Classify
 
@@ -78,19 +78,17 @@ git submodule status --recursive | grep '^+' | awk '{print $2}'
 >
 > **Registry fallback**: score < 3 → content-based domain analysis → if still ambiguous, prompt user via disambiguation field. SSOT: `<workspace-root>/_meta/rules/project-registry-scoring.md`
 
-**Deduplication** (multi-signal, 2026-04-16 revision):
+**Deduplication** (multi-signal):
 
 1. **source field exact match**: `source: work/meetings/...` 경로 직접 일치
 2. **Title similarity ≥70%**: fuzzy compare against vault note titles
-3. **Recent update-section detection** (NEW): 대상 회의 날짜 헤더(`## Update (YYYY-MM-DD)` 또는 `## YYYY-MM-DD ...`)가 vault 노트에 이미 존재하면 "이미 반영됨"으로 판정
+3. **Recent update-section detection**: 대상 회의 날짜 헤더(`## Update (YYYY-MM-DD)` 또는 `## YYYY-MM-DD ...`)가 vault 노트에 이미 존재하면 "이미 반영됨"으로 판정
 4. **Entity overlap** (보조): 회의 제목의 주요 인물·기관 키워드가 vault 노트 본문에 ≥3회 등장 시 후보
 
 **판정 로직**:
 - 1, 2, 3 중 **임의 하나 hit** → "already reflected — skip" 제안
 - 1 miss + 2 hit (≥70%) → "update" 제안 (source field 갱신 포함)
 - 모두 miss → "create" 제안
-
-**근거 (2026-04-16 학습)**: /vault-sync가 04-14 회의 3건을 재추출 제안했으나 실제로는 vault 노트에 이미 반영됨. source field만 원본 경로를 가리키지 않아 dedup이 놓쳤음. update-section detection을 추가하여 content-level dedup 보완.
 
 ### Step 2: Propose
 
@@ -134,20 +132,9 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
   3. **update** proposals: hand off to the `/vault-update` procedure (MCP `patch_note`/`write_note` with the original insight preserved, `## Update YYYY-MM-DD` section, `/vault-lint note=` afterwards) — this skill does not carry its own update path
   4. Show created/updated note for review
 
-### Step 3.5: R4 Sibling Merge — Method Evidence 자동 갱신 (M10, 2026-04-24 도입)
+### Step 3.5: R4 Sibling Merge (Method Evidence 자동 갱신)
 
-이번 세션에서 **R4 sibling merge**가 1건 이상 실행된 경우 (≥2 meetings → 1 노트 merge), `sibling-meeting-merge-n-to-one-consolidation-method` 노트의 evidence 테이블을 자동 갱신한다.
-
-**절차**:
-1. 이번 /vault-sync 라운드에서 수행한 R4 merge 노트 목록 수집 (target note + merged sessions count)
-2. `mcp__obsidian__read_note('notes/sibling-meeting-merge-n-to-one-consolidation-method.md')` 호출
-3. `## 실증 사례 (3건, YYYY-MM-DD 기준)` 테이블에서 해당 merged 노트 행 찾기
-4. **누적 N 증가**: `N = 기존 N + 이번 라운드 병합 수`
-5. **날짜 분포 append**: `기존 분포 + MM-DD(N추가)` 형태로 append
-6. `mcp__obsidian__patch_note`로 테이블 갱신
-7. 신규 merged 노트(케이스 추가)인 경우 **새 행** 추가
-
-**근거**: 2026-04-24 Rethink O2 — 4라운드 누적 method evidence drift (기록 N=5, 실제 N=13) 해소
+이번 라운드에서 **R4 sibling merge**(≥2 meetings → 1 노트 merge)가 1건 이상 실행됐으면, Step 4 전에 `references/r4-method-evidence.md`를 읽고 method 노트의 evidence 테이블을 갱신한다.
 
 **Skip 조건**:
 - R4 merge 0건인 세션 → Step 3.5 skip
