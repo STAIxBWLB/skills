@@ -13,18 +13,12 @@ from tqdm import tqdm
 @lru_cache(maxsize=1)
 def _find_hwp_cli():
     """hwp-cli(Rust) 'hwp' 바이너리 탐색.
-    우선순위: $HWP_CLI → ~/.cargo/bin/hwp → dev/hwp-cli/target/release/hwp → PATH의 hwp(검증).
+    우선순위: $HWP_CLI → PATH의 hwp 릴리스 바이너리(`hwp cat --help` 종료 코드 0으로 검증).
     바이너리 이름 'hwp'는 (구) hwp-toolkit 래퍼와 충돌하므로 PATH 후보는 'cat' 서브커맨드
     유무로 검증해 오인 호출을 막는다."""
     env = os.environ.get("HWP_CLI")
-    explicit = []
-    if env:
-        explicit.append(Path(env))
-    explicit.append(Path.home() / ".cargo" / "bin" / "hwp")
-    explicit.append(Path.home() / "workspace/work/dev/hwp-cli/target/release/hwp")
-    for c in explicit:
-        if c.is_file() and os.access(c, os.X_OK):
-            return str(c)
+    if env and Path(env).is_file() and os.access(env, os.X_OK):
+        return env
     path_hwp = shutil.which("hwp")
     if path_hwp and _is_hwp_cli(path_hwp):
         return path_hwp
