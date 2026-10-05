@@ -223,7 +223,7 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 | #<n> <title> | passed | squash | <merge-commit> |
 | #<n> <title> | blocked: 2 unresolved threads | - | stopped |
 
-<review receipt from references/ocr-review-gate.md, when OCR is required>
+<review receipt from references/ocr-review-gate.md; `not applicable` when OCR is not required>
 
 | Pointer | Commit | Result |
 |---------|--------|--------|

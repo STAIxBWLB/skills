@@ -111,7 +111,7 @@ append는 fs 직접 append(`>>`)로 수행. `vault/log`는 plain logfile(확장�
 - **자동 수정 금지**: 리포트만 생성. 수정은 사용자가 별도 스킬(`/vault-extract`, `/vault-connect`, `inbox-process`)로 실행.
 - **vault 쓰기는 MCP Obsidian만**: `write_note`, `update_frontmatter`, `patch_note` 사용. 파일시스템 `Write`/`Edit` 금지. 읽기는 `scripts/lint.py`가 fs 읽기 전용으로 수행(결정적 스크립트 예외).
 - **서브모듈 내부 깊이 검사 안 함**: 서브모듈은 해당 저장소의 자체 lint로 위임.
-- **CI 등록 금지**: 로컬 vault 접근이 필요하므로 CI 파이프라인에 등록하지 않는다. 자동화 요청에는 로컬 수동 실행(주간 `full`, 대규모 ingest 후 `vault`)을 안내한다.
+- **CI 등록 금지**: 로컬 vault 접근이 필요하므로 CI 파이프라인에 등록하지 않는다. 실행 주기는 주간 `full`, 대규모 ingest 후 `vault`.
 - **성능**: vault 스코프는 스크립트 1회 실행. work 스코프(L07/L08 `Glob work/**/*`)가 비용의 대부분이므로 필요 시 `/vault-lint vault`로 분리.
 - **대용량 log**: L09가 라인 수 20k 초과 감지 시 "수동 아카이브 권장" warn만 추가 (자동 롤오버 안 함).
 - **중복 리포트**: 같은 날 여러 번 실행 시 `vault/reports/lint-YYMMDD.md`를 덮어쓴다 (최신 상태 유지). 이력은 `vault/log`의 `LINT` 이벤트로 추적.
