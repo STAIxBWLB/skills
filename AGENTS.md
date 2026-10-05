@@ -52,6 +52,10 @@ instructions.
 - **Split by timing.** Move content to `references/` by when it is needed,
   not by length; the pointer names the moment ("Read `references/x.md`
   before ...").
+- **Human companion.** Content only a human maintainer needs (rationale,
+  history, incidents, extra examples) goes to the skill's `README.md`. It
+  opens with a line naming SKILL.md as the instruction source, holds no
+  directives, and agents read it only when editing the skill.
 - **Delivery.** A rule binds only on a surface the runtime reads at the
   moment it applies; host-specific loading still needs a host-neutral
   pointer. Confirm by asking a fresh session to reproduce the rule.
