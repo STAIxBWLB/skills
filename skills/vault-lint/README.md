@@ -28,4 +28,4 @@ The skill implements the lint stage of Karpathy's "LLM Wiki Method": a periodic 
 
 ## Run cadence
 
-The skill was designed for one `/vault-lint full` run per week and a `/vault-lint vault` run after a large ingest. It is not registered in CI because it needs local vault access.
+The skill was designed for one `/vault-lint full` run per week and a `/vault-lint vault` run after a large ingest. CI registration is ruled out (see SKILL.md 가드레일) because every run needs local vault access.
