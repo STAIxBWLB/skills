@@ -14,7 +14,7 @@
 
 **L09: 로그 포맷** (스코프 정본: `_meta/rules/ingest-chain.md` §"lint L09 스코프")
 
-`vault/log`는 append-only라 과거 라인은 소급 수정하지 않는다(제안 조치에도 넣지 않음). warn은 **해결 가능한 신규 위반**에 한정한다. 정규 TYPE인데 스크립트가 미등록으로 보고하면 `scripts/lint.py` 상수 드리프트로 따로 보고한다:
+`vault/log`는 append-only라 과거 라인은 소급 수정하지 않는다(제안 조치에도 넣지 않음). warn은 **해결 가능한 신규 위반**에 한정한다:
 
 1. **미등록 TYPE**: 정규 12종(`INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`)에도, 정규화표(`CREATE UPDATE MIGRATE REFACTOR MERGE MOVE RELOCATE RENAME DRAFT REVIEW RESEARCH REF CLEANUP CLOSE DONE SUPERSEDED DUPLICATE SKIP EDIT CORRECT`)에도 없는 TYPE
 2. **구조 위반**: `YYYY-MM-DD HH:MM  TYPE  ...` 형태가 아닌 라인(불릿 접두, 시각 컬럼 누락 등; 경계 위반 라인도 여기서 잡힌다)
