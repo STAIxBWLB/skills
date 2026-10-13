@@ -111,7 +111,7 @@ def main() -> int:
         else:
             print(
                 "error: Chrome/Chromium not found. Pass --chrome or set CHROME_BIN.\n"
-                "fallback: convert to docx/hwpx first and print with LibreOffice "
+                "no other PDF route is supported; ask the user how to proceed "
                 "(see references/pdf-print-path.md)",
                 file=sys.stderr,
             )

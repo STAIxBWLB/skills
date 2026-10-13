@@ -80,13 +80,10 @@ Rules:
   receipt's `source` records the converted temp file.
 - Do not produce outgoing PDF from HWPX with a bare native renderer: the
   hwp-cli renderer drops every table row after a page boundary (silent data
-  loss with exit 0). The default is the Chrome HTML print path. Do not claim
-  a direct LibreOffice HWPX conversion path unless it has been smoke-tested
-  on the generated file; the verified no-Chrome fallback is
-  `md2docx <src.md>` followed by direct `soffice --headless --convert-to pdf`
-  on that DOCX. Native rendering remains a last resort for table-free
-  documents with explicit user request, and pages must be visually verified
-  before sending. See `references/pdf-print-path.md`.
+  loss with exit 0). The default is the Chrome HTML print path. When no
+  Chrome/Chromium is available, stop and ask the user how to proceed.
+  Native rendering remains a last resort for table-free documents with
+  explicit user request, and pages must be visually verified before sending. See `references/pdf-print-path.md`.
 
 ## Script
 
