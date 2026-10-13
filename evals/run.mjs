@@ -41,6 +41,13 @@ function parseArgs(argv) {
     i++;
   }
   if (!(args.runs >= 1)) fail("--runs must be >= 1");
+  if (!(args.timeout >= 1)) fail("--timeout must be >= 1 (seconds)");
+  // Resolve git-ref variants up front so a bad ref is a harness error, not a crash mid-run.
+  for (const v of args.variants) {
+    if (v === "current" || v === "control") continue;
+    const ok = spawnSync("git", ["-C", repoRoot, "rev-parse", "--verify", "--quiet", "--end-of-options", `${v}^{commit}`], { stdio: "ignore" }).status === 0;
+    if (!ok) fail(`--variant ${v} is not a commit in this repo`);
+  }
   if (args.variants.length === 0) args.variants.push("current");
   return args;
 }
@@ -120,7 +127,7 @@ function installSkill(variant, skill, configDir, scratch) {
   writeFileSync(join(pluginDir, ".claude-plugin", "plugin.json"), '{"name":"eval"}\n');
   let src = join(repoRoot, "skills", skill);
   if (variant !== "current") {
-    const tar = execFileSync("git", ["-C", repoRoot, "archive", "--format=tar", variant, `skills/${skill}`]);
+    const tar = execFileSync("git", ["-C", repoRoot, "archive", "--format=tar", "--end-of-options", variant, `skills/${skill}`]);
     const out = join(scratch, "ref");
     mkdirSync(out, { recursive: true });
     execFileSync("tar", ["-x", "-C", out], { input: tar });
@@ -262,4 +269,9 @@ function main() {
   process.exit(forbiddenTotal > 0 ? 1 : harnessErrors > 0 ? 2 : neverPassed.length > 0 ? 1 : 0);
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  // Anything thrown outside a graded run (bad ref contents, fs errors) is a harness error.
+  fail(err?.message ?? String(err));
+}
