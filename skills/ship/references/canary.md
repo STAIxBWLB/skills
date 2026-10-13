@@ -24,7 +24,7 @@ Resolve the production origin as stage 5 does (deploy workflow
 ## Observation rules
 
 Every check is read-only. Load pages with GET and probe links with HEAD; never
-submit forms, sign in, or follow a link whose path suggests a state change
+submit forms, sign in, or probe or follow a link whose path suggests a state change
 (logout, delete, unsubscribe, cancel). A route that needs sign-in is listed as
 unverified scope instead of being visited.
 
@@ -69,7 +69,7 @@ checking every route each round and comparing it to its baseline:
   baseline, a new broken link, or a load-time anomaly. Values the baseline
   already had are not anomalies.
 - One-off: seen in a single round and gone in the next.
-- Repeated: seen in two or more consecutive rounds.
+- Repeated: seen in two or more rounds, consecutive or not.
 - Recovered incident: repeated, then cleared before the window ended. Keep it
   in the report; recovery does not erase it.
 
@@ -82,8 +82,8 @@ reverts.
 
 Fill the Canary section of the Ship Report:
 
-- Baseline: source (captured this run, or the runbook's location), time, and
-  live deployment; or `none`, with the section titled current-state check.
+- Baseline: captured this run, with time and live deployment; or `none`, with
+  the section titled current-state check.
 - Routes: each route, with `(default)` when not from the runbook; window and
   interval actually run.
 - Per-route deltas: baseline -> latest for status, console error count with new

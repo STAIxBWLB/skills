@@ -161,6 +161,9 @@ Commit messages in English. Do not add a `Co-Authored-By` trailer.
 
 ### 4. Deploy Dispatch
 
+For `/ship deploy` on a repository with a web surface, read
+`references/canary.md` and capture its baseline before dispatching.
+
 Detect how the repository deploys. Never assume.
 
 Inspect `.github/workflows/*` for a deploy or release workflow and read its
@@ -241,7 +244,7 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 
 ### Canary  <"Canary: current-state check" without a baseline; "Canary: not applicable (<reason>)" alone when skipped>
 
-Baseline: <captured this run | runbook location | none>, <time>, live <deployment id or commit>
+Baseline: <captured this run | none>, <time>, live <deployment id or commit>
 Routes: <route list, (default) where not from the runbook>; window <m> min, every <s> s
 
 | Route | Status | Console errors | Broken links | Load time |
