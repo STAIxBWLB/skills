@@ -43,7 +43,9 @@ Read,Write,Edit,Glob,Grep,Skill`, `--strict-mcp-config` with no servers,
 `--permission-prompts none`, and the budget cap. The child environment carries
 only `PATH`, `HOME`, `TMPDIR`, `LANG`, `CLAUDE_CONFIG_DIR`, and the credential.
 Built-in CLI skills remain available; account plugins, hooks, settings, and
-memory do not load.
+memory do not load. Reads outside the fixture are refused, so files a skill
+loads from the installed bundle (for example `lib/` adapters) are unreachable
+and the agent falls back to the skill's stated defaults.
 
 ## Cases
 

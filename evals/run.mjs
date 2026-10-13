@@ -170,7 +170,9 @@ function runOnce(c, variant, index, args, root) {
     try { msg = JSON.parse(line); } catch { continue; }
     if (msg.type === "result" && typeof msg.total_cost_usd === "number") cost = msg.total_cost_usd;
     if (msg.type === "system" && msg.subtype === "init") skillLoaded = (msg.skills ?? []).includes(`eval:${c.skill}`);
-    for (const block of msg.message?.content ?? []) if (block.type === "tool_use" && block.name === "Skill") skillUsed = true;
+    const content = Array.isArray(msg.message?.content) ? msg.message.content : [];
+    // Count only calls that name the skill under test; a control's failed call to the bare name is not use.
+    for (const block of content) if (block.type === "tool_use" && block.name === "Skill" && block.input?.skill === `eval:${c.skill}`) skillUsed = true;
   }
 
   const changes = diffTrees(before, snapshot(ws));
