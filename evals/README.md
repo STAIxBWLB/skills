@@ -42,8 +42,9 @@ confined to the fixture, no shell or web tools), `--tools
 Read,Write,Edit,Glob,Grep,Skill`, `--strict-mcp-config` with no servers,
 `--permission-prompts none`, and the budget cap. The child environment carries
 only `PATH`, `HOME`, `TMPDIR`, `LANG`, `CLAUDE_CONFIG_DIR`, and the credential.
-Built-in CLI skills remain available; account plugins, hooks, settings, and
-memory do not load. Reads outside the fixture are refused, so files a skill
+Built-in CLI skills remain available; account plugins, hooks, user/project/local
+settings, and memory do not load (managed settings, if a host has any, still
+apply). Reads outside the fixture are refused, so files a skill
 loads from the installed bundle (for example `lib/` adapters) are unreachable
 and the agent falls back to the skill's stated defaults.
 
@@ -72,6 +73,8 @@ plus every Write/Edit call in the transcript, so a reverted write still
 counts); else 2 when a run did not execute (agent exit, timeout, auth failure,
 skill not loaded); else 1 when a non-control case/variant passes 0 of N runs;
 else 0. The control variant is a baseline and is expected to fail its cases.
+These codes are those of `node evals/run.mjs`; `make skills-eval` reports any
+non-zero exit as make's own failure.
 
 ## Self-test
 

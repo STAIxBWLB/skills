@@ -219,14 +219,24 @@ function runOnce(c, variant, variantIndex, index, args, root) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const cases = discoverCases(args.cases);
+  // Everything a run needs is checked before the first run, so no setup error can
+  // land after a graded forbidden write and mask its exit 1.
+  for (const c of cases) {
+    try { JSON.parse(readFileSync(join(c.dir, "expect.json"), "utf8")); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
+    for (const v of args.variants) {
+      if (v === "current" || v === "control") continue;
+      const has = spawnSync("git", ["-C", repoRoot, "cat-file", "-e", `${v}^{commit}:skills/${c.skill}`], { stdio: "ignore" }).status === 0;
+      if (!has) fail(`--variant ${v} has no skills/${c.skill}`);
+    }
+  }
   if (!args.agent && !AUTH_ENV.some((k) => process.env[k])) {
     fail(`isolated runs need ${AUTH_ENV.join(" or ")} in the environment; the real config dir and keychain are never read`);
   }
-  const root = mkdtempSync(join(tmpdir(), "skills-eval-"));
-  // A temp dir inside a git work tree would let the agent discover that repo.
-  if (spawnSync("git", ["-C", root, "rev-parse", "--is-inside-work-tree"], { stdio: "ignore" }).status === 0) {
-    fail(`temp dir ${root} is inside a git work tree; set TMPDIR elsewhere`);
+  // Refuse before creating anything: a temp dir inside a git work tree would let the agent discover that repo.
+  if (spawnSync("git", ["-C", tmpdir(), "rev-parse", "--is-inside-work-tree"], { stdio: "ignore" }).status === 0) {
+    fail(`temp dir ${tmpdir()} is inside a git work tree; set TMPDIR elsewhere`);
   }
+  const root = mkdtempSync(join(tmpdir(), "skills-eval-"));
 
   const rows = [];
   let forbiddenTotal = 0;
