@@ -5,10 +5,29 @@
   "minAppVersion": "0.0.0",
   "skillsSubdir": "skills",
   "skills": [
-    { "name": "argument-placeholder", "path": "skills/argument-placeholder" },
-    { "name": "env-variable", "path": "skills/env-variable" },
-    { "name": "skill-home-path", "path": "skills/skill-home-path" },
-    { "name": "frontmatter-key", "path": "skills/frontmatter-key" },
-    { "name": "prose-only", "path": "skills/prose-only" }
+    {
+      "name": "argument-placeholder",
+      "path": "skills/argument-placeholder"
+    },
+    {
+      "name": "env-variable",
+      "path": "skills/env-variable"
+    },
+    {
+      "name": "skill-home-path",
+      "path": "skills/skill-home-path"
+    },
+    {
+      "name": "frontmatter-key",
+      "path": "skills/frontmatter-key"
+    },
+    {
+      "name": "prose-only",
+      "path": "skills/prose-only"
+    },
+    {
+      "name": "vault-legacy",
+      "path": "skills/vault-legacy"
+    }
   ]
 }

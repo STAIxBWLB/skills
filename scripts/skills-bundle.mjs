@@ -97,8 +97,10 @@ const HOST_FRONTMATTER_KEYS = new Set([
   // Qwen Code
   "priority", "allowedTools", "source",
 ]);
-// Repo-local legacy keys, kept in place by AGENTS.md "Skill authoring".
+// Repo-local legacy keys, kept in place by AGENTS.md "Skill authoring" only
+// in the vault-* skills; anywhere else they are not to be copied.
 const LEGACY_FRONTMATTER_KEYS = new Set(["trigger"]);
+const isLegacyKey = (rel, key) => LEGACY_FRONTMATTER_KEYS.has(key) && /^skills\/vault-[^/]+\/SKILL\.md$/.test(rel);
 
 // Code spans of one markdown file as [{ line, text }]: every line inside a
 // fenced block, plus inline code spans that contain whitespace.
@@ -137,7 +139,7 @@ function hostCompatFindings(rel, content) {
     const lines = content.split("\n");
     for (let i = 1; i < lines.length && lines[i] !== "---"; i += 1) {
       const key = /^([A-Za-z0-9_-]+):/.exec(lines[i])?.[1];
-      if (key && !HOST_FRONTMATTER_KEYS.has(key) && !LEGACY_FRONTMATTER_KEYS.has(key)) {
+      if (key && !HOST_FRONTMATTER_KEYS.has(key) && !isLegacyKey(rel, key)) {
         findings.push({ line: i + 1, rule: { ...rule, label: `${rule.label} "${key}"` } });
       }
     }

@@ -3,7 +3,6 @@ name: prose-only
 description: Fixture. Host syntax in prose and bare paths only; expect no host-compat warning.
 license: MIT
 allowed-tools: Read
-trigger: legacy key kept in place
 metadata:
   version: "1.0"
 ---

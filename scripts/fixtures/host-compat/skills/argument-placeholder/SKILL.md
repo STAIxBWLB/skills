@@ -1,6 +1,6 @@
 ---
 name: argument-placeholder
-description: Fixture. Expect one "host argument placeholder" warning on the fenced command.
+description: Fixture. Expect one "host argument placeholder" error on the fenced command.
 ---
 
 ```sh

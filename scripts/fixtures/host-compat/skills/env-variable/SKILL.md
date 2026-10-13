@@ -1,6 +1,6 @@
 ---
 name: env-variable
-description: Fixture. Expect one "host env variable" warning on the fenced command.
+description: Fixture. Expect one "host env variable" error on the fenced command.
 ---
 
 ```sh
