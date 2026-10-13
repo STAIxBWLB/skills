@@ -64,12 +64,18 @@ instructions.
   domains, or secrets; identity and machine-specific paths live in workspace
   configuration. `make skills-verify` warns on known patterns
   (`PRIVATE_REFERENCE_RULES` in `scripts/skills-bundle.mjs`); add no new hits.
+- **Host-neutral.** Commands in a skill use paths relative to the skill
+  directory, not one host's argument placeholder, env variable, or skill-home
+  path. `make skills-verify` warns on these and on undocumented frontmatter
+  keys (`HOST_COMPAT_RULES`); fixture run:
+  `node scripts/skills-bundle.mjs verify --root scripts/fixtures/host-compat`.
 
 ## Verification
 
 Run `make skills-verify` from the repository root. A successful run prints
 `skills-verify ok: <N> skills, <M> tracked files` and exits zero;
-private-reference warnings print to stderr and do not change the exit code.
+private-reference and host-compat warnings print to stderr and do not change
+the exit code; a rule promoted to `fail` does.
 Review LinkedIn setup changes against `REVIEW.md`, especially evidence
 boundaries, idempotent writes, and on-demand cadence behavior.
 
