@@ -33,7 +33,7 @@ def load_pres(path: Path) -> Presentation:
         return Presentation(str(path))
     except Exception as e:
         print(f"[pptx-toolkit] python-pptx load 실패: {e}", file=sys.stderr)
-        print("  .ppt (97-2003) 는 지원 안 됨. pandoc/soffice 변환 필요.", file=sys.stderr)
+        print("  .ppt (97-2003) 는 지원 안 됨. 사용자에게 .pptx로 다시 저장해 달라고 요청.", file=sys.stderr)
         sys.exit(2)
 
 
