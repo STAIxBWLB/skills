@@ -265,7 +265,7 @@ def render_report(
 
     lines.append("## Next steps")
     lines.append("")
-    lines.append("- 후보를 검토하여 유의미한 것은 수동으로 SKILL.md 를 작성해 스킬화하거나 `~/.maru/skills/_drafts/` 로 이동")
+    lines.append("- 후보를 검토하여 유의미한 것은 해당 스킬 소스 repo에 이슈·PR로 SKILL.md 를 추가 (런타임 설치본 직접 수정 금지)")
     lines.append("- 사전 커버리지 부족이 느껴지면 `skill-mine/scripts/skill_miner/vocab/actions.yaml` · `objects.yaml` 보강")
     lines.append("- 기존 스킬과 overlap 이 높으면 신규 생성 대신 해당 스킬의 triggers 를 확장 고려")
     return "\n".join(lines) + "\n"
