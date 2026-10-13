@@ -61,11 +61,11 @@ const HOST_COMPAT_RULES = [
   // $ARGUMENTS: Claude Code and Kimi only; Codex, Qwen, OpenCode, Grok
   // document no argument placeholder. $0/$1 shorthands are left out: they
   // collide with ordinary shell positional parameters in code blocks.
-  { label: "host argument placeholder", scope: "code", pattern: /\$ARGUMENTS\b/, level: "warn" },
+  { label: "host argument placeholder", scope: "code", pattern: /\$ARGUMENTS\b/, level: "fail" },
   // ${CLAUDE_SKILL_DIR}, ${CLAUDE_PROJECT_DIR}, ... (Claude Code),
   // ${KIMI_SKILL_DIR}, $KIMI_CODE_HOME (Kimi), $QWEN_SKILL_ROOT (Qwen),
   // $GROK_PLUGIN_ROOT (Grok), $CODEX_HOME (Codex).
-  { label: "host env variable", scope: "code", pattern: /\$\{?(CLAUDE|KIMI|QWEN|GROK|CODEX)_[A-Z0-9_]+/, level: "warn" },
+  { label: "host env variable", scope: "code", pattern: /\$\{?(CLAUDE|KIMI|QWEN|GROK|CODEX)_[A-Z0-9_]+/, level: "fail" },
   // Skill homes: .claude/skills (Claude Code, also read by OpenCode),
   // $CODEX_HOME/skills = ~/.codex/skills and .agents/skills (Codex; the
   // latter also Kimi, OpenCode, Grok), .kimi-code/skills (Kimi),
@@ -75,9 +75,12 @@ const HOST_COMPAT_RULES = [
     label: "host skill-home path",
     scope: "code",
     pattern: /(\.(claude|codex|agents|kimi-code|qwen|grok|opencode)|\.config\/opencode)\/skills\b/,
-    level: "warn",
+    level: "fail",
   },
   // A key no target host documents is dead on every host.
+  // Stays at warn: host docs add keys over time and a push to main releases,
+  // so a new legitimate key must not block a release. Revisit at the next
+  // host-doc refresh.
   { label: "undocumented frontmatter key", scope: "frontmatter", level: "warn" },
 ];
 

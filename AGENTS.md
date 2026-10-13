@@ -66,8 +66,8 @@ instructions.
   (`PRIVATE_REFERENCE_RULES` in `scripts/skills-bundle.mjs`); add no new hits.
 - **Host-neutral.** Commands in a skill use paths relative to the skill
   directory, not one host's argument placeholder, env variable, or skill-home
-  path. `make skills-verify` warns on these and on undocumented frontmatter
-  keys (`HOST_COMPAT_RULES`); fixture run:
+  path. `make skills-verify` fails on these and warns on undocumented
+  frontmatter keys (`HOST_COMPAT_RULES`); fixture run (exits 1 by design):
   `node scripts/skills-bundle.mjs verify --root scripts/fixtures/host-compat`.
 
 ## Verification
