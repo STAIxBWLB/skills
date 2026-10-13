@@ -67,9 +67,11 @@ duration, and total cost from the CLI result. Per-run failures print to stderr.
 Each run keeps `ws/`, `transcript.jsonl`, `stderr.txt`, and `grade.json` under
 the printed artifacts dir.
 
-Exit 1 when any run performs a forbidden action or a non-control case/variant
-passes 0 of N runs, 2 on harness errors, else 0. The control variant is a
-baseline and is expected to fail its cases.
+Exit 1 when any run performs or attempts a forbidden write (final tree diff
+plus every Write/Edit call in the transcript, so a reverted write still
+counts); else 2 when a run did not execute (agent exit, timeout, auth failure,
+skill not loaded); else 1 when a non-control case/variant passes 0 of N runs;
+else 0. The control variant is a baseline and is expected to fail its cases.
 
 ## Self-test
 

@@ -7,11 +7,12 @@
 // Each run copies a case fixture into a fresh temp dir, runs the host CLI
 // headless there with an isolated CLAUDE_CONFIG_DIR and HOME that hold only the
 // skill under test, then grades the workspace tree diff against expect.json.
-// Runs are serial by design. Exit 1 when any run performs a forbidden action,
-// or when a non-control case/variant passes 0 of N runs.
+// Runs are serial by design. Exit 1 when any run performs or attempts a forbidden
+// write; else 2 when a run did not execute (agent exit, skill not loaded); else 1
+// when a non-control case/variant passes 0 of N runs; else 0.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -83,10 +84,12 @@ function diffTrees(before, after) {
   return changes.sort((a, b) => a.path.localeCompare(b.path));
 }
 
-// A change is forbidden when it hits a forbidden prefix or leaves every allowed prefix.
+// A path is forbidden when it hits a forbidden prefix or leaves every allowed prefix.
+const under = (path, prefixes) => (prefixes ?? []).some((p) => path === p || path.startsWith(p));
+const isForbidden = (expect, path) => under(path, expect.forbidden) || !under(path, expect.allowed);
+
 function grade(expect, changes, readFile) {
-  const under = (path, prefixes) => (prefixes ?? []).some((p) => path === p || path.startsWith(p));
-  const forbidden = changes.filter((c) => under(c.path, expect.forbidden) || !under(c.path, expect.allowed));
+  const forbidden = changes.filter((c) => isForbidden(expect, c.path));
   const failures = forbidden.map((c) => `forbidden ${c.kind}: ${c.path}`);
   for (const req of expect.required ?? []) {
     const re = new RegExp(req.pattern);
@@ -127,8 +130,9 @@ function installSkill(variant, skill, configDir, scratch) {
   return pluginDir;
 }
 
-function runOnce(c, variant, index, args, root) {
-  const scratch = join(root, `${c.id.replace("/", "-")}-${variant.replace(/[^\w.-]/g, "_")}-${index}`);
+function runOnce(c, variant, variantIndex, index, args, root) {
+  // The variant ordinal keeps names that sanitize alike (HEAD~1, HEAD_1) apart.
+  const scratch = join(root, `${c.id.replace("/", "-")}-v${variantIndex}-${variant.replace(/[^\w.-]/g, "_")}-${index}`);
   const ws = join(scratch, "ws");
   const configDir = join(scratch, "config");
   const home = join(scratch, "home");
@@ -164,6 +168,7 @@ function runOnce(c, variant, index, args, root) {
   let cost = null;
   let skillUsed = false;
   let skillLoaded = false;
+  const writePaths = [];
   for (const line of (proc.stdout ?? "").split("\n")) {
     if (!line.startsWith("{")) continue;
     let msg;
@@ -172,18 +177,36 @@ function runOnce(c, variant, index, args, root) {
     if (msg.type === "system" && msg.subtype === "init") skillLoaded = (msg.skills ?? []).includes(`eval:${c.skill}`);
     const content = Array.isArray(msg.message?.content) ? msg.message.content : [];
     // Count only calls that name the skill under test; a control's failed call to the bare name is not use.
-    for (const block of content) if (block.type === "tool_use" && block.name === "Skill" && block.input?.skill === `eval:${c.skill}`) skillUsed = true;
+    for (const block of content) {
+      if (block.type !== "tool_use") continue;
+      if (block.name === "Skill" && block.input?.skill === `eval:${c.skill}`) skillUsed = true;
+      if (["Write", "Edit", "MultiEdit", "NotebookEdit"].includes(block.name)) writePaths.push(block.input?.file_path ?? block.input?.notebook_path);
+    }
   }
 
   const changes = diffTrees(before, snapshot(ws));
   const expect = JSON.parse(readFileSync(join(c.dir, "expect.json"), "utf8"));
   const result = grade(expect, changes, (p) => readFileSync(join(ws, p), "utf8"));
+  // A forbidden write the agent later reverted leaves no trace in the final tree,
+  // so every write attempt in the transcript is graded too.
+  const wsReal = realpathSync(ws);
+  const counted = new Set(changes.filter((ch) => isForbidden(expect, ch.path)).map((ch) => ch.path));
+  for (const raw of writePaths.filter(Boolean)) {
+    const abs = resolve(ws, raw);
+    const rel = relative(abs.startsWith(wsReal) ? wsReal : ws, abs);
+    if (counted.has(rel) || !(rel.startsWith("..") || isForbidden(expect, rel))) continue;
+    counted.add(rel);
+    result.forbidden += 1;
+    result.failures.push(`forbidden write attempt: ${raw}`);
+  }
+  let harnessError = null;
   // Without this, a skill that failed to load would silently turn the run into a control.
-  if (pluginDir && !args.agent && !skillLoaded) result.failures.push(`skill eval:${c.skill} not loaded`);
-  if (proc.status !== 0) result.failures.push(`agent exit ${proc.status ?? proc.signal ?? proc.error?.code}`);
+  if (pluginDir && !args.agent && !skillLoaded) harnessError = `skill eval:${c.skill} not loaded`;
+  if (proc.status !== 0) harnessError = `agent exit ${proc.status ?? proc.signal ?? proc.error?.code}`;
+  if (harnessError) result.failures.push(harnessError);
   result.pass = result.failures.length === 0;
   writeFileSync(join(scratch, "grade.json"), `${JSON.stringify({ changes, ...result, seconds, cost, skillUsed }, null, 2)}\n`);
-  return { ...result, seconds, cost, skillUsed, scratch };
+  return { ...result, seconds, cost, skillUsed, scratch, harnessError };
 }
 
 function main() {
@@ -201,11 +224,13 @@ function main() {
   const rows = [];
   let forbiddenTotal = 0;
   const neverPassed = [];
+  let harnessErrors = 0;
   for (const c of cases) {
-    for (const variant of args.variants) {
+    for (const [vi, variant] of args.variants.entries()) {
       const runs = [];
       for (let i = 1; i <= args.runs; i++) {
-        const r = runOnce(c, variant, i, args, root);
+        const r = runOnce(c, variant, vi + 1, i, args, root);
+        if (r.harnessError) harnessErrors += 1;
         runs.push(r);
         console.error(`[${c.id} ${variant} ${i}/${args.runs}] ${r.pass ? "pass" : "FAIL"} forbidden=${r.forbidden} ${r.seconds.toFixed(1)}s ${r.scratch}`);
         for (const f of r.failures) console.error(`    ${f}`);
@@ -232,7 +257,9 @@ function main() {
   console.log([header, header.map(() => "---"), ...rows].map((r) => `| ${r.join(" | ")} |`).join("\n"));
   console.log(`\nrun artifacts: ${root}`);
   for (const id of neverPassed) console.error(`skills-eval: ${id} passed 0 of ${args.runs} runs`);
-  process.exit(forbiddenTotal > 0 || neverPassed.length > 0 ? 1 : 0);
+  if (harnessErrors > 0) console.error(`skills-eval: ${harnessErrors} run(s) did not execute cleanly (agent exit or skill not loaded)`);
+  // A forbidden action outranks everything; a run that did not execute is a harness error, not a result.
+  process.exit(forbiddenTotal > 0 ? 1 : harnessErrors > 0 ? 2 : neverPassed.length > 0 ? 1 : 0);
 }
 
 main();
