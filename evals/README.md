@@ -62,7 +62,7 @@ and the agent falls back to the skill's stated defaults.
 ## Results
 
 stdout is a table per case and variant: first-try pass, passes out of N,
-forbidden actions summed over runs, runs that invoked the Skill tool, mean
+forbidden actions summed over runs, runs that invoked `eval:<skill>`, mean
 duration, and total cost from the CLI result. Per-run failures print to stderr.
 Each run keeps `ws/`, `transcript.jsonl`, `stderr.txt`, and `grade.json` under
 the printed artifacts dir.
