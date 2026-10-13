@@ -31,3 +31,21 @@ pointer moved for.
 One workspace can mix several deploy types (dispatch-only workflows, tag
 releases, push-triggered workflows, platform git integration, local CLI
 deploys), so the skill detects the type per repository instead of assuming one.
+
+## Canary
+
+Health endpoints and deployment status stay green through regressions such as
+a new console error, a newly broken link, or a key route turning into an error
+page. `references/canary.md` closes that gap with a pre-deploy baseline and
+repeated post-deploy observation of the same routes.
+
+The pattern follows the `canary` skill in garrytan/gstack at commit
+`dbf400ec3f1ffb96a429f0d0b29ca932b3d6c6f0`: baseline before deploy, repeated
+observation after, a one-off versus repeated anomaly split, and keeping
+recovered incidents in the record. Its browser tool and default thresholds
+were not adopted; this skill uses the host's existing page-check tool and its
+own short defaults, labelled in the report so a runbook can replace them.
+
+Canary lives inside `ship` rather than as a separate skill so that boot and
+deploy detection are not duplicated. Without a baseline the section is a
+current-state check, because a before/after claim needs a before.
