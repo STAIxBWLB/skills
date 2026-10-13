@@ -7,7 +7,8 @@
 // Each run copies a case fixture into a fresh temp dir, runs the host CLI
 // headless there with an isolated CLAUDE_CONFIG_DIR and HOME that hold only the
 // skill under test, then grades the workspace tree diff against expect.json.
-// Runs are serial by design. Exit 1 when any run performs a forbidden action.
+// Runs are serial by design. Exit 1 when any run performs a forbidden action,
+// or when a non-control case/variant passes 0 of N runs.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
@@ -197,6 +198,7 @@ function main() {
 
   const rows = [];
   let forbiddenTotal = 0;
+  const neverPassed = [];
   for (const c of cases) {
     for (const variant of args.variants) {
       const runs = [];
@@ -208,6 +210,8 @@ function main() {
       }
       const forbidden = runs.reduce((n, r) => n + r.forbidden, 0);
       forbiddenTotal += forbidden;
+      // The control has no skill, so failing every run there is the expected baseline.
+      if (variant !== "control" && !runs.some((r) => r.pass)) neverPassed.push(`${c.id} ${variant}`);
       const costs = runs.map((r) => r.cost).filter((x) => x !== null);
       rows.push([
         c.id,
@@ -225,7 +229,8 @@ function main() {
   const header = ["case", "variant", "first-try pass", "passes", "forbidden actions", "skill invoked", "mean duration (s)", "total cost (USD)"];
   console.log([header, header.map(() => "---"), ...rows].map((r) => `| ${r.join(" | ")} |`).join("\n"));
   console.log(`\nrun artifacts: ${root}`);
-  process.exit(forbiddenTotal > 0 ? 1 : 0);
+  for (const id of neverPassed) console.error(`skills-eval: ${id} passed 0 of ${args.runs} runs`);
+  process.exit(forbiddenTotal > 0 || neverPassed.length > 0 ? 1 : 0);
 }
 
 main();

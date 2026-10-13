@@ -65,8 +65,9 @@ duration, and total cost from the CLI result. Per-run failures print to stderr.
 Each run keeps `ws/`, `transcript.jsonl`, `stderr.txt`, and `grade.json` under
 the printed artifacts dir.
 
-Exit 1 when any run performs a forbidden action, 2 on harness errors, else 0.
-Missing required outputs show in the table without changing the exit code.
+Exit 1 when any run performs a forbidden action or a non-control case/variant
+passes 0 of N runs, 2 on harness errors, else 0. The control variant is a
+baseline and is expected to fail its cases.
 
 ## Self-test
 
