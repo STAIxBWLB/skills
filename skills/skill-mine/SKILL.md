@@ -1,13 +1,10 @@
 ---
 name: skill-mine
 description: >
-  Claude Code 세션 로그의 사용자 프롬프트 corpus를 Knowledge Graph(graphify +
-  networkx + Leiden)로 변환하여 반복되는 워크플로우 패턴을 감지하고 스킬 후보를
-  추출한다. 전통 NLP·LLM API 호출 없음 — 사전 기반 엔티티 매칭 + 그래프 커뮤니티
-  탐지로 전면 로컬·결정론적·비용 0 동작. 출력은
-  `_meta/reports/skill-candidates-YYMMDD.md` 마크다운 리포트.
-  트리거: skill mine, 스킬 채굴, 스킬 마이닝, 반복 패턴 감지, 프롬프트 스킬화,
-  /skill-mine, skill miner, 패턴 감지, 지식그래프 스킬, graph skill mining
+  여러 Claude Code 세션에 걸쳐 반복되는 업무 지시를 찾아 새 스킬 후보로 뽑을 때
+  (스킬 채굴, skill mine, 반복 패턴 감지, /skill-mine): 세션 로그의 사용자
+  프롬프트를 사전 매칭과 지식그래프(graphify + networkx + Leiden)로 묶어 순위를
+  매긴 스킬 후보 마크다운 리포트를 만든다. LLM·API 호출 없이 로컬·결정론적으로 동작.
 ---
 
 # skill-mine — 지식그래프 기반 프롬프트 패턴 → 스킬 후보 (LLM-free)
@@ -16,7 +13,7 @@ description: >
 
 - 사용자가 "자주 반복되는 업무를 스킬로 뽑아달라" / "스킬 채굴" / "반복 패턴 감지" 등을 요청할 때
 - 주기적으로 (주 1회 권장) 최근 프롬프트 corpus에서 누락된 스킬 후보를 발굴할 때
-- `skillify`/`learner` 스킬은 현재 세션 1건만 대상 — 세션 간 반복 패턴 감지는 이 스킬이 담당
+- 대상은 세션 1건이 아니라 여러 세션에 걸친 반복 패턴
 - `/vault-graph` 와 동일한 NetworkX/Leiden 파이프라인을 재사용하므로 vault 그래프 리포트와 일관성 유지
 
 ## 전제
@@ -110,7 +107,7 @@ cd <workspace-root>
 
 ## 후속 작업
 
-1. **승격** (수동): 적합한 후보 1건 선택 → `skill-creator`로 SKILL.md 본문 작성 → public이면 `~/.maru/skills/<name>/`, private이면 `~/.maru/skills/_sources/skills-private/skills/<name>/` 배치
+1. **승격** (수동): 적합한 후보 1건 선택 → SKILL.md 본문 작성 → 해당 스킬 소스 repo에 issue·PR로 추가 (런타임 설치본 직접 수정 금지)
 2. **확장**: 기존 스킬과 overlap 이 높으면 해당 스킬의 description / triggers 에 새 표현 추가
 3. **거부**: 의미 없는 클러스터면 무시
 4. **사전 보강**: god_nodes 에 기대한 어휘가 안 보이면 `scripts/skill_miner/vocab/actions.yaml` / `objects.yaml` 에 표제어 추가
@@ -131,6 +128,5 @@ cd <workspace-root>
 ## 다음 단계 (선택 구현)
 
 - `~/.maru/skills/_drafts/YYMMDD-<slug>/SKILL.md` 템플릿 기반 자동 드래프트 (후보 → 뼈대)
-- 주간 스케줄 (`oh-my-claudecode:schedule`) + Telegram 알림 (`configure-notifications`)
 - `synonyms.yaml` — `object:inbox` ≡ `object:수신함` 병합
 - incremental mode (`--since <last-run>`) — 신규 프롬프트만 처리
