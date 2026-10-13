@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const evalsRoot = dirname(fileURLToPath(import.meta.url));
@@ -32,16 +32,17 @@ function parseArgs(argv) {
     if (value === undefined) fail(`missing value for ${flag}`);
     if (flag === "--case") args.cases.push(value);
     else if (flag === "--variant") args.variants.push(value);
-    else if (flag === "--runs") args.runs = Number.parseInt(value, 10);
+    else if (flag === "--runs") args.runs = /^\d+$/.test(value) ? Number(value) : NaN;
     else if (flag === "--budget") args.budget = value;
     else if (flag === "--model") args.model = value;
-    else if (flag === "--timeout") args.timeout = Number.parseInt(value, 10);
+    else if (flag === "--timeout") args.timeout = /^\d+$/.test(value) ? Number(value) : NaN;
     else if (flag === "--agent") args.agent = resolve(value);
     else fail(`unknown argument: ${flag}`);
     i++;
   }
   if (!(args.runs >= 1)) fail("--runs must be >= 1");
   if (!(args.timeout >= 1)) fail("--timeout must be >= 1 (seconds)");
+  if (!/^\d+(\.\d+)?$/.test(args.budget) || !(Number(args.budget) > 0)) fail("--budget must be a positive number (USD)");
   // Resolve git-ref variants up front so a bad ref is a harness error, not a crash mid-run.
   for (const v of args.variants) {
     if (v === "current" || v === "control") continue;
@@ -74,6 +75,9 @@ function snapshot(root) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const abs = join(dir, entry.name);
       if (entry.isDirectory()) walk(abs);
+      // Symlinks and other special entries are recorded, not read, so a link the
+      // agent leaves behind is graded as a change instead of crashing the snapshot.
+      else if (!entry.isFile()) out.set(relative(root, abs), `special:${entry.isSymbolicLink() ? "symlink" : "other"}`);
       else out.set(relative(root, abs), createHash("sha256").update(readFileSync(abs)).digest("hex"));
     }
   };
@@ -98,19 +102,25 @@ const isForbidden = (expect, path) => under(path, expect.forbidden) || !under(pa
 function grade(expect, changes, readFile) {
   const forbidden = changes.filter((c) => isForbidden(expect, c.path));
   const failures = forbidden.map((c) => `forbidden ${c.kind}: ${c.path}`);
-  for (const req of expect.required ?? []) {
-    const re = new RegExp(req.pattern);
-    const hits = changes.filter((c) => c.kind === "added" && re.test(c.path));
-    if (req.count !== undefined && hits.length !== req.count) {
-      failures.push(`expected ${req.count} new file(s) matching ${req.pattern}, got ${hits.length}`);
+  let gradingError = null;
+  try {
+    for (const req of expect.required ?? []) {
+      const re = new RegExp(req.pattern);
+      const hits = changes.filter((c) => c.kind === "added" && re.test(c.path));
+      if (req.count !== undefined && hits.length !== req.count) {
+        failures.push(`expected ${req.count} new file(s) matching ${req.pattern}, got ${hits.length}`);
+      }
+      for (const hit of hits) {
+        const text = readFile(hit.path);
+        for (const pat of req.contains ?? []) if (!new RegExp(pat, "m").test(text)) failures.push(`${hit.path} lacks /${pat}/`);
+        for (const pat of req.absent ?? []) if (new RegExp(pat, "m").test(text)) failures.push(`${hit.path} has /${pat}/`);
+      }
     }
-    for (const hit of hits) {
-      const text = readFile(hit.path);
-      for (const pat of req.contains ?? []) if (!new RegExp(pat, "m").test(text)) failures.push(`${hit.path} lacks /${pat}/`);
-      for (const pat of req.absent ?? []) if (new RegExp(pat, "m").test(text)) failures.push(`${hit.path} has /${pat}/`);
-    }
+  } catch (e) {
+    gradingError = `grading error: ${e.message}`;
+    failures.push(gradingError);
   }
-  return { pass: failures.length === 0, forbidden: forbidden.length, failures };
+  return { pass: failures.length === 0, forbidden: forbidden.length, failures, gradingError };
 }
 
 // The isolated runs never read the real config dir or keychain, so the host CLI
@@ -201,12 +211,13 @@ function runOnce(c, variant, variantIndex, index, args, root) {
   for (const raw of writePaths.filter(Boolean)) {
     const abs = resolve(ws, raw);
     const rel = relative(abs.startsWith(wsReal) ? wsReal : ws, abs);
-    if (counted.has(rel) || !(rel.startsWith("..") || isForbidden(expect, rel))) continue;
+    const outside = rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel);
+    if (counted.has(rel) || !(outside || isForbidden(expect, rel))) continue;
     counted.add(rel);
     result.forbidden += 1;
     result.failures.push(`forbidden write attempt: ${raw}`);
   }
-  let harnessError = null;
+  let harnessError = result.gradingError;
   // Without this, a skill that failed to load would silently turn the run into a control.
   if (pluginDir && !args.agent && !skillLoaded) harnessError = `skill eval:${c.skill} not loaded`;
   if (proc.status !== 0) harnessError = `agent exit ${proc.status ?? proc.signal ?? proc.error?.code}`;
@@ -219,10 +230,20 @@ function runOnce(c, variant, variantIndex, index, args, root) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const cases = discoverCases(args.cases);
-  // Everything a run needs is checked before the first run, so no setup error can
-  // land after a graded forbidden write and mask its exit 1.
+  // Malformed cases fail here, before any run. Errors that still escape a run are
+  // caught per run in the loop below, so they cannot mask an earlier exit 1.
   for (const c of cases) {
-    try { JSON.parse(readFileSync(join(c.dir, "expect.json"), "utf8")); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
+    let expect;
+    try { expect = JSON.parse(readFileSync(join(c.dir, "expect.json"), "utf8")); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
+    const strings = (x) => x === undefined || (Array.isArray(x) && x.every((s) => typeof s === "string"));
+    if (!strings(expect.allowed) || !strings(expect.forbidden)) fail(`${c.id}/expect.json: allowed and forbidden must be string arrays`);
+    for (const req of expect.required ?? []) {
+      for (const re of [req.pattern, ...(req.contains ?? []), ...(req.absent ?? [])]) {
+        try { new RegExp(re); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
+      }
+    }
+    for (const f of ["fixture", "prompt.md"]) if (!existsSync(join(c.dir, f))) fail(`${c.id}: missing ${f}`);
+    if (args.variants.includes("current") && !existsSync(join(repoRoot, "skills", c.skill))) fail(`${c.id}: no skills/${c.skill}`);
     for (const v of args.variants) {
       if (v === "current" || v === "control") continue;
       const has = spawnSync("git", ["-C", repoRoot, "cat-file", "-e", `${v}^{commit}:skills/${c.skill}`], { stdio: "ignore" }).status === 0;
@@ -246,7 +267,13 @@ function main() {
     for (const [vi, variant] of args.variants.entries()) {
       const runs = [];
       for (let i = 1; i <= args.runs; i++) {
-        const r = runOnce(c, variant, vi + 1, i, args, root);
+        let r;
+        try {
+          r = runOnce(c, variant, vi + 1, i, args, root);
+        } catch (e) {
+          // Recorded as a harness error; the loop goes on so the table and exit order still apply.
+          r = { pass: false, forbidden: 0, failures: [`harness error: ${e.message}`], harnessError: e.message, seconds: 0, cost: null, skillUsed: false, scratch: "-" };
+        }
         if (r.harnessError) harnessErrors += 1;
         runs.push(r);
         console.error(`[${c.id} ${variant} ${i}/${args.runs}] ${r.pass ? "pass" : "FAIL"} forbidden=${r.forbidden} ${r.seconds.toFixed(1)}s ${r.scratch}`);
