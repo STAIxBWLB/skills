@@ -69,6 +69,9 @@ gh pr view <n> --comments
 When `ssot.development_lifecycle` requires OCR review, read
 `references/ocr-review-gate.md` before deciding the gate and apply it.
 
+When this run will deploy a repository with a web surface, read
+`references/canary.md` before merging and capture its baseline.
+
 Then list review threads, paginating while `hasNextPage` is true:
 
 ```bash
@@ -211,6 +214,9 @@ publishes but that never appeared, is reported as a failure. Never infer success
 from silence, and never report a deploy as finished without naming the signal
 that confirmed it.
 
+Once a signal confirms the deploy of a web surface, run the observation in
+`references/canary.md`.
+
 ## Output
 
 ```markdown
@@ -232,6 +238,19 @@ SHIP_ROOT: <path>  (<owner>/<repo>)
 | Deploy | Type | Signal | Result |
 |--------|------|--------|--------|
 | <workflow or "git integration"> | dispatch | deployment=success, health ok | deployed |
+
+### Canary  <"Canary: current-state check" without a baseline; "Canary: not applicable (<reason>)" alone when skipped>
+
+Baseline: <captured this run | runbook location | none>, <time>, live <deployment id or commit>
+Routes: <route list, (default) where not from the runbook>; window <m> min, every <s> s
+
+| Route | Status | Console errors | Broken links | Load time |
+|-------|--------|----------------|--------------|-----------|
+| <route> | 200 -> 200 | 0 -> 1 (new: "<message>") | 0 -> 0 | 410 -> 450 ms |
+
+Anomalies: <route, finding, one-off | repeated, rounds seen> or none
+Recovered incidents: <route, finding, rounds seen, recovered at> or none
+Unverified scope: permissions, data integrity, external delivery; <routes behind sign-in, unreadable signals>
 
 Merged: 0  Blocked: 0  Deployed: 0  Errors: 0
 ```
