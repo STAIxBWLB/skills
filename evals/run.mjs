@@ -63,6 +63,8 @@ function discoverCases(filter) {
       if (existsSync(join(dir, "expect.json"))) cases.push({ id: `${skill}/${name}`, skill, dir });
     }
   }
+  const unknown = filter.filter((id) => !cases.some((c) => c.id === id));
+  if (unknown.length) fail(`no case named ${unknown.join(", ")}`);
   const picked = filter.length ? cases.filter((c) => filter.includes(c.id)) : cases;
   if (picked.length === 0) fail(`no cases matched ${filter.join(", ") || "evals/*/*/expect.json"}`);
   return picked;
@@ -98,6 +100,30 @@ function diffTrees(before, after) {
 // A path is forbidden when it hits a forbidden prefix or leaves every allowed prefix.
 const under = (path, prefixes) => (prefixes ?? []).some((p) => path === p || path.startsWith(p));
 const isForbidden = (expect, path) => under(path, expect.forbidden) || !under(path, expect.allowed);
+
+// Schema of expect.json; returns the first problem or null. A loose value here
+// would grade silently wrong (a string iterated per character, a missing pattern
+// matching everything), so anything off-schema is a harness error.
+function expectProblem(expect) {
+  const isObj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
+  const strArr = (x) => Array.isArray(x) && x.every((s) => typeof s === "string");
+  const compiles = (s) => { try { new RegExp(s); return true; } catch { return false; } };
+  if (!isObj(expect)) return "must be an object";
+  if (!strArr(expect.allowed)) return "allowed must be a string array";
+  if (expect.forbidden !== undefined && !strArr(expect.forbidden)) return "forbidden must be a string array";
+  if (expect.required === undefined) return null;
+  if (!Array.isArray(expect.required)) return "required must be an array";
+  for (const [i, req] of expect.required.entries()) {
+    if (!isObj(req)) return `required[${i}] must be an object`;
+    if (typeof req.pattern !== "string" || !compiles(req.pattern)) return `required[${i}].pattern must be a valid regex string`;
+    if (req.count !== undefined && !(Number.isInteger(req.count) && req.count >= 0)) return `required[${i}].count must be a non-negative integer`;
+    for (const key of ["contains", "absent"]) {
+      if (req[key] === undefined) continue;
+      if (!strArr(req[key]) || !req[key].every(compiles)) return `required[${i}].${key} must be an array of valid regex strings`;
+    }
+  }
+  return null;
+}
 
 function grade(expect, changes, readFile) {
   const forbidden = changes.filter((c) => isForbidden(expect, c.path));
@@ -235,13 +261,8 @@ function main() {
   for (const c of cases) {
     let expect;
     try { expect = JSON.parse(readFileSync(join(c.dir, "expect.json"), "utf8")); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
-    const strings = (x) => x === undefined || (Array.isArray(x) && x.every((s) => typeof s === "string"));
-    if (!strings(expect.allowed) || !strings(expect.forbidden)) fail(`${c.id}/expect.json: allowed and forbidden must be string arrays`);
-    for (const req of expect.required ?? []) {
-      for (const re of [req.pattern, ...(req.contains ?? []), ...(req.absent ?? [])]) {
-        try { new RegExp(re); } catch (e) { fail(`${c.id}/expect.json: ${e.message}`); }
-      }
-    }
+    const problem = expectProblem(expect);
+    if (problem) fail(`${c.id}/expect.json: ${problem}`);
     for (const f of ["fixture", "prompt.md"]) if (!existsSync(join(c.dir, f))) fail(`${c.id}: missing ${f}`);
     if (args.variants.includes("current") && !existsSync(join(repoRoot, "skills", c.skill))) fail(`${c.id}: no skills/${c.skill}`);
     for (const v of args.variants) {
