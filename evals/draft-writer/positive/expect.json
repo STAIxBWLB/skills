@@ -1,0 +1,13 @@
+{
+  "description": "One high candidate above the threshold becomes exactly one new draft; the low candidate is skipped; nothing outside the drafts collection changes and the existing draft is not overwritten.",
+  "allowed": ["scratchpad/drafts/"],
+  "forbidden": ["scratchpad/drafts/261001-memo-existing.md"],
+  "required": [
+    {
+      "pattern": "^scratchpad/drafts/[^/]+\\.md$",
+      "count": 1,
+      "contains": ["^status: draft$", "^generated_by: draft-writer$", "inbox/items/pending/261010-gws-budget-reply/summary\\.md"],
+      "absent": ["^promoted_to:", "^status: accepted"]
+    }
+  ]
+}

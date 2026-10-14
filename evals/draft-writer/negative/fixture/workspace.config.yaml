@@ -1,0 +1,8 @@
+# Eval fixture workspace. Paths are relative to the directory holding this file.
+paths:
+  scratchpad: scratchpad
+scratchpad:
+  ideation_subdir: ideation
+  memos_subdir: memos
+  drafts_subdir: drafts
+  temp_subdir: temp
