@@ -6,7 +6,8 @@
 //
 // Each run copies a case fixture into a fresh temp dir, runs the host CLI
 // headless there with an isolated CLAUDE_CONFIG_DIR and HOME that hold only the
-// skill under test, then grades the workspace tree diff against expect.json.
+// skill under test and the bundle lib/, then grades the workspace tree diff
+// against expect.json.
 // Runs are serial by design. Bad arguments and malformed cases exit 2 before any
 // run. Then exit 1 when any run performs or attempts a forbidden write; else 2
 // when a run did not execute cleanly (agent exit, error result, skill not loaded,
@@ -30,8 +31,10 @@ function parseArgs(argv) {
   const args = { cases: [], variants: [], runs: 3, budget: "0.50", timeout: 600 };
   for (let i = 0; i < argv.length; i++) {
     const [flag, value] = [argv[i], argv[i + 1]];
-    if (!["--case", "--variant", "--runs", "--budget", "--model", "--timeout", "--agent"].includes(flag)) fail(`unknown argument: ${flag}`);
-    if (value === undefined) fail(`missing value for ${flag}`);
+    const FLAGS = ["--case", "--variant", "--runs", "--budget", "--model", "--timeout", "--agent"];
+    if (!FLAGS.includes(flag)) fail(`unknown argument: ${flag}`);
+    // A following flag is never a value: `--model --runs 2` is a missing model.
+    if (value === undefined || FLAGS.includes(value)) fail(`missing value for ${flag}`);
     if (flag === "--case") args.cases.push(value);
     else if (flag === "--variant") args.variants.push(value);
     else if (flag === "--runs") args.runs = /^\d+$/.test(value) ? Number(value) : NaN;

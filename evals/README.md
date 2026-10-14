@@ -20,7 +20,7 @@ Options for `evals/run.mjs` (pass through `EVAL_ARGS`):
 - `--runs <n>`: runs per case and variant, default 3. Runs are serial.
 - `--variant <v>`: repeatable, default `current`. `current` installs the skill
   from the working tree, `control` installs nothing, and any other value is a
-  git ref whose `skills/<skill>` is installed. Use a ref and `current` together
+  git ref whose `skills/<skill>` (and `lib/`, when the ref has it) is installed. Use a ref and `current` together
   for a before/after comparison of a skill edit.
 - `--budget <usd>`: per-run cap passed to `claude --max-budget-usd`, default `0.50`.
 - `--model <m>`, `--timeout <seconds>` (default 600).
@@ -35,9 +35,9 @@ the environment; without one it exits 2 before running anything.
 ## Isolation
 
 Each run gets a fresh temp dir (refused if it sits inside a git work tree)
-holding a copy of the case fixture, an empty `HOME`, and an isolated
-`CLAUDE_CONFIG_DIR`. The skill under test is the only addition, loaded as the
-session plugin `eval:<skill>`. The CLI runs with `--restricted` (file tools
+holding a copy of the case fixture, a `HOME` that holds only the bundle `lib/`
+(see below), and an isolated `CLAUDE_CONFIG_DIR`. The skill under test is the
+only other addition, loaded as the session plugin `eval:<skill>`. The CLI runs with `--restricted` (file tools
 confined to the fixture, no shell or web tools), `--tools
 Read,Write,Edit,Glob,Grep,Skill`, `--strict-mcp-config` with no servers,
 `--permission-prompts none`, and the budget cap. The child environment carries
