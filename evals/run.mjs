@@ -6,15 +6,17 @@
 //
 // Each run copies a case fixture into a fresh temp dir, runs the host CLI
 // headless there with an isolated CLAUDE_CONFIG_DIR and HOME that hold only the
-// skill under test, then grades the workspace tree diff against expect.json.
-// Runs are serial by design. Exit 1 when any run performs or attempts a forbidden
-// write; else 2 when a run did not execute (agent exit, skill not loaded); else 1
-// when a non-control case/variant passes 0 of N runs; else 0.
+// skill under test and the bundle lib/, then grades the workspace tree diff
+// against expect.json.
+// Runs are serial by design. Bad arguments and malformed cases exit 2 before any
+// run. Then exit 1 when any run performs or attempts a forbidden write; else 2
+// when a run did not execute cleanly (agent exit, error result, skill not loaded,
+// harness error); else 1 when a non-control case/variant passes 0 of N runs; else 0.
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const evalsRoot = dirname(fileURLToPath(import.meta.url));
@@ -29,7 +31,10 @@ function parseArgs(argv) {
   const args = { cases: [], variants: [], runs: 3, budget: "0.50", timeout: 600 };
   for (let i = 0; i < argv.length; i++) {
     const [flag, value] = [argv[i], argv[i + 1]];
-    if (value === undefined) fail(`missing value for ${flag}`);
+    const FLAGS = ["--case", "--variant", "--runs", "--budget", "--model", "--timeout", "--agent"];
+    if (!FLAGS.includes(flag)) fail(`unknown argument: ${flag}`);
+    // A following flag is never a value: `--model --runs 2` is a missing model.
+    if (value === undefined || FLAGS.includes(value)) fail(`missing value for ${flag}`);
     if (flag === "--case") args.cases.push(value);
     else if (flag === "--variant") args.variants.push(value);
     else if (flag === "--runs") args.runs = /^\d+$/.test(value) ? Number(value) : NaN;
@@ -37,7 +42,6 @@ function parseArgs(argv) {
     else if (flag === "--model") args.model = value;
     else if (flag === "--timeout") args.timeout = /^\d+$/.test(value) ? Number(value) : NaN;
     else if (flag === "--agent") args.agent = resolve(value);
-    else fail(`unknown argument: ${flag}`);
     i++;
   }
   if (!(args.runs >= 1)) fail("--runs must be >= 1");
@@ -90,7 +94,7 @@ function snapshot(root) {
 function diffTrees(before, after) {
   const changes = [];
   for (const [path, hash] of after) {
-    if (!before.has(path)) changes.push({ path, kind: "added" });
+    if (!before.has(path)) changes.push({ path, kind: "added", ...(hash.startsWith("special:") ? { special: hash } : {}) });
     else if (before.get(path) !== hash) changes.push({ path, kind: "modified" });
   }
   for (const path of before.keys()) if (!after.has(path)) changes.push({ path, kind: "deleted" });
@@ -107,14 +111,21 @@ const isForbidden = (expect, path) => under(path, expect.forbidden) || !under(pa
 function expectProblem(expect) {
   const isObj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
   const strArr = (x) => Array.isArray(x) && x.every((s) => typeof s === "string");
+  // A typo'd key would silently disable its check; an empty prefix matches every path.
+  const extra = (obj, keys) => Object.keys(obj).find((k) => !keys.includes(k));
+  const prefixes = (x) => strArr(x) && x.every((s) => s !== "");
   const compiles = (s) => { try { new RegExp(s); return true; } catch { return false; } };
   if (!isObj(expect)) return "must be an object";
-  if (!strArr(expect.allowed)) return "allowed must be a string array";
-  if (expect.forbidden !== undefined && !strArr(expect.forbidden)) return "forbidden must be a string array";
+  const key = extra(expect, ["description", "allowed", "forbidden", "required"]);
+  if (key) return `unknown key ${key}`;
+  if (!prefixes(expect.allowed)) return "allowed must be an array of non-empty strings";
+  if (expect.forbidden !== undefined && !prefixes(expect.forbidden)) return "forbidden must be an array of non-empty strings";
   if (expect.required === undefined) return null;
   if (!Array.isArray(expect.required)) return "required must be an array";
   for (const [i, req] of expect.required.entries()) {
     if (!isObj(req)) return `required[${i}] must be an object`;
+    const reqKey = extra(req, ["pattern", "count", "contains", "absent"]);
+    if (reqKey) return `required[${i}]: unknown key ${reqKey}`;
     if (typeof req.pattern !== "string" || !compiles(req.pattern)) return `required[${i}].pattern must be a valid regex string`;
     if (req.count !== undefined && !(Number.isInteger(req.count) && req.count >= 0)) return `required[${i}].count must be a non-negative integer`;
     for (const key of ["contains", "absent"]) {
@@ -137,6 +148,11 @@ function grade(expect, changes, readFile) {
         failures.push(`expected ${req.count} new file(s) matching ${req.pattern}, got ${hits.length}`);
       }
       for (const hit of hits) {
+        // Symlinks and FIFOs are never opened: a FIFO would block, a link could leave the workspace.
+        if (hit.special) {
+          failures.push(`${hit.path} is not a regular file (${hit.special})`);
+          continue;
+        }
         const text = readFile(hit.path);
         for (const pat of req.contains ?? []) if (!new RegExp(pat, "m").test(text)) failures.push(`${hit.path} lacks /${pat}/`);
         for (const pat of req.absent ?? []) if (new RegExp(pat, "m").test(text)) failures.push(`${hit.path} has /${pat}/`);
@@ -153,24 +169,43 @@ function grade(expect, changes, readFile) {
 // only authenticates through an env credential the caller passes in.
 const AUTH_ENV = ["ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN"];
 
+// Where the Maru app installs the bundle `lib/`; skills name adapters by this path.
+const BUNDLE_LIB = join(".maru", "skills", "_builtin", "lib");
+
 // --restricted ignores user skills, so the skill under test ships as a
 // session-only plugin inside the isolated config dir (invoked as eval:<skill>).
-function installSkill(variant, skill, configDir, scratch) {
-  if (variant === "control") return null;
+// The variant's bundle lib/ goes under the isolated HOME at its installed path.
+function installSkill(variant, skill, configDir, home, scratch) {
+  if (variant === "control") return {};
   const pluginDir = join(configDir, "eval-plugin");
   const dest = join(pluginDir, "skills", skill);
   mkdirSync(join(pluginDir, ".claude-plugin"), { recursive: true });
   writeFileSync(join(pluginDir, ".claude-plugin", "plugin.json"), '{"name":"eval"}\n');
-  let src = join(repoRoot, "skills", skill);
+  let src = repoRoot;
   if (variant !== "current") {
-    const tar = execFileSync("git", ["-C", repoRoot, "archive", "--format=tar", "--end-of-options", variant, `skills/${skill}`]);
-    const out = join(scratch, "ref");
-    mkdirSync(out, { recursive: true });
-    execFileSync("tar", ["-x", "-C", out], { input: tar });
-    src = join(out, "skills", skill);
+    const hasLib = spawnSync("git", ["-C", repoRoot, "cat-file", "-e", `${variant}^{commit}:lib`], { stdio: "ignore" }).status === 0;
+    const tar = execFileSync("git", ["-C", repoRoot, "archive", "--format=tar", "--end-of-options", variant, `skills/${skill}`, ...(hasLib ? ["lib"] : [])]);
+    src = join(scratch, "ref");
+    mkdirSync(src, { recursive: true });
+    execFileSync("tar", ["-x", "-C", src], { input: tar });
   }
-  cpSync(src, dest, { recursive: true });
-  return pluginDir;
+  cpSync(join(src, "skills", skill), dest, { recursive: true });
+  if (!existsSync(join(src, "lib"))) return { pluginDir };
+  const libDir = join(home, BUNDLE_LIB);
+  cpSync(join(src, "lib"), libDir, { recursive: true });
+  return { pluginDir, libDir };
+}
+
+// Real on-disk spelling (case, symlinks) of the deepest existing ancestor plus the
+// rest, so a wrong-case path on a case-insensitive filesystem grades as the file it hit.
+function onDisk(abs) {
+  const tail = [];
+  let head = abs;
+  while (!existsSync(head)) {
+    tail.unshift(basename(head));
+    head = dirname(head);
+  }
+  return join(realpathSync.native(head), ...tail);
 }
 
 function runOnce(c, variant, variantIndex, index, args, root) {
@@ -182,7 +217,7 @@ function runOnce(c, variant, variantIndex, index, args, root) {
   cpSync(join(c.dir, "fixture"), ws, { recursive: true });
   mkdirSync(configDir, { recursive: true });
   mkdirSync(home, { recursive: true });
-  const pluginDir = installSkill(variant, c.skill, configDir, scratch);
+  const { pluginDir, libDir } = installSkill(variant, c.skill, configDir, home, scratch);
 
   const prompt = readFileSync(join(c.dir, "prompt.md"), "utf8");
   const env = { PATH: process.env.PATH, HOME: home, TMPDIR: scratch, LANG: "en_US.UTF-8", CLAUDE_CONFIG_DIR: configDir };
@@ -198,6 +233,8 @@ function runOnce(c, variant, variantIndex, index, args, root) {
     "--strict-mcp-config",
     "--no-session-persistence",
     ...(pluginDir ? ["--plugin-dir", pluginDir] : []),
+    // --restricted confines file tools to the working dirs; --add-dir makes lib/ one of them.
+    ...(libDir ? ["--add-dir", libDir] : []),
     ...(args.model ? ["--model", args.model] : []),
   ];
 
@@ -211,12 +248,17 @@ function runOnce(c, variant, variantIndex, index, args, root) {
   let cost = null;
   let skillUsed = false;
   let skillLoaded = false;
+  let resultError = null;
   const writePaths = [];
   for (const line of (proc.stdout ?? "").split("\n")) {
     if (!line.startsWith("{")) continue;
     let msg;
     try { msg = JSON.parse(line); } catch { continue; }
     if (msg.type === "result" && typeof msg.total_cost_usd === "number") cost = msg.total_cost_usd;
+    // The CLI can exit 0 after a failed session (budget exhausted, API error); its result message says so.
+    if (msg.type === "result" && (msg.is_error === true || (msg.subtype !== undefined && msg.subtype !== "success"))) {
+      resultError = `agent result ${msg.subtype ?? "-"}${msg.is_error ? ` is_error: ${String(msg.result ?? "").slice(0, 200)}` : ""}`;
+    }
     if (msg.type === "system" && msg.subtype === "init") skillLoaded = (msg.skills ?? []).includes(`eval:${c.skill}`);
     const content = Array.isArray(msg.message?.content) ? msg.message.content : [];
     // Count only calls that name the skill under test; a control's failed call to the bare name is not use.
@@ -232,11 +274,10 @@ function runOnce(c, variant, variantIndex, index, args, root) {
   const result = grade(expect, changes, (p) => readFileSync(join(ws, p), "utf8"));
   // A forbidden write the agent later reverted leaves no trace in the final tree,
   // so every write attempt in the transcript is graded too.
-  const wsReal = realpathSync(ws);
+  const wsReal = realpathSync.native(ws);
   const counted = new Set(changes.filter((ch) => isForbidden(expect, ch.path)).map((ch) => ch.path));
   for (const raw of writePaths.filter(Boolean)) {
-    const abs = resolve(ws, raw);
-    const rel = relative(abs.startsWith(wsReal) ? wsReal : ws, abs);
+    const rel = relative(wsReal, onDisk(resolve(ws, raw)));
     const outside = rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel);
     if (counted.has(rel) || !(outside || isForbidden(expect, rel))) continue;
     counted.add(rel);
@@ -246,6 +287,7 @@ function runOnce(c, variant, variantIndex, index, args, root) {
   let harnessError = result.gradingError;
   // Without this, a skill that failed to load would silently turn the run into a control.
   if (pluginDir && !args.agent && !skillLoaded) harnessError = `skill eval:${c.skill} not loaded`;
+  if (resultError) harnessError = resultError;
   if (proc.status !== 0) harnessError = `agent exit ${proc.status ?? proc.signal ?? proc.error?.code}`;
   if (harnessError) result.failures.push(harnessError);
   result.pass = result.failures.length === 0;
@@ -322,7 +364,7 @@ function main() {
   console.log([header, header.map(() => "---"), ...rows].map((r) => `| ${r.join(" | ")} |`).join("\n"));
   console.log(`\nrun artifacts: ${root}`);
   for (const id of neverPassed) console.error(`skills-eval: ${id} passed 0 of ${args.runs} runs`);
-  if (harnessErrors > 0) console.error(`skills-eval: ${harnessErrors} run(s) did not execute cleanly (agent exit or skill not loaded)`);
+  if (harnessErrors > 0) console.error(`skills-eval: ${harnessErrors} run(s) did not execute cleanly (agent exit, error result, skill not loaded, or harness error)`);
   // A forbidden action outranks everything; a run that did not execute is a harness error, not a result.
   process.exit(forbiddenTotal > 0 ? 1 : harnessErrors > 0 ? 2 : neverPassed.length > 0 ? 1 : 0);
 }
