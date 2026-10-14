@@ -51,6 +51,9 @@ Path: `<drafts>/<YYMMDD>-<type>-<slug>.md`.
 
 `<drafts>` is `<paths.scratchpad>/<scratchpad.drafts_subdir>`, resolved per
 `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` (default `scratchpad/drafts`).
+When that adapter file cannot be read, read the two keys from
+`workspace.config.yaml` directly, use the default for an absent key, and
+continue.
 `<type>` comes from the workspace document-type vocabulary (`reply`, `report`,
 `plan`, `memo`, ...) and `<slug>` is a short description. Follow the workspace
 naming rule: no spaces, lowercase ASCII or Hangul, hyphen-separated.
