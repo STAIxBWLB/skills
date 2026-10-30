@@ -6,6 +6,8 @@ description: Show vault statistics and health overview
 
 # /vault-stats
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Display comprehensive vault statistics. Numbers only; the "what to do next" recommendation is `/vault-next`.
 
 ## Metrics

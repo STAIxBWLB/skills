@@ -6,6 +6,8 @@ description: Scan work/ for changes and propose vault extractions with confirmat
 
 # /vault-sync [scope]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Scan work/ for new or changed content and propose vault extractions. Nothing is created without explicit user confirmation.
 
 ## Input

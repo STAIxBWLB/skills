@@ -8,7 +8,7 @@ Workflow step 5 (`[phase:verify]`), run before drafting when
   owners, dates, amounts, quoted commitments, and any "someone said X is
   happening" attributions.
 - Internal verification: cross-check each claim against the step-4 context
-  bundle plus targeted lookups: vault notes (`vmem_search`),
+  bundle plus targeted lookups: vault notes (`vmem_search` with the `vault` id bound per `lib/vault_adapter.md` §Runtime Discovery),
   past meeting notes under the meeting root, open tasks, and the project
   registry. Flag transcription-error suspects (a surface form
   phonetically/visually close to a known canonical entity, e.g. a garbled

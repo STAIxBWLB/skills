@@ -6,6 +6,8 @@ trigger: /vault-rename
 
 # /vault-rename [old-name] [new-name]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Atomic vault note rename with full reference propagation. Implements 2026-04-22 Rethink M7 (JSIF→JIUCC 사례의 18 파일 수동 patch 이슈 해소).
 
 ## Input

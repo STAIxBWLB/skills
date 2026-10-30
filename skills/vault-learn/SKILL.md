@@ -6,6 +6,8 @@ description: Query→Wiki 환원 — research a topic (or promote a conversation
 
 # /vault-learn [topic]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Promote a research finding or conversation answer into the vault graph **only after explicit user approval**. Implements the Query→Wiki 환원 루프 defined in `vault/AGENTS.md` §"Query → Wiki 환원 루프".
 
 **Not for**: observations about how the vault/methodology itself is working (friction, surprises, process notes) — those go to `ops/observations/` via `/vault-remember` (no approval gate, no LEARN line; they feed `/vault-rethink`). `/vault-learn` writes knowledge into `notes/`.

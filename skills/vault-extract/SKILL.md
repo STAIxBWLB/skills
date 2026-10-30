@@ -6,6 +6,8 @@ description: Extract insights from a source document into vault notes
 
 # /vault-extract [source]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Extract insights, decisions, observations from a source document and create vault notes.
 
 ## Input

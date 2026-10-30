@@ -6,6 +6,8 @@ description: Review accumulated observations and tensions for methodology evolut
 
 # /vault-rethink [mode]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Review observations, tensions, and methodology drift.
 
 ## Modes

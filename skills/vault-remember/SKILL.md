@@ -6,6 +6,8 @@ description: Record an operational observation or methodology learning
 
 # /vault-remember [observation]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Record an observation about methodology, process, or friction for later review.
 
 **Not for**: knowledge — facts, decisions, insights about the world or the user's projects belong in `notes/` via `/vault-learn` (approval gate + LEARN log) or `/vault-extract`. `/vault-remember` only writes `ops/observations/` entries that `/vault-rethink` consumes.

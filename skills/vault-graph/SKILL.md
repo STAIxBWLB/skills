@@ -10,6 +10,8 @@ description: >
 
 # /vault-graph [command]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 
 `vault-graph` owns the graph workflow.

@@ -12,6 +12,8 @@ description: >
 
 # /vault-lint 스킬
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 work/ + vault/ 정합성 검증 리포트 생성기.
 
 ## 기본 원칙

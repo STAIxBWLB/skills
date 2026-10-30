@@ -6,6 +6,8 @@ description: Restructure notes, split/merge, improve titles, reorganize MOCs (wi
 
 # /vault-refactor [target]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Restructure vault content for better organization. **Never auto-executes** — always presents a structured plan and waits for explicit user approval.
 
 ## Operations

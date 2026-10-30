@@ -6,6 +6,8 @@ description: Find and create wiki link connections between vault notes
 
 # /vault-connect [note]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Find relationships between a note and existing vault notes, create wiki links.
 
 ## Input
