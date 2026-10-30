@@ -96,7 +96,7 @@ YYYY-MM-DD HH:MM  EXTRACT  <project>  <source> → <vault/notes/x.md>  — <type
 
 **Update vs create**: for updates, use `— updated: <type>` to distinguish.
 
-**Failure**: if the receipt shows the note applied but `logged: false`, warn user and proceed (do not roll back). If vmem refused the note, record only the `failed:` line.
+**Failure**: inspect `applied`, `changes` and `logged` on every receipt. `ok: true`, `applied: true`, `logged: false`: the note saved but its log line did not; warn the user and proceed (do not roll back). `refused` with `applied: false`: nothing was written; record only the `failed:` line. `refused` with `applied: true`: the write partly persisted; stop, report the receipt and reconcile the note and log before any retry (`lib/vault_adapter.md` §Write results).
 
 **Vault access**: vmem MCP only. No filesystem Write/Edit on vault paths.
 

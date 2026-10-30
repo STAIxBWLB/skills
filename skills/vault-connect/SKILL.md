@@ -55,7 +55,7 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`, `[
 
 **Bidirectional links**: one `vmem_link` call updates both notes and writes one line.
 
-**Failure**: a refused `vmem_link` writes nothing; report its issues and keep the links that succeeded.
+**Failure**: inspect each refused receipt's `applied`, `changes` and `logged`. With `applied: false` nothing was written: report its issues and keep the links that succeeded. With `applied: true` the write partly persisted: stop, report the receipt and reconcile the notes and log before any retry (`lib/vault_adapter.md` §Write results).
 
 **Vault access**: vmem MCP only.
 
