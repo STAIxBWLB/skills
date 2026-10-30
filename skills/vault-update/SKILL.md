@@ -1,10 +1,12 @@
 ---
 name: vault-update
 trigger: /vault-update
-description: Refresh an outdated note with new context while preserving core insight (MCP Obsidian only)
+description: Refresh an outdated note with new context while preserving core insight (vmem MCP only)
 ---
 
 # /vault-update [note]
+
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 
 Update a note with new information while preserving original meaning. This is the single-note leaf; batch discovery of notes that need updating is `/vault-sync` (its "update" proposals run this procedure).
 
@@ -13,33 +15,34 @@ Update a note with new information while preserving original meaning. This is th
 
 ## Process
 
-1. Read target note via `mcp__obsidian__read_note`
+1. Read target note via `vmem_read` (keep its `sha256` for `expectedSha`)
 2. Identify what's changed (new context, superseded info, additional evidence)
 3. Draft the update:
    - preserve core insight
    - add new content in an explicit section (e.g., `## Update YYYY-MM-DD`) OR inline-revise with preservation
-4. Apply via MCP Obsidian:
-   - minor edit → `mcp__obsidian__patch_note(path, oldString, newString)`
-   - major rewrite → `mcp__obsidian__write_note(path, content, mode: "overwrite")`
-   - frontmatter change → `mcp__obsidian__update_frontmatter(path, frontmatter)`
-5. Check connected notes (via `mcp__obsidian__search_notes` for wiki-link targets); propose cascading updates if needed
+4. Apply via vmem:
+   - minor edit → `vmem_patch(path, oldString, newString, expectedSha)`
+   - new section → `vmem_append(path, section: "Update YYYY-MM-DD", markdown)`
+   - major rewrite → there is no overwrite tool: patch section by section, or create a replacement note with `vmem_create` and retire the old one with `vmem_supersede(old, next)`
+   - frontmatter change → `vmem_set_frontmatter(path, set, unset, expectedSha)`
+   - expect: vmem refuses a stale `expectedSha`, an invalid frontmatter value, a new unresolved wiki link and an edit inside `## Topics`
+5. Check connected notes (via `vmem_links(path)` and `vmem_search`); propose cascading updates if needed
 6. Record update in note body (timestamp or changelog line)
 7. Run `/vault-lint note=<path>` on updated note
-8. Append `CONNECT` event to `log` if wiki-links changed, or skip log if only body/frontmatter touched
+8. vmem logs every write with a default `EXTRACT` line (`vmem_patch`/`vmem_append`/`vmem_set_frontmatter` take no `log` argument); when wiki-links changed, add one `vmem_log_append(type: "CONNECT", ...)` line
 
 ## Vault Access
 
-**MCP Obsidian only**. No filesystem Read/Write/Edit on vault paths. Use:
+**vmem MCP only**. No filesystem Read/Write/Edit on vault paths. Use:
 
-| Operation | MCP Tool |
+| Operation | vmem tool |
 |-----------|---------|
-| Read | `mcp__obsidian__read_note` |
-| Full rewrite | `mcp__obsidian__write_note(mode: "overwrite")` |
-| Append | `mcp__obsidian__write_note(mode: "append")` |
-| Targeted edit | `mcp__obsidian__patch_note` |
-| Frontmatter | `mcp__obsidian__update_frontmatter` |
-| Tags | `mcp__obsidian__manage_tags` |
-| Search for impact | `mcp__obsidian__search_notes` |
+| Read | `vmem_read` |
+| Full rewrite | section `vmem_patch` calls, or `vmem_create` + `vmem_supersede` |
+| Append | `vmem_append` |
+| Targeted edit | `vmem_patch` |
+| Frontmatter and tags | `vmem_set_frontmatter` |
+| Search for impact | `vmem_links`, `vmem_search` |
 
 ## Quality Gates
 

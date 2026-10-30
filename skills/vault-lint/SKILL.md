@@ -12,6 +12,8 @@ description: >
 
 # /vault-lint 스킬
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 work/ + vault/ 정합성 검증 리포트 생성기.
 
 ## 기본 원칙
@@ -21,7 +23,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 - **log append**: `vault/log`에 `LINT` 이벤트 1줄 추가
 - **vault 스코프 판정은 스크립트**: `scripts/lint.py`가 `notes/`·`log`·`reports/`를 **fs 읽기 전용**으로 스캔해
   L01·L02·L03·L09·L10·L11·L12를 판정한다(`lib/vault_adapter.md`의 결정적 스크립트 예외, `build-graph.py`와 동일).
-  vault **쓰기**(리포트 노트)는 종전대로 MCP Obsidian만 사용.
+  vault **쓰기**(리포트)는 vmem만 사용. `vmem lint`(=`vmem_lint`)가 같은 판정을 내며, 두 결과는 parity 교차 검증 대상이다.
 - **work/ 접근**: Read / Grep / Glob (서브모듈 내부 깊이 검사는 위임)
 
 ## 호출 형식
@@ -94,22 +96,22 @@ scope가 `full`·`work`·`inbox`·`names`이면 검사 전에 `references/work-s
 
 ### 4단계: 리포트 생성
 
-`vault/reports/lint-YYMMDD.md`를 `mcp__obsidian__write_note`로 생성. vault 스코프 섹션은 2단계 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
+`vault/reports/lint-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem report <vault> reports/lint-YYMMDD.md --body -`(기본 EXTRACT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`(LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
 
 ### 5단계: log append
 
-`vault/log`에 1줄 append:
+(a) 경로일 때만 `vmem_log_append(type: "LINT", project: "-", source: "vault/ + work/", note: "E errors, W warnings")`로 LINT 1줄 기록((b)는 `vmem_lint`가 이미 LINT를 기록하므로 추가하지 않음):
 
 ```
 YYYY-MM-DD HH:MM  LINT  -  vault/ + work/  — E errors, W warnings
 ```
 
-append는 fs 직접 append(`>>`)로 수행. `vault/log`는 plain logfile(확장자 없음)로 vault MCP-only 쓰기 원칙의 유일 예외. 노트(.md) 쓰기는 종전대로 MCP 전용.
+log 파일 직접 append(`>>`) 금지.
 
 ## 가드레일
 
 - **자동 수정 금지**: 리포트만 생성. 수정은 사용자가 별도 스킬(`/vault-extract`, `/vault-connect`, `inbox-process`)로 실행.
-- **vault 쓰기는 MCP Obsidian만**: `write_note`, `update_frontmatter`, `patch_note` 사용. 파일시스템 `Write`/`Edit` 금지. 읽기는 `scripts/lint.py`가 fs 읽기 전용으로 수행(결정적 스크립트 예외).
+- **vault 쓰기는 vmem만**: 리포트는 `vmem report`, 노트 수정은 `vmem_*` 쓰기 도구. 파일시스템 `Write`/`Edit` 금지. 읽기는 `scripts/lint.py`가 fs 읽기 전용으로 수행(결정적 스크립트 예외).
 - **서브모듈 내부 깊이 검사 안 함**: 서브모듈은 해당 저장소의 자체 lint로 위임.
 - **CI 등록 금지**: 로컬 vault 접근이 필요하므로 CI 파이프라인에 등록하지 않는다. 권장 주기는 주간 `full` 1회, 대규모 ingest 후 `vault`.
 - **성능**: vault 스코프는 스크립트 1회 실행. work 스코프(L07/L08 `Glob work/**/*`)가 비용의 대부분이므로 필요 시 `/vault-lint vault`로 분리.

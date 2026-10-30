@@ -10,6 +10,8 @@ description: >
 
 # /vault-graph [command]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 
 `vault-graph` owns the graph workflow.
@@ -74,7 +76,7 @@ Options:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 삽입, 구 리포트 삭제)
    - workspace: `<vault.path>/reports/workspace-graph.json` (report suppressed — DR-023 §6; counts printed to stdout)
    - code: `<target>/graphify-out/graph.json`, `<target>/graphify-out/graph-report-YYMMDD.md`
-6. For vault builds, append `GRAPH` event to `vault/log` (plain logfile, direct fs append):
+6. For vault builds, record a `GRAPH` event with `vmem_log_append(type: "GRAPH", project: "-", source: "vault/reports/graph-report-YYMMDD.md", note: "N notes, M communities, K surprises")` (no direct log-file append; if the build ran as `vmem_graph_build`, it already recorded GRAPH, so skip this). expect: vmem refuses a TYPE outside the ingest-chain set:
    ```
    YYYY-MM-DD HH:MM  GRAPH  -  vault/reports/graph-report-YYMMDD.md  — N notes, M communities, K surprises
    ```
@@ -100,7 +102,7 @@ Report the node's `community`, its degree-ranked neighbors (≤10), and same-com
    - vault: `<vault.path>/reports/graph-report-*.md`
    - code: `<target>/graphify-out/graph-report-*.md`
 2. Select newest report and warn if older than 7 days.
-3. Read vault reports through Obsidian MCP and code reports through filesystem read.
+3. Read vault and code reports through filesystem read (reports are machine-generated artifacts; vmem tools read notes).
 4. Summarize overview, god nodes, top communities, surprising connections, and isolate count.
 
 ## Query Process (`/vault-graph query "<question>" [options]`)

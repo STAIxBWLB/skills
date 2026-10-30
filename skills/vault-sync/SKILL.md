@@ -6,6 +6,8 @@ description: Scan work/ for changes and propose vault extractions with confirmat
 
 # /vault-sync [scope]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Scan work/ for new or changed content and propose vault extractions. Nothing is created without explicit user confirmation.
 
 ## Input
@@ -142,9 +144,9 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 
 ### Step 4: Record
 - Update last-sync timestamp in `ops/sessions/last-sync-timestamp` (plain file, fs write)
-- Log sync results in `ops/sessions/YYYYMMDD-sync.md` via `mcp__obsidian__write_note` (vault markdown)
+- Log sync results in `ops/sessions/YYYYMMDD-sync.md` with `vmem report <vault> ops/sessions/YYYYMMDD-sync.md --body -` (no MCP tool writes `ops/`; expect: vmem refuses secret-looking text and an unsafe path)
 - Promote vault-relevant `TASK` events from the work-local `.maru/tasks-log.md`
-  to `vault/log` (ingest-chain TYPE `TASK`; task-management does not write the
+  to `vault/log` with `vmem_log_append(type: "TASK", ...)` (task-management does not write the
   vault directly — context-enrichment §6)
 - **Graph freshness (DR-019 §6)**: run vault-lint L11 (graph staleness). If `vault-graph.json`
   is > 7 days stale, propose `/vault-graph build`. Suggest only — do not auto-build.

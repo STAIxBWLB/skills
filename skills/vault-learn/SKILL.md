@@ -6,6 +6,8 @@ description: Query→Wiki 환원 — research a topic (or promote a conversation
 
 # /vault-learn [topic]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Promote a research finding or conversation answer into the vault graph **only after explicit user approval**. Implements the Query→Wiki 환원 루프 defined in `vault/AGENTS.md` §"Query → Wiki 환원 루프".
 
 **Not for**: observations about how the vault/methodology itself is working (friction, surprises, process notes) — those go to `ops/observations/` via `/vault-remember` (no approval gate, no LEARN line; they feed `/vault-rethink`). `/vault-learn` writes knowledge into `notes/`.
@@ -26,8 +28,8 @@ Promote a research finding or conversation answer into the vault graph **only af
 - If conversation mode: collect the question, the files cross-referenced, and the synthesized answer
 
 ### Step 2: Vault duplicate check
-- `mcp__obsidian__search_notes(query: "...")` on the topic + key terms
-- `mcp__obsidian__read_note("notes/glossary.md")` for term collisions
+- `vmem_search(query: "...")` on the topic + key terms
+- `vmem_read(path: "glossary", section: "<term>")` or `vmem_read(path: "glossary")` for term collisions
 
 ### Step 3: Propose (user approval gate — MANDATORY)
 Present a proposal block:
@@ -40,7 +42,7 @@ domain: research | projects | teaching | operations | people | ai-practice
 confidence: experimental (new research, default) | likely (consensus) | proven (verified sources) — schema values only (vault/AGENTS.md §Schema)
 
 Option A (NEW note):
-  - path: notes/<prose-title>.md
+  - path: notes/<kebab-case-stem>.md (lowercase letters, digits, hyphens)
   - description: <one-line>
   - topics: [[<moc>]]
   - source: <url | work/ path | conversation:<date>>
@@ -55,16 +57,17 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 **Do NOT write to vault without explicit accept.** If user skips, append `— proposed, skipped` LEARN line anyway (see Step 6).
 
 ### Step 4: Execute (on accept)
-- Write note via `mcp__obsidian__write_note` (new) or `patch_note` (update)
-- Schema: YAML frontmatter with `description`, `type`, `domain`, `topics`, `confidence`, `source`
+- New note: `vmem_create(stem, type, domain, topics, description, confidence, source, body, log: {type: "LEARN", project, source, note: "promoted: <type>"})`
+- Update: `vmem_patch(path, oldString, newString, expectedSha)` or `vmem_append(path, section, markdown)` (no `log` argument; vmem records a default EXTRACT line), then `vmem_log_append(type: "LEARN", project, source, dest, note: "updated: <title>")`
 - Body: atomic insight, context, relevant notes section
+- expect: vmem refuses a missing or duplicated note field, a `confidence` outside the schema, a `topics` entry that is not an existing MOC, a new unresolved wiki link and secret-looking text; report the named issues instead of retrying with guessed values
 
 ### Step 5: Connect
 - Call `/vault-connect note=<new-note>` to wire wiki-links (delegates log append to /vault-connect for CONNECT event)
 
-### Step 6: Append LEARN event to vault/log
+### Step 6: LEARN event in vault/log
 
-Always append — even when user skips — so the query history is preserved.
+Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 `vmem_create` records it through its `log` argument; an update records it with the Step 4 `vmem_log_append`; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
 
 **Format**:
 
@@ -79,7 +82,7 @@ YYYY-MM-DD HH:MM  LEARN  <project>  <source> → <vault/notes/x.md>  — <note>
   - `proposed, skipped` (user declined the proposal)
   - `failed: <reason>` (write error)
 
-**Vault access**: MCP Obsidian only.
+**Vault access**: vmem MCP only.
 
 ## Quality Gates
 - Each promoted note must be a single atomic insight (composability test: "This note argues that [title]")

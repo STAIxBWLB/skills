@@ -6,6 +6,8 @@ description: Extract insights from a source document into vault notes
 
 # /vault-extract [source]
 
+> Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+
 Extract insights, decisions, observations from a source document and create vault notes.
 
 ## Input
@@ -18,15 +20,15 @@ Before writing ANY vault note, verify the source summary.md frontmatter has **al
 1. **`description`** — string, ≥10 chars, not equal to title
 2. **`domain`** — ∈ `{research | projects | teaching | operations | people | ai-practice}`
 3. **`topics`** — array containing ≥1 `[[wiki-link]]` **AND every `[[target]]` must exist as a real note in `vault/notes/<target>.md`** (MOC enforcement — topics carry hub navigation only, not keyword tags)
-   - Verify existence via `mcp__obsidian__get_notes_info(paths: [notes/<target>.md, ...])` for the full list of topic targets, or by listing `vault/notes/` and checking each
+   - vmem checks this at write time; `vmem_mocs` lists the existing MOCs when you need to choose one. expect: vmem refuses (V02) a `topics` entry that is not an existing MOC
    - If any `[[target]]` is missing: **ABORT** (do NOT auto-create the MOC) — the caller (or user) must either fix the summary's topics or create the MOC note first
    - Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`) belong in body text, NOT in `topics`. Schema is "topics = MOC only" per `vault/AGENTS.md §Schema`.
 
-**Read the summary's frontmatter via `mcp__obsidian__get_frontmatter` (or equivalent YAML parse) BEFORE building the vault note body.**
+**Read the summary's frontmatter with a YAML parse of the work/ file BEFORE building the vault note body.** expect: vmem refuses (V01) a missing `description`, `type` or `domain` and an enum value outside the vocabulary.
 
 If any check fails:
 - **ABORT** the extract for this summary
-- Emit failed event to `log`: `YYYY-MM-DD HH:MM  EXTRACT  <proj>  <summary> → -  — failed: <reason>` (reasons include: `missing required fields: <field list>`, `dead topic: [[<target>]] not in vault/notes/`)
+- Emit failed event with `vmem_log_append(type: "EXTRACT", project: <proj>, source: <summary>, note: "failed: <reason>")` (reasons include: `missing required fields: <field list>`, `dead topic: [[<target>]] not in vault/notes/`)
 - Return error to caller (`inbox-process`, /vault-sync, /vault-pipeline) — caller decides whether to continue with other items
 - **Do NOT synthesize empty values. Do NOT guess. Do NOT proceed to write.**
 - User must fix summary.md and re-run. `inbox-process` must re-emit summary with correct fields when the summary came from an inbox item.
@@ -67,19 +69,19 @@ If any check fails:
    - Body: the insight with context
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
-6. **Post-write verification** (MANDATORY): re-read the created note via `mcp__obsidian__get_frontmatter`. If `description`, `domain`, or `topics` is missing or empty in the written note, **delete the note** via `mcp__obsidian__delete_note`, log `— failed: post-write verification`, and return error. This catches edge cases where write succeeds but frontmatter gets stripped (Obsidian linter, encoding, etc.).
+6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the result is `{refused: true, issues}` with `applied: false`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller. If `applied: true` despite `refused`, stop and reconcile per `lib/vault_adapter.md` §Write results.
 7. After creating notes, invoke /vault-connect with entities hint (from summary.md):
    - Read `entities` field from source summary.md (if present — list of 인물/기관 names)
    - Pass entities list to `/vault-connect` as wiki-link candidate seeds (`entities_hint` parameter)
    - `/vault-connect` uses entities to prioritize wiki-link discovery in its first pass
    - **Note**: `keywords` field is NOT carried forward to vault notes — it exists only for route scoring reproducibility
-8. **Append EXTRACT event to vault/log** (ingest chain audit trail)
+8. **EXTRACT event in vault/log** (ingest chain audit trail) comes from the step 6 `log` argument
 
 > **Registry fallback**: when project registry scoring < 3 → content-based domain analysis → if still ambiguous, prompt user. SSOT: `<workspace-root>/_meta/rules/project-registry-scoring.md`
 
 ## Log Append (Step 8 — REQUIRED)
 
-Every note created or updated by /vault-extract must produce one `log` line. `vault/log` is a plain logfile (no extension): append via direct fs write (`>>`), the sole exception to MCP-only vault writes.
+Every note created or updated by /vault-extract must produce one `log` line. `vmem_create` writes it from its `log` argument. An update (`vmem_patch` / `vmem_append`, which take no `log`) records a default EXTRACT line; add `— updated: <type>` only if the contract needs that note text, with `vmem_log_append`. Failures use `vmem_log_append`. Never append to the log file directly.
 
 **Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
 
@@ -96,9 +98,9 @@ YYYY-MM-DD HH:MM  EXTRACT  <project>  <source> → <vault/notes/x.md>  — <type
 
 **Update vs create**: for updates, use `— updated: <type>` to distinguish.
 
-**Failure**: if note creation succeeds but log append fails, warn user and proceed (do not roll back). If note creation fails, do not append.
+**Failure**: inspect `applied`, `changes` and `logged` on every receipt. `ok: true`, `applied: true`, `logged: false`: the note saved but its log line did not; warn the user and proceed (do not roll back). `refused` with `applied: false`: nothing was written; record only the `failed:` line. `refused` with `applied: true`: the write partly persisted; stop, report the receipt and reconcile the note and log before any retry (`lib/vault_adapter.md` §Write results).
 
-**Vault access**: MCP Obsidian only. No filesystem Write/Edit on vault paths.
+**Vault access**: vmem MCP only. No filesystem Write/Edit on vault paths.
 
 ## Sibling Meeting Merge Rule (2026-04-16)
 
