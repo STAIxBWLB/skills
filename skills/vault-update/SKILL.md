@@ -27,7 +27,7 @@ Update a note with new information while preserving original meaning. This is th
 5. Check connected notes (via `vmem_links(path)` and `vmem_search`); propose cascading updates if needed
 6. Record update in note body (timestamp or changelog line)
 7. Run `/vault-lint note=<path>` on updated note
-8. vmem logs every write; pass `log: {type: "CONNECT", ...}` when wiki-links changed, otherwise the default `EXTRACT` line is kept
+8. vmem logs every write with a default `EXTRACT` line (`vmem_patch`/`vmem_append`/`vmem_set_frontmatter` take no `log` argument); when wiki-links changed, add one `vmem_log_append(type: "CONNECT", ...)` line
 
 ## Vault Access
 

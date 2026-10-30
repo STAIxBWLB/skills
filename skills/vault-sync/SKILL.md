@@ -142,7 +142,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 
 ### Step 4: Record
 - Update last-sync timestamp in `ops/sessions/last-sync-timestamp` (plain file, fs write)
-- Log sync results in `ops/sessions/YYYYMMDD-sync.md` with `vmem report <vault> ops/sessions/YYYYMMDD-sync.md --body -` (no MCP tool writes `ops/`)
+- Log sync results in `ops/sessions/YYYYMMDD-sync.md` with `vmem report <vault> ops/sessions/YYYYMMDD-sync.md --body -` (no MCP tool writes `ops/`; expect: vmem refuses secret-looking text and an unsafe path)
 - Promote vault-relevant `TASK` events from the work-local `.maru/tasks-log.md`
   to `vault/log` with `vmem_log_append(type: "TASK", ...)` (task-management does not write the
   vault directly — context-enrichment §6)

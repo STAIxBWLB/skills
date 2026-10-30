@@ -71,9 +71,9 @@ Accept: [y]es, [n]o
 ### Step 4: Execute (on accept)
 
 1. **Rename note**: `vmem_move(from: "old-name", to: "new-name")` → `{preview, fingerprint}` 확인 후 `vmem_move(from, to, confirm: true, fingerprint)`. vmem이 vault 전체의 wiki/heading/block/embed 링크와 frontmatter wiki 참조를 같은 쓰기에서 새 stem으로 바꾸고 log에 ROUTE 한 줄을 남긴다. expect: vmem refuses a stale fingerprint, an existing destination and a non-kebab-case stem
-2. **Internal updates**: `vmem_patch` on the renamed note for:
-   - H1 line (`# old name` → `# new name`)
-   - description if contains old-name
+2. **Internal updates** on the renamed note (re-read for a fresh sha256 first):
+   - H1 line (`# old name` → `# new name`): `vmem_patch` (body)
+   - `description` if it contains old-name: `vmem_set_frontmatter(path, set: {description: ...})` (frontmatter is not patchable text; `vmem_patch` refuses it)
 3. **Plain-text mentions** (vault, MCP): 링크는 1단계에서 이미 바뀌었다. 링크가 아닌 본문 언급만 남으면:
    ```
    for each remaining plain-text occurrence:

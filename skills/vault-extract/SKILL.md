@@ -67,7 +67,7 @@ If any check fails:
    - Body: the insight with context
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
-6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the result is `{refused: true, issues}`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller.
+6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the result is `{refused: true, issues}` with `applied: false`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller. If `applied: true` despite `refused`, stop and reconcile per `lib/vault_adapter.md` §Write results.
 7. After creating notes, invoke /vault-connect with entities hint (from summary.md):
    - Read `entities` field from source summary.md (if present — list of 인물/기관 names)
    - Pass entities list to `/vault-connect` as wiki-link candidate seeds (`entities_hint` parameter)
@@ -79,7 +79,7 @@ If any check fails:
 
 ## Log Append (Step 8 — REQUIRED)
 
-Every note created or updated by /vault-extract must produce one `log` line. vmem writes it: pass `log` on `vmem_create` / `vmem_patch` / `vmem_append`, and use `vmem_log_append` for failures. Never append to the log file directly.
+Every note created or updated by /vault-extract must produce one `log` line. `vmem_create` writes it from its `log` argument. An update (`vmem_patch` / `vmem_append`, which take no `log`) records a default EXTRACT line; add `— updated: <type>` only if the contract needs that note text, with `vmem_log_append`. Failures use `vmem_log_append`. Never append to the log file directly.
 
 **Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
 

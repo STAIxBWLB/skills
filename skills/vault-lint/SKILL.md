@@ -94,17 +94,17 @@ scope가 `full`·`work`·`inbox`·`names`이면 검사 전에 `references/work-s
 
 ### 4단계: 리포트 생성
 
-`vault/reports/lint-YYMMDD.md`를 `vmem report <vault> reports/lint-YYMMDD.md --body -`로 생성(vault 스코프만 필요하면 `vmem_lint(write: true)`). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
+`vault/reports/lint-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem report <vault> reports/lint-YYMMDD.md --body -`(기본 EXTRACT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`(LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
 
 ### 5단계: log append
 
-`vmem_log_append(type: "LINT", project: "-", source: "vault/ + work/", note: "E errors, W warnings")`로 1줄 기록:
+(a) 경로일 때만 `vmem_log_append(type: "LINT", project: "-", source: "vault/ + work/", note: "E errors, W warnings")`로 LINT 1줄 기록((b)는 `vmem_lint`가 이미 LINT를 기록하므로 추가하지 않음):
 
 ```
 YYYY-MM-DD HH:MM  LINT  -  vault/ + work/  — E errors, W warnings
 ```
 
-log 파일 직접 append(`>>`) 금지. 4단계 리포트 저장도 vmem이 log에 한 줄 남긴다.
+log 파일 직접 append(`>>`) 금지.
 
 ## 가드레일
 

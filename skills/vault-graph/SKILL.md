@@ -74,7 +74,7 @@ Options:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 삽입, 구 리포트 삭제)
    - workspace: `<vault.path>/reports/workspace-graph.json` (report suppressed — DR-023 §6; counts printed to stdout)
    - code: `<target>/graphify-out/graph.json`, `<target>/graphify-out/graph-report-YYMMDD.md`
-6. For vault builds, record a `GRAPH` event with `vmem_log_append(type: "GRAPH", project: "-", source: "vault/reports/graph-report-YYMMDD.md", note: "N notes, M communities, K surprises")` (no direct log-file append):
+6. For vault builds, record a `GRAPH` event with `vmem_log_append(type: "GRAPH", project: "-", source: "vault/reports/graph-report-YYMMDD.md", note: "N notes, M communities, K surprises")` (no direct log-file append; if the build ran as `vmem_graph_build`, it already recorded GRAPH, so skip this). expect: vmem refuses a TYPE outside the ingest-chain set:
    ```
    YYYY-MM-DD HH:MM  GRAPH  -  vault/reports/graph-report-YYMMDD.md  — N notes, M communities, K surprises
    ```

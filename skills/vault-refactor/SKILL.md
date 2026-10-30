@@ -69,7 +69,7 @@ Filesystem access (Read/Write/Edit/Bash) is forbidden on vault paths.
 
 ## Log Append
 
-Every vmem write appends its own `log` line. Pass the same `log` argument on each write of a refactor batch so the lines share the batch summary (no direct log-file append):
+Every vmem write appends its own default `log` line (`vmem_patch`/`vmem_move`/`vmem_delete` take no `log` argument). After the batch, add one summary line with `vmem_log_append(type: "EXTRACT", project: "-", source: "refactor:<operation>", note: "<summary> (N notes, M links)")` (no direct log-file append):
 
 ```
 YYYY-MM-DD HH:MM  EXTRACT  -  refactor:<operation>  — <summary> (N notes, M links)
@@ -78,7 +78,7 @@ YYYY-MM-DD HH:MM  EXTRACT  -  refactor:<operation>  — <summary> (N notes, M li
 - `<operation>`: split | merge | rename | moc | promote
 - `<summary>`: one-line describing the change
 
-vmem records one line per write, so a batch of N writes leaves N lines with the same summary.
+vmem records one default line per write plus this one summary line.
 
 ## Guards
 

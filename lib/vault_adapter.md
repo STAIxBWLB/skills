@@ -24,12 +24,21 @@ At the start of a vault-facing workflow:
    - `ssot.people`
    - `ssot.ingest_chain` (log TYPE set and normalization table)
 3. If a key is missing, ask for the workspace-local value instead of hardcoding a personal path.
+4. Bind the vmem vault id: run `vmem vaults list --json` and take the id whose `path` equals the canonical `vault.path`. Pass that id as `vault` on **every** vmem call. If no registered vault matches, or more than one does, stop and report it; an omitted `vault` falls back to the first personal vault, which may be a different vault.
 
 ## Access Rules
 
 ### Vault Markdown
 
-All vault `.md` reads, searches, writes, moves, deletes and frontmatter edits go through the vmem MCP tools (`vmem_*`) — `notes/`, `reports/` and `ops/` alike. vmem validates every write before it saves (schema, enums, MOC topics, links, secrets, PII) and returns `{refused: true, issues}` instead of writing. Do not use filesystem write/edit, shell commands or another MCP server for vault markdown.
+All vault writes go through vmem, which validates before it saves (schema, enums, MOC topics, links, secrets, PII):
+
+- `notes/*.md`: the vmem MCP write tools below.
+- `ops/` and `reports/` files: the CLI `vmem report <vault> <ops/...|reports/...> --body -` (no MCP tool writes them).
+- Root docs (`AGENTS.md` and similar) are not agent-writable; change them only on the user's explicit maintenance instruction.
+
+Reads: `notes/` through `vmem_read` / `vmem_read_many` / `vmem_search` / `vmem_list` (they address flat notes only). `ops/`, `reports/` and root docs are read with read-only filesystem access. Do not use filesystem write/edit, shell redirection or another MCP server for any vault file.
+
+**Write results**: a receipt with `ok: true` and `applied: true` saved its changes. `refused: true` usually means nothing was written, but check `applied`, `changes` and `logged`: a rollback or cleanup failure can return `refused: true` with `applied: true` and persisted bytes. In that case stop, report the receipt, and reconcile the note and log before any retry.
 
 Declared exceptions (machine I/O, not agent writes):
 
@@ -56,7 +65,7 @@ Typical mappings:
 | Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-*.md`), `vmem_graph_build` |
 | Dry validation | `vmem_check` |
 
-Pass `expectedSha` (from `vmem_read`) on edits that must not race another writer.
+Pass `expectedSha` (from `vmem_read`) on edits that must not race another writer. Every successful write changes the note's sha256, so re-read before the next `expectedSha` edit of the same note.
 
 ### Workspace SSOT
 
@@ -69,7 +78,14 @@ Workspace-local operational files are not vault markdown. They may be read or ed
 
 ## Log Append
 
-vmem owns the vault log (`vault.log_file`). Every vmem write appends one attributed line itself; pass the optional `log` argument (`{type, project, source, dest?, note}`) to set its TYPE, project and note. For an event with no note write (for example a lint or sync run), call `vmem_log_append`. Do not append to the log with `>>` or any other filesystem write.
+vmem owns the vault log (`vault.log_file`). Every vmem write appends one attributed line itself:
+
+- `vmem_create`, `vmem_link`, `vmem_supersede` accept an optional `log` argument (`{type, project, source, dest?, note}`) that sets that line's TYPE, project and note.
+- `vmem_patch`, `vmem_append`, `vmem_set_frontmatter`, `vmem_move`, `vmem_delete` take no `log` argument (calls carrying it are rejected) and record a default line (`EXTRACT`/`ROUTE`/`RETHINK  -  vmem:<op> → path`).
+- `vmem_lint(write: true)` and `vmem_graph_build` record `LINT` / `GRAPH`; `vmem report` records a default `EXTRACT` line.
+- When a workflow's contract needs a TYPE the write did not record (for example a LEARN line for an update), add exactly that event with `vmem_log_append`. Do not add an event the write already recorded.
+
+Do not append to the log with `>>` or any other filesystem write.
 
 ```text
 YYYY-MM-DD HH:MM  TYPE  project  source → dest  — note
