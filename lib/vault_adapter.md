@@ -1,6 +1,6 @@
 ---
 name: vault_adapter
-description: Vault access rules for public vault-facing skills. Skills discover paths from workspace.config.yaml and use Obsidian MCP for vault markdown.
+description: Vault access rules for public vault-facing skills. Skills discover paths from workspace.config.yaml and use the vmem MCP tools for vault markdown.
 type: spec
 ---
 
@@ -29,25 +29,34 @@ At the start of a vault-facing workflow:
 
 ### Vault Markdown
 
-All vault `.md` writes, moves, deletes, frontmatter edits, and tag edits must go through Obsidian MCP tools — `notes/`, `ops/` (observations, methodology, sessions logs), and root docs alike. Agent-side reads and searches also go through MCP. Do not use filesystem write/edit or shell commands for vault markdown.
+All vault `.md` reads, searches, writes, moves, deletes and frontmatter edits go through the vmem MCP tools (`vmem_*`) — `notes/`, `reports/` and `ops/` alike. vmem validates every write before it saves (schema, enums, MOC topics, links, secrets, PII) and returns `{refused: true, issues}` instead of writing. Do not use filesystem write/edit, shell commands or another MCP server for vault markdown.
 
-Three declared exceptions (machine I/O, not agent writes):
+Declared exceptions (machine I/O, not agent writes):
 
 | Path | Writer / reader | Why |
 |---|---|---|
-| `log`, `ops/sessions/last-sync-timestamp` | fs read/append by any vault skill | plain files, not Obsidian notes |
-| `reports/{vault-graph.json,workspace-graph.json,graph-report-*.md,graph-trend.md}` | written by `lib/build-graph.py` (fs) | machine-generated artifacts; `lint-YYMMDD.md` is still written via MCP |
-| `notes/*.md` **read-only** | `lib/build-graph.py`, `vault-lint/scripts/lint.py` | deterministic scripts scan the tree; they never write notes |
+| `ops/sessions/last-sync-timestamp` | fs read/write by vault-sync | plain file, not a note |
+| `reports/{vault-graph.json,workspace-graph.json,graph-report-*.md,graph-trend.md}` | written by `lib/build-graph.py` (fs) until `vmem graph build` takes over the weekly job | machine-generated artifacts; `lint-*.md` is written by `vmem_lint` |
+| `notes/*.md` **read-only** | `lib/build-graph.py`, `vault-lint/scripts/lint.py` | cross-check scripts kept until two zero-diff parity runs against `vmem lint` / `vmem graph build`; they never write notes |
 
 Typical mappings:
 
-| Operation | Tool family |
+| Operation | vmem tool |
 |---|---|
-| Read note | `mcp__obsidian__read_note`, `read_multiple_notes` |
-| Search/list | `mcp__obsidian__search_notes`, `list_directory` |
-| Create/update | `mcp__obsidian__write_note`, `patch_note`, `update_frontmatter` |
-| Move/delete | `mcp__obsidian__move_note`, `move_file`, `delete_note` |
-| Tags/stats | `mcp__obsidian__manage_tags`, `list_all_tags`, `get_vault_stats` |
+| Read note / several notes | `vmem_read` (frontmatter, body, sha256), `vmem_read_many` (<=20) |
+| Search / list | `vmem_search`, `vmem_list` |
+| Links / neighbourhood | `vmem_links`, `vmem_graph_neighbors` |
+| Create note | `vmem_create` |
+| Edit body | `vmem_patch` (exact old/new text), `vmem_append` (into an H2 section) |
+| Edit frontmatter or tags | `vmem_set_frontmatter` |
+| Typed relation link | `vmem_link` |
+| Supersede | `vmem_supersede` |
+| Move / delete | `vmem_move`, `vmem_delete`: call once for `{preview, fingerprint}`, then again with `confirm: true` and that fingerprint |
+| MOCs / stats | `vmem_mocs`, `vmem_status` |
+| Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-*.md`), `vmem_graph_build` |
+| Dry validation | `vmem_check` |
+
+Pass `expectedSha` (from `vmem_read`) on edits that must not race another writer.
 
 ### Workspace SSOT
 
@@ -60,13 +69,13 @@ Workspace-local operational files are not vault markdown. They may be read or ed
 
 ## Log Append
 
-Vault-changing workflows append one line to the configured vault log (`vault.log_file`) by **direct fs append** (`>>`) — the log is a plain logfile, not a note:
+vmem owns the vault log (`vault.log_file`). Every vmem write appends one attributed line itself; pass the optional `log` argument (`{type, project, source, dest?, note}`) to set its TYPE, project and note. For an event with no note write (for example a lint or sync run), call `vmem_log_append`. Do not append to the log with `>>` or any other filesystem write.
 
 ```text
 YYYY-MM-DD HH:MM  TYPE  project  source → dest  — note
 ```
 
-`TYPE` is workspace-defined (`ssot.ingest_chain`): the canonical set is `INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`; historical non-standard TYPEs are interpreted via that rule's normalization table and must not be written anew (structure changes such as rename/refactor log as `EXTRACT`).
+`TYPE` is workspace-defined (`ssot.ingest_chain`): the canonical set is `INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`; historical non-standard TYPEs are interpreted via that rule's normalization table and must not be written anew (structure changes such as rename/refactor log as `EXTRACT`). vmem refuses a TYPE outside the set.
 
 ## Summary To Vault Fields
 
@@ -80,9 +89,9 @@ When promoting a source summary into a vault note, copy source-derived fields in
 | `source` | `source` | Preserve source identity |
 | `project` | `project` | Map via project registry when available |
 
-If required fields are missing, fail before writing. Do not synthesize blank or guessed values.
+If required fields are missing, fail before writing. Do not synthesize blank or guessed values. expect: vmem refuses a missing `description`, `type` or `domain`, an enum value outside the vocabulary, and a `topics` entry that is not an existing MOC.
 
-**MOC enforcement on `topics`**: `topics` carries hub navigation only. Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`, `duty-model`) belong in body text, not in `topics`. Skills must verify that each `[[target]]` in `topics` resolves to an existing note before promoting a summary to a vault note. If a needed MOC does not exist, create it first as a thin hub (`type: moc` + `description` + maru wiki-link), or replace the offending entry with an existing MOC. Never silently copy unknown wiki-links from summary.md into vault notes.
+**MOC enforcement on `topics`**: `topics` carries hub navigation only. Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`, `duty-model`) belong in body text, not in `topics`. vmem refuses a `topics` entry that does not resolve to an existing MOC. If a needed MOC does not exist, ABORT: a MOC is created separately with a `vmem_create type: moc` call on the user's instruction, never implicitly by an extract. Never silently copy unknown wiki-links from summary.md into vault notes.
 
 ## Project Registry Pattern
 
@@ -95,5 +104,5 @@ If required fields are missing, fail before writing. Do not synthesize blank or 
 ## Boundary
 
 - Work files: filesystem tools.
-- Vault markdown: Obsidian MCP only.
+- Vault markdown: vmem MCP only.
 - Cloud mirrors or synced copies: do not edit directly from vault skills.

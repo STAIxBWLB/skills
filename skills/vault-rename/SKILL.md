@@ -1,6 +1,6 @@
 ---
 name: vault-rename
-description: Safely rename a vault note and update all references across vault + extract/sync SKILL.md. Handles move_note + grep refs + batch patch_note + graph invalidate + log event in one atomic workflow.
+description: Safely rename a vault note and update all references across vault + extract/sync SKILL.md. Handles vmem_move (vault-wide link rewrite) + grep refs + skill patches + graph invalidate + log event in one workflow.
 trigger: /vault-rename
 ---
 
@@ -25,8 +25,8 @@ Atomic vault note rename with full reference propagation. Implements 2026-04-22 
 
 ### Step 1: Pre-flight 검증
 
-1. `mcp__obsidian__read_note old-name.md` — old note 존재 확인
-2. `mcp__obsidian__read_note new-name.md` — new 이름 충돌 확인
+1. `vmem_read(path: "old-name")` — old note 존재 확인
+2. `vmem_read(path: "new-name")` — new 이름 충돌 확인 (vmem_move도 기존 대상이 있으면 V08로 거부)
    - 존재 시 ABORT, 사용자에게 보고 (merge 의도면 `/vault-refactor` 권고)
 3. 변경 영향 범위 grep 수행 (Step 2 병행)
 
@@ -70,15 +70,16 @@ Accept: [y]es, [n]o
 
 ### Step 4: Execute (on accept)
 
-1. **Rename note**: `mcp__obsidian__move_note(oldPath, newPath)`
-2. **Internal updates**: patch_note on the renamed note for:
+1. **Rename note**: `vmem_move(from: "old-name", to: "new-name")` → `{preview, fingerprint}` 확인 후 `vmem_move(from, to, confirm: true, fingerprint)`. vmem이 vault 전체의 wiki/heading/block/embed 링크와 frontmatter wiki 참조를 같은 쓰기에서 새 stem으로 바꾸고 log에 ROUTE 한 줄을 남긴다. expect: vmem refuses a stale fingerprint, an existing destination and a non-kebab-case stem
+2. **Internal updates**: `vmem_patch` on the renamed note for:
    - H1 line (`# old name` → `# new name`)
    - description if contains old-name
-3. **Batch patch references** (vault, MCP):
+3. **Plain-text mentions** (vault, MCP): 링크는 1단계에서 이미 바뀌었다. 링크가 아닌 본문 언급만 남으면:
    ```
-   for each vault file with references:
-     mcp__obsidian__patch_note(path, old-name, new-name, replaceAll: true)
+   for each remaining plain-text occurrence:
+     vmem_patch(path, oldString: "<occurrence with enough context to be unique>", newString: "<same text with new-name>")
    ```
+   (`vmem_patch`는 정확히 한 군데만 바꾼다. replaceAll 없음)
 4. **Batch patch references** (~/.maru/skills, filesystem):
    ```
    for each skill file with references:
@@ -95,18 +96,16 @@ Accept: [y]es, [n]o
    - Meeting 원본 파일명 (`work/meetings/.../04-02 회의 - JSIF-AWS...md`) — 물리 파일명 변경은 별도 의사결정
 3. **의도되지 않은 잔여 존재** → 사용자에게 보고 + 추가 패치 여부 확인
 
-### Step 6: log EXTRACT event append
+### Step 6: log event
 
-```
-YYYY-MM-DD HH:MM  EXTRACT  -  notes/{{old}}.md → notes/{{new}}.md  — renamed, N files updated
-```
+`vmem_move`가 `ROUTE  -  notes/{{old}}.md → notes/{{new}}.md` 한 줄을 이미 남긴다. 4단계 skill 파일 수정 결과를 기록해야 하면 `vmem_log_append(type: "EXTRACT", project: "-", source: "notes/{{old}}.md", dest: "notes/{{new}}.md", note: "renamed, N files updated")`를 쓴다. log 파일 직접 append 금지.
 
 ## Safety Rules
 
-- **Move_note 실패 시 ABORT** — 참조 patch 단계 진입 금지
+- **vmem_move 거부·실패 시 ABORT** — 참조 patch 단계 진입 금지
 - **Patch 도중 일부 실패** → 성공분 기록 + 실패 목록 사용자 보고, 자동 롤백 없음 (감사 가능한 부분 진척 우선)
 - **설치 스킬 인식**: `~/.claude/skills/` 및 `~/.codex/skills/`는 canonical `~/.maru/skills/`를 가리키는 symlink 설치 대상이다. 편집은 canonical에서 수행한다.
-- **vault 쓰기는 MCP Obsidian만** (notes/·reports/·ops/). 예외: `log`는 plain logfile로 fs append 허용
+- **vault 쓰기는 vmem MCP만** (notes/·reports/·ops/). log도 vmem이 기록한다
 - **skill 파일은 Filesystem Edit** (`.claude/skills/`·`~/.maru/skills/`는 vault 외부)
 
 ## Quality Gates

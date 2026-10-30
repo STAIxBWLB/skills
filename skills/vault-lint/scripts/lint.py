@@ -2,7 +2,7 @@
 """vault-lint deterministic core — read-only fs scan of a vault.
 
 Runs the vault-scope checks (L01 L02 L03 L09 L10 L11 L12) and prints the
-report body as markdown. Report writing (Obsidian MCP) and the LINT log line
+report body as markdown. Report writing (vmem) and the LINT log line
 stay in SKILL.md. Reads notes/ via fs read-only — the same exception
 build-graph.py relies on (lib/vault_adapter.md).
 

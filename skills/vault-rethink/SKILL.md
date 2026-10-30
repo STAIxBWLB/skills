@@ -18,10 +18,10 @@ Review observations, tensions, and methodology drift.
 
 ### review mode
 
-1. **Observations 처리**: `ops/observations/` + `ops/tensions/` 파일 읽기 (MCP `read_multiple_notes`). `tensions/`는 첫 긴장 기록 전까지 디렉토리 자체가 없다 — 부재는 드리프트가 아니라 미사용 상태
+1. **Observations 처리**: `ops/observations/` + `ops/tensions/` 파일 읽기 (`vmem_read_many`, 20개씩). `tensions/`는 첫 긴장 기록 전까지 디렉토리 자체가 없다 — 부재는 드리프트가 아니라 미사용 상태
 2. **Patterns 식별**: methodology·process·friction·surprise·quality 5 카테고리 그룹핑
 3. **Methodology changes 제안**: evidence 기반, `M{N}` ID 부여
-4. **Decisions 기록**: `ops/methodology/YYMMDD-rethink-report.md`를 `mcp__obsidian__write_note`로 생성 (frontmatter + state snapshot + observations + tensions + proposed changes + drift check)
+4. **Decisions 기록**: `ops/methodology/YYMMDD-rethink-report.md`를 `vmem report <vault> ops/methodology/YYMMDD-rethink-report.md --body -`로 생성(`ops/` 쓰기 MCP 도구 없음; vmem이 내용 검사 후 저장하고 log를 남긴다) (frontmatter + state snapshot + observations + tensions + proposed changes + drift check)
 
 > 구 M4-2 인라인 태스크 aging check·cap 경고(`ops/reminders.md`, 200/500 임계)는 2026-05-05 인라인 태스크의 work `tasks/` 이관으로 retired. 측정 대상이 없으므로 단계에서 제거(2026-08-19).
 

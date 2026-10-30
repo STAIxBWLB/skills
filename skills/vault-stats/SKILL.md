@@ -22,9 +22,9 @@ Display comprehensive vault statistics. Numbers only; the "what to do next" reco
 
 Do not recompute what the lint/graph pipeline already produces:
 
-1. Size / MOCs / Activity / Growth: list `vault/notes/` (`mcp__obsidian__list_directory`, `get_notes_info`) and parse frontmatter (type, domain)
+1. Size / MOCs / Activity / Growth: `vmem_status` for counts, `vmem_list(limit: 500)` (paged by `prefix`) for each note's type and domain, `vmem_mocs` for MOC sizes
 2. Connections (edges, density, top hubs): read the latest `reports/graph-report-YYMMDD.md` and `reports/graph-trend.md`
-3. Orphan count and schema compliance: run `~/.maru/env/.venv/bin/python3 ~/.maru/skills/vault-lint/scripts/lint.py --vault <vault.path>` and take the L03 / L02 counts (same numbers `/vault-lint vault` reports)
+3. Orphan count and schema compliance: run `vmem lint <vault> --json` (or `vmem_lint`) and take the L03 / L02 counts (same numbers `/vault-lint vault` reports; `lint.py` stays as the cross-check)
 4. Read `ops/sessions/last-sync-timestamp`
 5. Assemble metrics
 
