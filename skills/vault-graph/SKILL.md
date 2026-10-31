@@ -142,5 +142,5 @@ Options:
 - `/vault-connect` Step 0 reads graph report for connection candidates
 - `/vault-sync` checks graph report for unconnected surprising connections
 - `/vault-lint` checks L11 (graph staleness > 7 days), L12 (island communities, reported by member list)
-- `skill-mine` builds its own virtual-vault graph (`skill_miner/wiki_graph.py`)
+- `skill-mine` mines skill candidates with `vmem skills mine`, which uses the same deterministic Leiden communities
 - `<workspace-root>/AGENTS.md` §"Vault-First" Graph Report shortcut: T2/T3 ops read report before full vault search
