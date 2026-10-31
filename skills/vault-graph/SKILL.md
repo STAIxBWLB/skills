@@ -60,7 +60,7 @@ Options:
    - `--vault` → `vmem graph build <vault>` (or `vmem_graph_build`); skip steps 2-3
    - `--code <path>` → `<path>`, `--mode code`
    - `--workspace` → `<vault.path>` (target) + `--work-root <workspace-root>`, `--mode wiki`
-   - no option → current directory, `--mode auto`
+   - no option → current directory, `--mode auto`; when that directory is `<vault.path>` or any other wiki vault, use the `--vault` route instead (vmem), because build-graph.py's wiki export writes vault reports outside vmem
 2. For code mode, ensure `.graphifyignore` exists. If missing, offer to copy `<workspace-root>/_meta/templates/graphifyignore`.
 3. Execute:
    ```bash
