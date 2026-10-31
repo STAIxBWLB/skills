@@ -45,8 +45,8 @@ Declared exceptions (machine I/O, not agent writes):
 | Path | Writer / reader | Why |
 |---|---|---|
 | `ops/sessions/last-sync-timestamp` | fs read/write by vault-sync | plain file, not a note |
-| `reports/{vault-graph.json,workspace-graph.json,graph-report-*.md,graph-trend.md}` | written by `lib/build-graph.py` (fs) until `vmem graph build` takes over the weekly job | machine-generated artifacts; `lint-*.md` is written by `vmem_lint` |
-| `notes/*.md` **read-only** | `lib/build-graph.py`, `vault-lint/scripts/lint.py` | cross-check scripts kept until two zero-diff parity runs against `vmem lint` / `vmem graph build`; they never write notes |
+| `reports/workspace-graph.json` | written by `lib/build-graph.py --work-root` (fs) | machine-generated artifact; `vault-graph.json`, `graph-report-*.md`, `graph-trend.md` and `lint-report-*.md` are written by `vmem graph build` / `vmem lint --write` |
+| `notes/*.md` **read-only** | `lib/build-graph.py` (`--work-root` workspace layer) | reads notes for the workspace graph; never writes notes |
 
 Typical mappings:
 
