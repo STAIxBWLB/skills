@@ -13,6 +13,7 @@ import os
 import re
 import tempfile
 import zipfile
+from xml.sax.saxutils import quoteattr
 
 TEXT_PARTS = re.compile(r"ppt/(slides|slideLayouts|slideMasters|charts)/[^/]+\.xml$")
 THEME_PART = re.compile(r"ppt/theme/theme\d+\.xml$")
@@ -24,10 +25,11 @@ def retag(xml: str) -> str:
 
 
 def set_theme_font(xml: str, font: str) -> str:
-    hang = f'<a:font script="Hang" typeface="{font}"/>'
+    attr = quoteattr(font)  # escapes &, < and quotes for the XML attribute
+    hang = f'<a:font script="Hang" typeface={attr}/>'
 
     def fix(block: str) -> str:
-        block = re.sub(r'<a:ea typeface="[^"]*"', lambda _: f'<a:ea typeface="{font}"', block)
+        block = re.sub(r'<a:ea typeface="[^"]*"', lambda _: f'<a:ea typeface={attr}', block)
         if '<a:font script="Hang"' in block:
             return re.sub(r'<a:font script="Hang" typeface="[^"]*"/>', lambda _: hang, block)
         return re.sub(r"(<a:cs [^>]*/>|</a:cs>)", lambda m: m.group(1) + hang, block, count=1)
@@ -43,6 +45,7 @@ def selftest():
     assert '<a:ea typeface="F"' in out and '<a:font script="Hang" typeface="F"/>' in out, out
     t2 = '<a:majorFont><a:ea typeface=""/><a:cs typeface=""/><a:font script="Hang" typeface="Old"/></a:majorFont>'
     assert set_theme_font(t2, "F").count('typeface="F"') == 2
+    assert 'typeface="A &amp; B"' in set_theme_font(t, "A & B")
 
 
 def main():
@@ -56,17 +59,21 @@ def main():
     fd, tmp = tempfile.mkstemp(suffix=".pptx", dir=os.path.dirname(os.path.abspath(out)))
     os.close(fd)
     runs = 0
-    with zipfile.ZipFile(a.deck) as zi, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zo:
-        for item in zi.infolist():
-            data = zi.read(item.filename)
-            if TEXT_PARTS.match(item.filename):
-                text = data.decode("utf-8")
-                runs += text.count('lang="en-US"')
-                data = retag(text).encode("utf-8")
-            elif a.font and THEME_PART.match(item.filename):
-                data = set_theme_font(data.decode("utf-8"), a.font).encode("utf-8")
-            zo.writestr(item, data)
-    os.replace(tmp, out)
+    try:
+        with zipfile.ZipFile(a.deck) as zi, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zo:
+            for item in zi.infolist():
+                data = zi.read(item.filename)
+                if TEXT_PARTS.match(item.filename):
+                    text = data.decode("utf-8")
+                    runs += text.count('lang="en-US"')
+                    data = retag(text).encode("utf-8")
+                elif a.font and THEME_PART.match(item.filename):
+                    data = set_theme_font(data.decode("utf-8"), a.font).encode("utf-8")
+                zo.writestr(item, data)
+        os.replace(tmp, out)
+    except BaseException:
+        os.remove(tmp)
+        raise
     print(f"ko_fix: {runs} runs re-tagged ko-KR" + (f", theme Hangul font = {a.font}" if a.font else "") + f" -> {out}")
 
 
