@@ -13,7 +13,7 @@ without an app release.
 
 - `skills/<name>/SKILL.md` — the skills themselves (the list is `manifest.json`)
 - `envs/default/` — shared Python/Node runtime scaffold for skills
-- `lib/` — shared helpers (e.g. `build-graph.py`)
+- `lib/` — shared helpers (e.g. `vault_adapter.md`)
 - `docs/` — reference material used by skills
 - `manifest.json` — bundle manifest: `repoSlug`, `channelTag`,
   `minAppVersion`, and the canonical skill list
