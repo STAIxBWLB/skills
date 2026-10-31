@@ -10,7 +10,8 @@ Claude Code 세션 로그에서 반복되는 업무 지시를 감지하여 재�
 skill_miner/
 ├── extract.py         # JSONL → 순수 user prompt (stdlib only)
 ├── materialize.py     # prompt → virtual wiki note (PyYAML)
-├── graph_build.py     # virtual vault → NetworkX graph (build-graph.py 재사용)
+├── graph_build.py     # virtual vault → NetworkX graph
+├── wiki_graph.py      # wiki-link graph primitives (retired lib/build-graph.py에서 이관)
 ├── analyze.py         # community → candidate + Markdown 리포트
 ├── run.py             # 4단계 오케스트레이터 CLI
 ├── vocab/
@@ -25,7 +26,7 @@ skill_miner/
 
 2. **Materialize**: 각 프롬프트를 wiki markdown note로 변환. `vocab/actions.yaml`, `vocab/objects.yaml`, `project-registry.yaml` (people/orgs/keywords/acronyms) 과 longest-match 매칭하여 `[[action:<verb>]]` / `[[object:<noun>]]` / `[[entity:<kind>:<slug>]]` wiki-link 삽입. PII 마스킹 (사람명→`[PERSON]`, 경로→`[PATH]`, 이메일→`[EMAIL]`).
 
-3. **GraphBuild**: `~/.maru/skills/_builtin/lib/build-graph.py` 의 `extract_wiki`, `build_graph`, `detect_communities` (Leiden seed=42 / Louvain fallback), `find_god_nodes`, `find_surprising_connections`, `compute_community_stats` 를 그대로 import 하여 재사용.
+3. **GraphBuild**: `wiki_graph.py`의 `extract_wiki`, `build_graph`, `detect_communities` (Leiden seed=42 / Louvain fallback), `find_god_nodes`, `find_surprising_connections`, `compute_community_stats` 를 사용. 2026-10-31 retired `lib/build-graph.py`에서 그대로 옮겼다(같은 입력에서 출력 동일 확인).
 
 4. **Analyze**: 커뮤니티별 후보 생성:
    - 합격: prompt 멤버 ≥ 3 AND novelty ≥ 0.3
@@ -98,4 +99,4 @@ objects:
 
 ## 관련
 
-- 이 파이프라인은 `vault-graph` 스킬과 동일한 `~/.maru/skills/_builtin/lib/build-graph.py` primitives 를 사용한다. vault 그래프 분석 · skill 패턴 감지가 같은 파이프라인을 공유한다.
+- vault 그래프는 vmem(`vmem graph build`)이 빌드한다. 이 파이프라인의 그래프 primitives는 `wiki_graph.py`에 있다.

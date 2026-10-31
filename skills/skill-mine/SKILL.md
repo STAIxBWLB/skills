@@ -36,7 +36,7 @@ JSONL → 순수 user prompt (tool_result, slash command, system-reminder, 인�
 
 PII 마스킹: 사람명 → `[PERSON]`, 이메일 → `[EMAIL]`, 절대경로 → `[PATH]`.
 
-### 3. GraphBuild (`~/.maru/skills/_builtin/lib/build-graph.py` 재사용)
+### 3. GraphBuild (`skill_miner/wiki_graph.py`)
 - `extract_wiki()` → nodes/edges 추출 (markdown wiki-link 파서)
 - `build_graph()` → NetworkX `Graph`
 - `detect_communities()` → Leiden (seed=42) / Louvain fallback
@@ -122,8 +122,8 @@ cd <workspace-root>
 ## 관련 파일
 
 - 스크립트: `~/.maru/skills/skill-mine/scripts/skill_miner/` (extract/materialize/graph_build/analyze/run + vocab)
-- 재사용 primitives: `~/.maru/skills/_builtin/lib/build-graph.py`
-- 관련 스킬: `vault-graph` (동일한 그래프 primitives 사용)
+- 그래프 primitives: `skill_miner/wiki_graph.py`
+- 관련 스킬: `vault-graph`
 
 ## 다음 단계 (선택 구현)
 

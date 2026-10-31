@@ -7,7 +7,6 @@ sync with it.
 ## Runtime And Shared Helpers
 
 - `envs/default/` — shared Python/Node runtime scaffold for document, graph, and workspace skills.
-- `lib/build-graph.py` — shared graph builder used by `vault-graph` and `skill-mine`.
 - `lib/vault_adapter.md` — shared vault access policy for Obsidian MCP workflows.
 
 ## Skills (39)

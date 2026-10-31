@@ -1,10 +1,5 @@
-"""Build a NetworkX graph from the materialized virtual wiki-vault.
-
-Reuses primitives from the bundle's own lib/build-graph.py so vault graph and
-skill mining stay on the same graph pipeline.
-"""
+"""Build a NetworkX graph from the materialized virtual wiki-vault."""
 from __future__ import annotations
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -12,41 +7,30 @@ from pathlib import Path
 import networkx as nx
 from networkx.readwrite import json_graph
 
+import wiki_graph as BG
+
 
 def find_bundle_root() -> Path:
     """Root of the skills bundle this package was installed into.
 
-    `lib/build-graph.py` and the `skills/` catalog are bundle assets, not
-    workspace assets: in-repo the bundle root is the repo root, deployed it is
-    e.g. ~/.maru/skills/_builtin. Anchor on `lib/build-graph.py` so both
-    layouts resolve without a config lookup.
+    The `skills/` catalog is a bundle asset, not a workspace asset: in-repo the
+    bundle root is the repo root, deployed it is e.g. ~/.maru/skills/_builtin.
+    Anchor on `manifest.json` next to `skills/` so both layouts resolve without
+    a config lookup.
     """
     for path in Path(__file__).resolve().parents:
-        if (path / "lib" / "build-graph.py").is_file():
+        if (path / "manifest.json").is_file() and (path / "skills").is_dir():
             return path
     raise RuntimeError("Cannot find the skills bundle root from skill-mine location")
 
 
 BUNDLE_ROOT = find_bundle_root()
-BUILD_GRAPH_PATH = BUNDLE_ROOT / "lib" / "build-graph.py"
-
-
-def _load_build_graph_module():
-    spec = importlib.util.spec_from_file_location("build_graph", BUILD_GRAPH_PATH)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Cannot load build-graph.py from {BUILD_GRAPH_PATH}")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
-BG = _load_build_graph_module()
 
 
 def _enrich_prompt_timestamps(virtual_vault: Path, G: nx.Graph) -> None:
     """Backfill `timestamp`/`session` on prompt nodes.
 
-    build-graph.py's extract_wiki() only propagates a whitelist of frontmatter
+    extract_wiki() only propagates a whitelist of frontmatter
     fields — timestamp is dropped. We re-read the prompt note frontmatter here
     so analyze.py can compute unique_days / day_span accurately.
     """
