@@ -126,8 +126,8 @@ slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
 
 slide.addText("Do effects of the X program on cognitive and socio-emotional skills\nat age 8 persist to age 35 outcomes (earnings, health, crime),\nand does the pathway run through skills or through schooling attainment?", {
   x: 1.7, y: 1.55, w: 6.6, h: 1.3,
-  fontSize: 19, fontFace: FONTS.face, color: COLORS.primary,
-  bold: false, align: "center", valign: "middle"
+  fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.primary,
+  bold: false, align: "left", valign: "middle"
 });
 
 // Optional: brief note on what makes this paper's approach novel
@@ -246,11 +246,11 @@ slide.addChart(pres.charts.BAR, [{
 // (In practice, add a call-out arrow/box over the chart image or use addText overlay)
 slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
   x: 0.55, y: 1.2, w: 1.8, h: 0.5,
-  fill: { color: COLORS.highlight }, line: { color: "E6C800", pt: 1 }, rectRadius: 0.06
+  fill: { color: COLORS.highlight }, line: { color: COLORS.highlight, pt: 1 }, rectRadius: 0.06
 });
 slide.addText("↑ 28% for Q1", {
   x: 0.55, y: 1.2, w: 1.8, h: 0.5,
-  fontSize: 14, fontFace: FONTS.face, color: "7A5200", bold: true, align: "center", valign: "middle"
+  fontSize: FONTS.label, fontFace: FONTS.face, color: COLORS.primary, bold: true, align: "center", valign: "middle"
 });
 
 // INTERPRETIVE TEXT (right side)
@@ -265,7 +265,7 @@ slide.addText([
   { text: "Precision: 95% CI = [14%, 22%] for pooled estimate", options: { breakLine: true } },
 ], {
   x: 6.2, y: 1.55, w: 3.3, h: 2.5,
-  fontSize: FONTS.body - 1, fontFace: FONTS.face, color: COLORS.body,
+  fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   bullet: true, paraSpaceAfter: 12
 });
 

@@ -30,18 +30,18 @@ Write a slide-by-slide outline (action title, exhibit type). Confirm it with the
 
 Communication-first design; these override the pptx skill's design-forward defaults.
 
-- **Canvas**: `LAYOUT_WIDE` (13.33 × 7.5 in). The patterns' coordinates are for 10 in; scale by 1.333.
+- **Canvas**: `LAYOUT_WIDE` (13.33 × 7.5 in). The patterns' positions are for 10 in; scale them by 1.333, keep margins and font sizes as stated here. The patterns show placement and sizes: in a structured deck, put those positions on the layouts and placeholders. Where a scaled pattern conflicts with a rule in this file, this file wins.
 - **Color**: white content slides; at most three colors. Default primary `1F4E79`, accent `2E75B6`, highlight `FFF2CC` for the one key finding. Color directs attention, never decorates.
 - **Font**: one sans family with Hangul glyphs, installed where the deck will be presented (for example Noto Sans KR or the institution's font). Use it for the theme's heading and body fonts.
 - **Sizes**: action title 26-28 pt bold; section header 20-22 pt; body 20 pt minimum; chart labels 16-18 pt; on-slide citations 12-14 pt muted. When text does not fit at these sizes, cut words or split the slide.
-- **Layout**: left-align body text; 0.5 in minimum margins on one grid; results slides put the exhibit left and interpretation right; leave white space.
+- **Layout**: left-align body text; 0.5 in minimum margins on one grid; set `margin: 0` on text boxes so their left edge lines up with the title; results slides put the exhibit left and interpretation right. Balance each slide vertically: with few words on the wide canvas, enlarge the exhibit or set body text up to 24 pt rather than leaving the lower half empty.
 - **No decoration**: no icons in circles, stock images or clip art; no rules under titles or accent bars; no full-bleed images on content slides; about 40 words (Korean: about 40 eojeol) of body text per content slide.
 
 ## Korean decks
 
 Each rule answers a failure seen when the upstream rules were applied to a Korean deck.
 
-- **Action titles**: one complete sentence of about 30 characters including spaces, so it fits one line at 28 pt on the wide canvas and never exceeds two. Longer Korean titles wrapped to two or three lines.
+- **Action titles**: one complete sentence that fits one line at 28 pt on the wide canvas (about 30 Hangul syllables; Latin letters take less width) and never exceeds two. Longer Korean titles wrapped to two or three lines.
 - **Columns**: give 20 pt body text at least 4.5 in of width; narrower columns wrapped every two or three words.
 - **Word wrap and fonts**: pptxgenjs tags every run `en-US`, so PowerPoint splits Hangul mid-word, and it leaves the theme's Hangul font slots empty. After `writeFile()` (and the pptx skill's theme step), run:
 
@@ -55,12 +55,12 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
 
 1. Build per the pptx skill as a structured deck, then run `ko_fix.py` for Korean text.
 2. **File QA**: the pptx skill's `validate.py`. **Content QA**: its text extraction script; check order, typos and leftover placeholders.
-3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-N.png` through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
+3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-N.png` through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
 4. **Academic QA**:
    - every content slide has an action title, and the ghost deck test passes
    - one exhibit per results slide, each with its "so what" marked on the exhibit
    - every borrowed figure or data point is cited on its slide
-   - the Conclusions slide is the last main slide (it stays up during Q&A), with contact details; References follows it as back matter, then any appendix
+   - the Conclusions slide is the last main slide (it stays up during Q&A), with contact details; References follows it as back matter (sources include tools, models and datasets used, not only papers), then any appendix
    - body text ≥ 20 pt; no decorative elements; section dividers or a breadcrumb bar in decks over 15 slides
 
 ## Key principles
