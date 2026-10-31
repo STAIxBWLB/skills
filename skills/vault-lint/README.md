@@ -13,6 +13,7 @@ The skill implements the lint stage of Karpathy's "LLM Wiki Method": a periodic 
 
 ## Script history
 
+- On 2026-10-31 `scripts/lint.py` was removed and the vault scope moved to `vmem lint` (STAIxBWLB/skills#88). On the live personal vault both reported the same findings (0 errors, 0 warnings), and vault-mem's parity checks had already compared their finding sets twice on the private corpus. vmem adds L13 (filename) and L14 (source paths). The entries below describe the retired script.
 - `scripts/lint.py` parses frontmatter with PyYAML (block sequences, flow arrays, folded scalars). The switch on 2026-08-19 removed the cause of L02 false positives.
 - The MOC-only rule for `topics:` (checked by L01) dates from 2026-05-22.
 - The script's TYPE lists for L09 carry a keep-aligned comment pointing at the workspace ingest-chain rule, so the rule table and the constants in `scripts/lint.py` change together.

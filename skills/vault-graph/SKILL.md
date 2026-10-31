@@ -2,10 +2,10 @@
 name: vault-graph
 trigger: /vault-graph
 description: >
-  Graphify 기반 지식그래프 빌드·분석·질의 스킬. vault wiki-link 그래프와
-  코드 AST 그래프를 모두 지원한다. `~/.maru/skills/_builtin/lib/build-graph.py`를
-  단일 빌더로 사용해 커뮤니티 탐지(graspologic leiden, louvain fallback), god node 분석,
-  surprising connections, graphify MCP serve 안내를 제공한다.
+  지식그래프 빌드·분석·질의 스킬. vault wiki-link 그래프는 `vmem graph build`가,
+  workspace 레이어와 코드 AST 그래프는 `~/.maru/skills/_builtin/lib/build-graph.py`가
+  빌드한다. 커뮤니티 탐지, god node 분석, surprising connections, graphify MCP serve
+  안내를 제공한다.
 ---
 
 # /vault-graph [command]
@@ -20,8 +20,9 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 
 | Item | Path |
 |------|------|
+| Vault builder | `vmem graph build <vault>` (MCP `vmem_graph_build`) |
 | Python | `~/.maru/env/.venv/bin/python` |
-| Builder | `~/.maru/skills/_builtin/lib/build-graph.py` |
+| Workspace/code builder | `~/.maru/skills/_builtin/lib/build-graph.py` |
 | Skill runner | `~/.maru/skills/vault-graph/scripts/run.sh` |
 | graphifyignore template | `<workspace-root>/_meta/templates/graphifyignore` |
 
@@ -39,7 +40,7 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 ### Build Commands
 - **build**: Run community detection + analysis pipeline. Outputs:
   - `vault/reports/vault-graph.json` (NetworkX graph)
-  - `vault/reports/graph-report-YYMMDD.md` (audit report; **최신 1개만 보관** — 빌더가 구 리포트를 삭제하고 `graph-trend.md`에 행 1개를 삽입한다)
+  - `vault/reports/graph-report-YYMMDD.md` (audit report; 구 리포트는 보존되고 `graph-trend.md`에 빌드마다 행 1개가 추가된다)
 - **build --workspace**: Add the work operational layer → `vault/reports/workspace-graph.json` (vault-graph.json untouched; no report written). **온디맨드 전용** — 주간 리츄얼에서 제외(L11b 폐기, `_meta/rules/knowledge-graph-integration.md` §7). See below.
 - **neighbors [note]**: 1-hop neighborhood + community of a note from `vault-graph.json` (jq, no build).
 - **report**: Read the latest graph report (if < 7 days old)
@@ -56,10 +57,10 @@ Options:
 - `<target>`: auto-detect wiki/code mode from a target directory
 
 1. Resolve target and mode:
-   - `--vault` → `<vault.path>`, `--mode wiki`
+   - `--vault` → `vmem graph build <vault>` (or `vmem_graph_build`); skip steps 2-3
    - `--code <path>` → `<path>`, `--mode code`
    - `--workspace` → `<vault.path>` (target) + `--work-root <workspace-root>`, `--mode wiki`
-   - no option → current directory, `--mode auto`
+   - no option → current directory, `--mode auto`; when that directory is `<vault.path>` or any other wiki vault, use the `--vault` route instead (vmem), because build-graph.py's wiki export writes vault reports outside vmem
 2. For code mode, ensure `.graphifyignore` exists. If missing, offer to copy `<workspace-root>/_meta/templates/graphifyignore`.
 3. Execute:
    ```bash
@@ -71,18 +72,15 @@ Options:
      ~/.maru/skills/_builtin/lib/build-graph.py \
      --target <vault.path> --work-root <workspace-root>
    ```
-4. Pipeline: read notes/code → extract graph → build NetworkX graph → community detection (graspologic leiden, `random_seed=42`; louvain fallback) → god node analysis → surprising connections → report. 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
+4. Pipeline: read notes/code → extract graph → community detection → god node analysis → surprising connections → report. vmem uses deterministic label propagation (MOCs excluded); build-graph.py uses graspologic leiden (`random_seed=42`; louvain fallback). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
 5. Outputs:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 삽입, 구 리포트 삭제)
    - workspace: `<vault.path>/reports/workspace-graph.json` (report suppressed — DR-023 §6; counts printed to stdout)
    - code: `<target>/graphify-out/graph.json`, `<target>/graphify-out/graph-report-YYMMDD.md`
-6. For vault builds, record a `GRAPH` event with `vmem_log_append(type: "GRAPH", project: "-", source: "vault/reports/graph-report-YYMMDD.md", note: "N notes, M communities, K surprises")` (no direct log-file append; if the build ran as `vmem_graph_build`, it already recorded GRAPH, so skip this). expect: vmem refuses a TYPE outside the ingest-chain set:
-   ```
-   YYYY-MM-DD HH:MM  GRAPH  -  vault/reports/graph-report-YYMMDD.md  — N notes, M communities, K surprises
-   ```
-   The weekly ritual is a **single** vault build (2026-08-19: `--workspace` is on-demand only). Order: build → lint → vault push → work pointer bump.
+6. vault builds: vmem writes the reports and records the GRAPH event itself; add no log line. A vault build reported as refused names the rule in its receipt; stop and report it.
+   The weekly ritual is a **single** vault build, run by the workspace's weekly job (`--workspace` is on-demand only). Order: build → lint → vault push → work pointer bump.
 
-   **Vault 쓰기 예외**: 빌더는 `reports/{vault-graph.json,workspace-graph.json,graph-report-*.md,graph-trend.md}`를 fs로 직접 쓴다(기계 산출물). 노트(`notes/`·`ops/`)는 계속 MCP 전용(`lib/vault_adapter.md`).
+   **Vault 쓰기 예외**: `build-graph.py --work-root`는 `reports/workspace-graph.json`만 fs로 직접 쓴다(기계 산출물). vault 그래프 산출물과 노트는 vmem 전용(`lib/vault_adapter.md`).
 
 ## Neighbors Process (`/vault-graph neighbors <note>`)
 

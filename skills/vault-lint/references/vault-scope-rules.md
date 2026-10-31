@@ -1,6 +1,6 @@
-# vault 스코프 판정 규칙 (L01, L02, L03, L09, L10, L11, L12)
+# vault 스코프 판정 규칙 (L01, L02, L03, L09~L14)
 
-`scripts/lint.py`가 구현한 판정 규칙의 요약. finding을 설명하거나 수정 제안을 쓸 때, `note=<path>` 결과를 판정할 때 기준으로 쓴다.
+`vmem lint`가 구현한 판정 규칙의 요약. finding을 설명하거나 수정 제안을 쓸 때, `note=<path>` 결과를 판정할 때 기준으로 쓴다.
 
 - **L01**: 본문 `[[x]]` + frontmatter wiki-link 필드(`topics`·`project`·`projects`·`supersedes`·`superseded_by`; alias `[[name|display]]`는 `name`만)가 `notes/<x>.md`로 해소되지 않으면 error. **MOC 정책**: `topics:`는 MOC만 허용, 키워드 wiki-link는 L01 error(동일 가드: vault-extract §Preconditions, vault_adapter §Summary To Vault Fields)
 - **L02**: `type` ∈ `insight | decision | observation | person | project | method | moc | reference`; `topics` 필수(단 `type: moc`는 `topics` 미요구 + `description` 필수); `confidence` ∈ `proven | likely | experimental`, `status` ∈ `active | superseded | archived`, **값이 있을 때만** 검사(없으면 통과). `status`는 노트 생애주기이지 사업 진행 상태가 아니다(작업 상태는 본문에). 정보 줄: `status: superseded` 건수(0이면 supersede 프로토콜 미가동 표시)
@@ -8,6 +8,8 @@
 - **L09**: 아래 §L09 참조
 - **L10**: `project:` 값이 `[[x]]`면 `notes/x.md` 실존, plain이면 registry id, 둘 다 아니면 warn
 - **L11**: 최신 `graph-report-YYMMDD.md`가 7일 초과/부재 → warn(`/vault-graph build` 권장)
+- **L13**: 파일명이 소문자 ASCII kebab-case가 아니면 error. 이름 변경은 `vmem move`(legacy 이름 원본 허용)
+- **L14**: frontmatter `source:` 경로가 해소되지 않으면 warn
 - **L12**: `vault-graph.json`에서 cross-community edge 0인 커뮤니티 → warn, **멤버 목록(≤10 + N more)으로 보고**. 커뮤니티 번호는 빌드 로컬이라 인용 금지(KG 규칙 §5.1). singleton은 정보 줄
 
 ## L09
