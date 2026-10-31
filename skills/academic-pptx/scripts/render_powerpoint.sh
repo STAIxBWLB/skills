@@ -10,10 +10,14 @@ dpi=${2:-110}
 command -v pdftoppm >/dev/null || { echo "render_powerpoint: needs pdftoppm (poppler)" >&2; exit 3; }
 
 box="$HOME/Library/Containers/com.microsoft.Powerpoint/Data/render-tmp"
-name="render-$$-$(basename "$deck")"
+name="render-$$.pptx"   # fixed name: the deck name never enters the AppleScript
 mkdir -p "$box"
 lock="${TMPDIR:-/tmp}/render_powerpoint.lock"
-until mkdir "$lock" 2>/dev/null; do sleep 1; done   # PowerPoint exports one deck at a time
+waited=0   # PowerPoint exports one deck at a time
+until mkdir "$lock" 2>/dev/null; do
+  sleep 1; waited=$((waited + 1))
+  [ "$waited" -lt 600 ] || { echo "render_powerpoint: $lock held for 10 min; remove it if no render is running" >&2; exit 1; }
+done
 trap 'rm -f "$box/$name" "$box/${name%.pptx}.pdf"; rmdir "$lock"' EXIT
 cp "$deck" "$box/$name"
 
