@@ -1,0 +1,35 @@
+#!/bin/bash
+# Render a .pptx through Microsoft PowerPoint for Mac: <deck>.pdf and <deck>-slide-N.png beside the deck.
+# Usage: bash render_powerpoint.sh deck.pptx [dpi]   (dpi default 110)
+# Exit 3: not macOS or PowerPoint missing (report visual QA as unverified).
+# Works inside PowerPoint's sandbox container, so no file-access prompt appears.
+set -euo pipefail
+deck=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+dpi=${2:-110}
+[ "$(uname)" = Darwin ] && [ -d "/Applications/Microsoft PowerPoint.app" ] || { echo "render_powerpoint: needs macOS + Microsoft PowerPoint" >&2; exit 3; }
+command -v pdftoppm >/dev/null || { echo "render_powerpoint: needs pdftoppm (poppler)" >&2; exit 3; }
+
+box="$HOME/Library/Containers/com.microsoft.Powerpoint/Data/render-tmp"
+name="render-$$-$(basename "$deck")"
+mkdir -p "$box"
+lock="${TMPDIR:-/tmp}/render_powerpoint.lock"
+until mkdir "$lock" 2>/dev/null; do sleep 1; done   # PowerPoint exports one deck at a time
+trap 'rm -f "$box/$name" "$box/${name%.pptx}.pdf"; rmdir "$lock"' EXIT
+cp "$deck" "$box/$name"
+
+osascript <<EOF
+with timeout of 180 seconds
+  tell application "Microsoft PowerPoint"
+    open POSIX file "$box/$name"
+    delay 2
+    save presentation "$name" in (POSIX file "$box/${name%.pptx}.pdf") as save as PDF
+    close presentation "$name" saving no
+  end tell
+end timeout
+EOF
+
+pdf="${deck%.pptx}.pdf"
+cp "$box/${name%.pptx}.pdf" "$pdf"
+rm -f "${deck%.pptx}"-slide-*.png
+pdftoppm -png -r "$dpi" "$pdf" "${deck%.pptx}-slide"
+ls -1 "${deck%.pptx}"-slide-*.png
