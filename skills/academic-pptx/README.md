@@ -24,3 +24,7 @@ The same 10-minute Korean seminar deck was built twice by independent agents (pp
 ## Render script notes
 
 `scripts/render_powerpoint.sh` copies the deck into PowerPoint's sandbox container before opening it. Opening or saving outside the container raises a "Grant File Access" dialog that blocks AppleScript until a person answers it. Exports are serialized with a lock directory because PowerPoint handles one scripted export at a time.
+
+## Rebuild checks
+
+Two fresh agents rebuilt the same deck from this skill alone. The first build had every title on one line and no mid-word Hangul breaks, but slides were top-heavy; that led to the layout balance rule and the pattern fixes (19 pt text, centred callout, extra colours). The second build was clean after four render rounds and surfaced two pattern bugs, now fixed: `bullet` set once on a run array bullets only the first paragraph (it belongs on each paragraph's first run), and shape borders take `width`, not `pt`.

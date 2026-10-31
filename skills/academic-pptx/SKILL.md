@@ -55,7 +55,7 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
 
 1. Build per the pptx skill as a structured deck, then run `ko_fix.py` for Korean text.
 2. **File QA**: the pptx skill's `validate.py`. **Content QA**: its text extraction script; check order, typos and leftover placeholders.
-3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-N.png` through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
+3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-*.png` (zero-padded numbers) through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
 4. **Academic QA**:
    - every content slide has an action title, and the ghost deck test passes
    - one exhibit per results slide, each with its "so what" marked on the exhibit
