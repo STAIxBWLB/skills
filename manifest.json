@@ -202,6 +202,17 @@
       ]
     },
     {
+      "name": "academic-pptx",
+      "path": "skills/academic-pptx",
+      "tier": "core",
+      "tags": [
+        "slides",
+        "pptx",
+        "academic",
+        "korean"
+      ]
+    },
+    {
       "name": "share-outbox",
       "path": "skills/share-outbox",
       "tier": "core",

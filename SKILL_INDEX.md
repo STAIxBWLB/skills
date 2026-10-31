@@ -12,6 +12,7 @@ sync with it.
 ## Skills
 
 - Document toolkits: `pptx-toolkit`, `xlsx-toolkit`, `md2docx`
+- Academic decks (editable .pptx): `academic-pptx`
 - Korean writing: `gaejosik`, `yunmun`
 - Social channels: `linkedin-manager`
 - Slide deck prompts: `canva-deck`, `notebooklm-deck`, `gpt-images-deck`
