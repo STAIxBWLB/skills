@@ -20,7 +20,7 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 | Item | Path |
 |------|------|
 | Vault/workspace builder | `vmem graph build <vault> [--workspace]` (MCP `vmem_graph_build`) |
-| Code builder | `~/.local/bin/graphify update <path>` (graphify CLI, absolute path) |
+| Code builder | `~/.maru/skills/vault-graph/scripts/run.sh -m graphify update <path>` (graphify from the shared skills runtime) |
 | Python | `~/.maru/env/.venv/bin/python` |
 | Skill runner (graphify query) | `~/.maru/skills/vault-graph/scripts/run.sh` |
 | graphifyignore template | `<workspace-root>/_meta/templates/graphifyignore` |
@@ -59,7 +59,7 @@ Options:
    ```bash
    vmem graph build <vault>               # --vault (MCP: vmem_graph_build)
    vmem graph build <vault> --workspace   # --workspace (MCP: vmem_graph_build workspace: true)
-   ~/.local/bin/graphify update <path>    # --code
+   ~/.maru/skills/vault-graph/scripts/run.sh -m graphify update <path>    # --code
    ```
    For code builds, ensure `<path>/.graphifyignore` exists first. If missing, offer to copy `<workspace-root>/_meta/templates/graphifyignore`.
 2. Pipeline: read notes/code → extract graph → community detection → god node analysis → surprising connections → report. vmem uses deterministic label propagation (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
