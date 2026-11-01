@@ -9,8 +9,8 @@
 // workspace-private references in shipped text (PRIVATE_REFERENCE_RULES), and
 // host-specific syntax in shipped skills (HOST_COMPAT_RULES).
 // package: verify + zip of exactly the git-tracked bundle files + signed-ready
-// metadata JSON (revision, commit, minAppVersion, envHash, archive sha/size,
-// per-file path/sha256/mode). Signing happens in CI via `tauri signer sign`.
+// metadata JSON (revision, commit, minAppVersion, requires, envHash, archive
+// sha/size, per-file path/sha256/mode). Signing happens in CI via `tauri signer sign`.
 //
 // This repository IS the bundle root: the bundle contains exactly the
 // tracked files under BUNDLE_PATHS (skills/, envs/, lib/, docs/,
@@ -30,6 +30,9 @@ import { fileURLToPath } from "node:url";
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const skillsRoot = repoRoot;
 const BUNDLE_PATHS = ["skills", "envs", "lib", "docs", "manifest.json", "SKILL_INDEX.md"];
+// Tools a bundle may declare a floor for in manifest.json `requires`.
+const REQUIRES_TOOLS = ["vmem", "amem"];
+const FLOOR_MENTION = /\b(vmem|amem) >= (\d+\.\d+\.\d+)/g;
 
 // Shipped text must not point into a private workspace. Rules start at
 // "warn" and move to "fail" one at a time once the bundle is clean of them.
@@ -198,6 +201,17 @@ function loadManifest(root) {
   if (!Array.isArray(manifest.skills) || manifest.skills.length === 0) {
     fail("manifest.json skills[] is empty");
   }
+  // requires: tool floors the app checks before it applies a bundle, the way
+  // it checks minAppVersion. The one place a floor is set; SKILL.md text that
+  // names a floor must agree with it (checked in verify).
+  const requires = manifest.requires ?? {};
+  if (typeof requires !== "object" || Array.isArray(requires)) fail("manifest.json requires is not an object");
+  for (const [tool, range] of Object.entries(requires)) {
+    if (!REQUIRES_TOOLS.includes(tool)) fail(`manifest.json requires names an unknown tool: ${tool}`);
+    if (typeof range !== "string" || !/^>=\d+\.\d+\.\d+$/.test(range)) {
+      fail(`manifest.json requires.${tool} is not ">=X.Y.Z": ${range}`);
+    }
+  }
   return manifest;
 }
 
@@ -310,6 +324,13 @@ function verify(root = repoRoot) {
     }
     if (buffer.includes(0)) continue; // binary: templates, images
     const text = buffer.toString("utf8");
+    if (rel.endsWith("/SKILL.md")) {
+      for (const [, tool, version] of text.matchAll(FLOOR_MENTION)) {
+        if (manifest.requires?.[tool] !== `>=${version}`) {
+          errors.push(`${rel}: names ${tool} >= ${version}, but manifest.json requires.${tool} is ${manifest.requires?.[tool] ?? "unset"}`);
+        }
+      }
+    }
     for (const { line, rule } of hostCompatFindings(rel, text)) {
       (rule.level === "fail" ? errors : hostWarnings).push(`${rel}:${line}: host-compat: ${rule.label}`);
     }
@@ -408,6 +429,7 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
     commit,
     publishedAt: new Date().toISOString(),
     minAppVersion: manifest.minAppVersion,
+    requires: manifest.requires ?? {},
     channelTag: manifest.channelTag,
     envHash: envHash(fileEntries),
     archive: { name: `${baseName}.zip`, sha256: sha256(zipBuffer), size: zipBuffer.length },

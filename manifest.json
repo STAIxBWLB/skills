@@ -3,6 +3,9 @@
   "repoSlug": "STAIxBWLB/skills",
   "channelTag": "skills-channel",
   "minAppVersion": "1.1.6",
+  "requires": {
+    "vmem": ">=0.2.3"
+  },
   "skillsSubdir": "skills",
   "envSubdir": "envs/default",
   "libSubdir": "lib",

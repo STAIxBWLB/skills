@@ -10,6 +10,8 @@ description: >
 # /vault-graph [command]
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
+>
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.2.3, stop and report `vault-graph build needs vmem >= 0.2.3 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
 
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 

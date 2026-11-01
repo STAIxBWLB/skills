@@ -16,7 +16,7 @@ without an app release.
 - `lib/` — shared helpers (e.g. `vault_adapter.md`)
 - `docs/` — reference material used by skills
 - `manifest.json` — bundle manifest: `repoSlug`, `channelTag`,
-  `minAppVersion`, and the canonical skill list
+  `minAppVersion`, `requires` (tool floors), and the canonical skill list
 - `SKILL_INDEX.md` — human-readable index (manifest.json is authoritative)
 
 Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
@@ -49,6 +49,14 @@ uploaded bundle is invisible to clients.
   revision instead.
 - **`minAppVersion`** (`manifest.json`) gates which apps may apply a
   bundle. Bump it only when a bundle genuinely needs newer app code.
+- **`requires`** (`manifest.json`, copied into the metadata JSON) holds the
+  `vmem`/`amem` floors as `">=X.Y.Z"`; an app with the floor gate (maru#466)
+  does not apply a bundle whose floor the installed tool misses. A skill that needs the floor checks
+  `vmem --version` itself and names it as `vmem >= X.Y.Z`; `make
+  skills-verify` fails when that text and `requires` disagree.
+- **`envHash`** in the metadata JSON is the digest of `envs/**`
+  (`uv.lock` and `pnpm-lock.yaml` included), so the app can build a new env
+  beside the old one when it changes.
 - Signing secrets (`TAURI_SIGNING_PRIVATE_KEY`,
   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`) are repo secrets; the public key is
   embedded in the app's `tauri.conf.json`.

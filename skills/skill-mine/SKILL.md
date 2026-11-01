@@ -10,6 +10,8 @@ description: >
 # skill-mine: 기억 기반 스킬 후보 채굴 (LLM-free)
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as the `<vault>` argument of the `vmem` CLI command (or `vault` on `vmem_skills_mine`).
+>
+> Before that call, run `vmem --version`. If it fails or prints a version below 0.2.3, stop and report `skill-mine needs vmem >= 0.2.3 (found <version, or "no vmem">)`: `vmem skills mine` first shipped in 0.2.3.
 
 ## 언제 사용
 
