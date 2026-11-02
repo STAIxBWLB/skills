@@ -26,6 +26,7 @@ For LinkedIn manager changes, also check:
   dated history survives, and missing cadence mode retains weekly compatibility.
 - Confirm no owner identity or workspace-specific paths are present in the
   public skill bundle.
+- Error messages: a new or changed error, refusal or failure message a person or agent sees names the cause (what failed and why) and the next step (the command, setting or target that fixes it). When secrets, ids or paths must stay out, it names the cause class and how to check it. A message missing either is a finding; Important when it is the only signal of a blocked action (a CLI exit, a refused tool call), otherwise a nit.
 
 Repeated behavioral mistakes belong in `AGENTS.md`. Findings are evidence, not
 merge authorization; merge only on user instruction.
