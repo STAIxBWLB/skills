@@ -67,7 +67,7 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 
 ### Step 6: LEARN event in vault/log
 
-Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 `vmem_create` records it through its `log` argument; an update records it with the Step 4 `vmem_log_append`; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
+Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 create or update records it through its `log` argument, so add none for it; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
 
 **Format**:
 
