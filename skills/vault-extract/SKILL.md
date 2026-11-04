@@ -81,7 +81,7 @@ If any check fails:
 
 ## Log Append (Step 8 — REQUIRED)
 
-Every note created or updated by /vault-extract must produce one `log` line. `vmem_create` writes it from its `log` argument. An update (`vmem_patch` / `vmem_append`, which take no `log`) records a default EXTRACT line; add `— updated: <type>` only if the contract needs that note text, with `vmem_log_append`. Failures use `vmem_log_append`. Never append to the log file directly.
+Every note created or updated by /vault-extract must produce one `log` line. `vmem_create` writes it from its `log` argument. An update (`vmem_patch` / `vmem_append`) records a default EXTRACT line; when the contract needs the `updated: <type>` note text, pass it as that write's `log` argument. Failures use `vmem_log_append`. Never append to the log file directly.
 
 **Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
 

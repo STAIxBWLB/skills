@@ -33,10 +33,10 @@ At the start of a vault-facing workflow:
 All vault writes go through vmem, which validates before it saves (schema, enums, MOC topics, links, secrets, PII):
 
 - `notes/*.md`: the vmem MCP write tools below.
-- `ops/` and `reports/` files: the CLI `vmem report <vault> <ops/...|reports/...> --body -` (no MCP tool writes them).
+- `ops/` and `reports/` files: `vmem_report(path, body)`, the MCP form of the CLI `vmem report <vault> <ops/...|reports/...> --body -` (same path rules, screening, receipt and default `EXTRACT` line).
 - Root docs (`AGENTS.md` and similar) are not agent-writable; change them only on the user's explicit maintenance instruction.
 
-Reads: `notes/` through `vmem_read` / `vmem_read_many` / `vmem_search` / `vmem_list` (they address flat notes only). `ops/`, `reports/` and root docs are read with read-only filesystem access. Do not use filesystem write/edit, shell redirection or another MCP server for any vault file.
+Reads: `notes/` through `vmem_read` / `vmem_read_many` / `vmem_search` / `vmem_list`. `ops/`, `reports/`, `self/`, `templates/` and root docs through `vmem_read_file` / `vmem_list_files` (bounded, paged like `vmem_read`); read-only filesystem access also works. Do not use filesystem write/edit, shell redirection or another MCP server for any vault file.
 
 **Write results**: a receipt with `ok: true` and `applied: true` saved its changes. `refused: true` usually means nothing was written, but check `applied`, `changes` and `logged`: a rollback or cleanup failure can return `refused: true` with `applied: true` and persisted bytes. In that case stop, report the receipt, and reconcile the note and log before any retry.
 
@@ -51,15 +51,17 @@ Typical mappings:
 | Operation | vmem tool |
 |---|---|
 | Read note / several notes | `vmem_read` (frontmatter, body, sha256), `vmem_read_many` (<=20) |
-| Search / list | `vmem_search`, `vmem_list` |
+| Search / list | `vmem_search`, `vmem_list` (page with the returned `nextCursor` as `cursor`) |
+| Read / list non-note files | `vmem_read_file`, `vmem_list_files` |
 | Links / neighbourhood | `vmem_links`, `vmem_graph_neighbors` |
 | Create note | `vmem_create` |
-| Edit body | `vmem_patch` (exact old/new text), `vmem_append` (into an H2 section) |
+| Edit body | `vmem_patch` (exact old/new text, or `edits` for up to 32 at once), `vmem_append` (into an H2 section) |
 | Edit frontmatter or tags | `vmem_set_frontmatter` |
 | Typed relation link | `vmem_link` |
 | Supersede | `vmem_supersede` |
 | Move / delete | `vmem_move`, `vmem_delete`: call once for `{preview, fingerprint}`, then again with `confirm: true` and that fingerprint |
-| MOCs / stats | `vmem_mocs`, `vmem_status` |
+| MOCs / stats | `vmem_mocs`, `vmem_stats` (counts by type, domain and status, recent edits, log events), `vmem_status` |
+| `ops/` / `reports/` file | `vmem_report` |
 | Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-*.md`), `vmem_graph_build` |
 | Dry validation | `vmem_check` |
 
@@ -78,10 +80,9 @@ Workspace-local operational files are not vault markdown. They may be read or ed
 
 vmem owns the vault log (`vault.log_file`). Every vmem write appends one attributed line itself:
 
-- `vmem_create`, `vmem_link`, `vmem_supersede` accept an optional `log` argument (`{type, project, source, dest?, note}`) that sets that line's TYPE, project and note.
-- `vmem_patch`, `vmem_append`, `vmem_set_frontmatter`, `vmem_move`, `vmem_delete` take no `log` argument (calls carrying it are rejected) and record a default line (`EXTRACT`/`ROUTE`/`RETHINK  -  vmem:<op> → path`).
-- `vmem_lint(write: true)` and `vmem_graph_build` record `LINT` / `GRAPH`; `vmem report` records a default `EXTRACT` line.
-- When a workflow's contract needs a TYPE the write did not record (for example a LEARN line for an update), add exactly that event with `vmem_log_append`. Do not add an event the write already recorded.
+- Every write tool (`vmem_create`, `vmem_patch`, `vmem_append`, `vmem_set_frontmatter`, `vmem_link`, `vmem_supersede`, `vmem_report`, and `vmem_move` / `vmem_delete` on the confirm call) accepts an optional `log` argument (`{type, project, source, dest?, note}`) that sets that line's TYPE, project and note. vmem refuses the whole write when the event is invalid.
+- Without `log`, a write records a default line (`EXTRACT`/`ROUTE`/`RETHINK`/`CONNECT  -  vmem:<op> → path`); `vmem_lint(write: true)` and `vmem_graph_build` record `LINT` / `GRAPH`.
+- When a workflow's contract needs a TYPE (for example a LEARN line for an update), pass it as `log` on that write. Use `vmem_log_append` only for an event with no write (a failure, a batch summary, a promoted TASK).
 
 Do not append to the log with `>>` or any other filesystem write.
 

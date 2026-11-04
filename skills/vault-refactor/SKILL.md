@@ -71,7 +71,7 @@ Filesystem access (Read/Write/Edit/Bash) is forbidden on vault paths.
 
 ## Log Append
 
-Every vmem write appends its own default `log` line (`vmem_patch`/`vmem_move`/`vmem_delete` take no `log` argument). After the batch, add one summary line with `vmem_log_append(type: "EXTRACT", project: "-", source: "refactor:<operation>", note: "<summary> (N notes, M links)")` (no direct log-file append):
+Every vmem write appends its own default `log` line. After the batch, add one summary line with `vmem_log_append(type: "EXTRACT", project: "-", source: "refactor:<operation>", note: "<summary> (N notes, M links)")` (no direct log-file append):
 
 ```
 YYYY-MM-DD HH:MM  EXTRACT  -  refactor:<operation>  — <summary> (N notes, M links)
