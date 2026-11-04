@@ -58,7 +58,7 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 
 ### Step 4: Execute (on accept)
 - New note: `vmem_create(stem, type, domain, topics, description, confidence, source, body, log: {type: "LEARN", project, source, note: "promoted: <type>"})`
-- Update: `vmem_patch(path, oldString, newString, expectedSha)` or `vmem_append(path, section, markdown)` (no `log` argument; vmem records a default EXTRACT line), then `vmem_log_append(type: "LEARN", project, source, dest, note: "updated: <title>")`
+- Update: `vmem_patch(path, oldString, newString, expectedSha, log)` or `vmem_append(path, section, markdown, log)` with `log: {type: "LEARN", project, source, dest, note: "updated: <title>"}`
 - Body: atomic insight, context, relevant notes section
 - expect: vmem refuses a missing or duplicated note field, a `confidence` outside the schema, a `topics` entry that is not an existing MOC, a new unresolved wiki link and secret-looking text; report the named issues instead of retrying with guessed values
 
@@ -67,7 +67,7 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 
 ### Step 6: LEARN event in vault/log
 
-Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 `vmem_create` records it through its `log` argument; an update records it with the Step 4 `vmem_log_append`; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
+Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 create or update records it through its `log` argument, so add none for it; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
 
 **Format**:
 

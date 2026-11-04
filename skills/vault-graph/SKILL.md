@@ -11,7 +11,7 @@ description: >
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 >
-> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.2.3, stop and report `vault-graph build needs vmem >= 0.2.3 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.4.0, stop and report `vault-graph build needs vmem >= 0.4.0 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
 
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 
@@ -90,7 +90,7 @@ Report the node's `community`, its degree-ranked neighbors (≤10), and same-com
    - vault: `<vault.path>/reports/graph-report-*.md`
    - code: `<target>/graphify-out/GRAPH_REPORT.md`
 2. Select newest report and warn if older than 7 days.
-3. Read vault and code reports through filesystem read (reports are machine-generated artifacts; vmem tools read notes).
+3. Read vault reports with `vmem_read_file` and code reports through filesystem read.
 4. Summarize overview, god nodes, top communities, surprising connections, and isolate count.
 
 ## Query Process (`/vault-graph query "<question>" [options]`)

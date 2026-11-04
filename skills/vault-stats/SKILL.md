@@ -24,7 +24,7 @@ Display comprehensive vault statistics. Numbers only; the "what to do next" reco
 
 Do not recompute what the lint/graph pipeline already produces:
 
-1. Size / MOCs / Activity / Growth: count notes and read each note's type and domain with `vmem_list(limit: 500)`, paged by stem `prefix` (it has no cursor); `vmem_mocs` for MOC sizes. Activity and Growth (created/modified over time) are not in vmem's read fields: take them from `vmem_log_tail` and read-only vault git history, or report them as unavailable. expect: vmem refuses a limit above 500
+1. Size / MOCs / Activity / Growth: `vmem_stats` (notes by type, domain and status, notes modified in the last 7 and 30 days, log events by type); `vmem_mocs` for MOC sizes; the recently created/modified notes themselves from `vmem_log_tail`. Growth beyond those windows: read-only vault git history, or report it as unavailable
 2. Connections (edges, density, top hubs): read the latest `reports/graph-report-YYMMDD.md` and `reports/graph-trend.md`
 3. Orphan count and schema compliance: run `vmem lint <vault> --json` (or `vmem_lint`) and take the L03 / L02 counts (same numbers `/vault-lint vault` reports)
 4. Read `ops/sessions/last-sync-timestamp`

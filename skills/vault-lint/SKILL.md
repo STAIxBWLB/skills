@@ -96,11 +96,11 @@ scope가 `full`·`work`·`inbox`·`names`이면 검사 전에 `references/work-s
 
 ### 4단계: 리포트 생성
 
-`vault/reports/lint-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem report <vault> reports/lint-YYMMDD.md --body -`(기본 EXTRACT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`(`reports/lint-report-YYMMDD.md`, LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 `markdown`을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
+`vault/reports/lint-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem_report(path: "reports/lint-YYMMDD.md", body, log)`(5단계 LINT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`(`reports/lint-report-YYMMDD.md`, LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 `markdown`을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
 
 ### 5단계: log append
 
-(a) 경로일 때만 `vmem_log_append(type: "LINT", project: "-", source: "vault/ + work/", note: "E errors, W warnings")`로 LINT 1줄 기록((b)는 `vmem_lint`가 이미 LINT를 기록하므로 추가하지 않음):
+(a) 경로는 4단계 `vmem_report`에 `log: {type: "LINT", project: "-", source: "vault/ + work/", note: "E errors, W warnings"}`를 넘겨 LINT 1줄을 기록한다((b)는 `vmem_lint`가 이미 LINT를 기록한다). 별도 `vmem_log_append`는 하지 않는다:
 
 ```
 YYYY-MM-DD HH:MM  LINT  -  vault/ + work/  — E errors, W warnings
@@ -111,7 +111,7 @@ log 파일 직접 append(`>>`) 금지.
 ## 가드레일
 
 - **자동 수정 금지**: 리포트만 생성. 수정은 사용자가 별도 스킬(`/vault-extract`, `/vault-connect`, `inbox-process`)로 실행.
-- **vault 쓰기는 vmem만**: 리포트는 `vmem report`, 노트 수정은 `vmem_*` 쓰기 도구. 파일시스템 `Write`/`Edit` 금지.
+- **vault 쓰기는 vmem만**: 리포트는 `vmem_report`(또는 CLI `vmem report`), 노트 수정은 `vmem_*` 쓰기 도구. 파일시스템 `Write`/`Edit` 금지.
 - **서브모듈 내부 깊이 검사 안 함**: 서브모듈은 해당 저장소의 자체 lint로 위임.
 - **CI 등록 금지**: 로컬 vault 접근이 필요하므로 CI 파이프라인에 등록하지 않는다. 권장 주기는 주간 `full` 1회, 대규모 ingest 후 `vault`.
 - **성능**: vault 스코프는 `vmem lint` 1회 실행. work 스코프(L07/L08 `Glob work/**/*`)가 비용의 대부분이므로 필요 시 `/vault-lint vault`로 분리.
