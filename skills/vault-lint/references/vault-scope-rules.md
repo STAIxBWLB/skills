@@ -1,8 +1,8 @@
-# vault 스코프 판정 규칙 (L01, L02, L03, L09~L14)
+# vault 스코프 판정 규칙 (L01, L02, L03, L09~L15)
 
 `vmem lint`가 구현한 판정 규칙의 요약. finding을 설명하거나 수정 제안을 쓸 때, `note=<path>` 결과를 판정할 때 기준으로 쓴다.
 
-- **L01**: 본문 `[[x]]` + frontmatter wiki-link 필드(`topics`·`project`·`projects`·`supersedes`·`superseded_by`; alias `[[name|display]]`는 `name`만)가 `notes/<x>.md`로 해소되지 않으면 error. **MOC 정책**: `topics:`는 MOC만 허용, 키워드 wiki-link는 L01 error(동일 가드: vault-extract §Preconditions, vault_adapter §Summary To Vault Fields)
+- **L01**: 본문 `[[x]]` + frontmatter wiki-link 필드(`topics`·`project`·`projects`·`supersedes`·`superseded_by`; alias `[[name|display]]`는 `name`만)가 `notes/<x>.md`로 해소되지 않으면 error. 각 finding은 존재하는 노트 중 최대 하나를 `suggested <path>`(title 검색 점수)로 제안하므로, 수정 제안은 그 후보를 먼저 검토하고 없을 때만 직접 찾는다. **MOC 정책**: `topics:`는 MOC만 허용, 키워드 wiki-link는 L01 error(동일 가드: vault-extract §Preconditions, vault_adapter §Summary To Vault Fields)
 - **L02**: `type` ∈ `insight | decision | observation | person | project | method | moc | reference`; `topics` 필수(단 `type: moc`는 `topics` 미요구 + `description` 필수); `confidence` ∈ `proven | likely | experimental`, `status` ∈ `active | superseded | archived`, **값이 있을 때만** 검사(없으면 통과). `status`는 노트 생애주기이지 사업 진행 상태가 아니다(작업 상태는 본문에). 정보 줄: `status: superseded` 건수(0이면 supersede 프로토콜 미가동 표시)
 - **L03**: topics 0 AND in-link 0 → orphan. **hub MOC `notes/index.md`는 예외**(3-tier 루트, 설계상 in-link·topics 없음). 도메인 MOC는 예외 아님
 - **L09**: 아래 §L09 참조
@@ -10,6 +10,7 @@
 - **L11**: 최신 `graph-report-YYMMDD.md`가 7일 초과/부재 → warn(`/vault-graph build` 권장)
 - **L13**: 파일명이 소문자 ASCII kebab-case가 아니면 error. 이름 변경은 `vmem move`(legacy 이름 원본 허용)
 - **L14**: frontmatter `source:` 경로가 해소되지 않으면 warn
+- **L15**: `confidence: proven`인데 `source`가 비어 있으면 warn — 근거(memory id·URL·workspace 경로)를 넣거나 confidence를 낮춘다. `--note` 스코프에서도 함께 필터된다
 - **L12**: `vault-graph.json`에서 cross-community edge 0인 커뮤니티 → warn, **멤버 목록(≤10 + N more)으로 보고**. 커뮤니티 번호는 빌드 로컬이라 인용 금지(KG 규칙 §5.1). singleton은 정보 줄
 
 ## L09
