@@ -11,7 +11,7 @@ description: >
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 >
-> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.4.0, stop and report `vault-graph build needs vmem >= 0.4.0 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
 
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 
@@ -69,7 +69,7 @@ Options:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 추가, 구 리포트 보존)
    - workspace: `<vault.path>/reports/workspace-graph.json` only (no report or trend row; the result lists the work counters)
    - code: `<path>/graphify-out/graph.json`, `<path>/graphify-out/GRAPH_REPORT.md`
-4. vmem writes the vault and workspace outputs and records the GRAPH event itself; add no log line. A build reported as refused names the rule in its receipt; stop and report it.
+4. vmem writes the vault and workspace outputs and records the GRAPH event itself; add no log line. A build whose receipt is `ok: false` names the rule that stopped it; stop and report it.
    The weekly ritual is a **single** vault build, run by the workspace's weekly job (`--workspace` is on-demand only). Order: build → lint → vault push → work pointer bump.
 
 ## Neighbors Process (`/vault-graph neighbors <note>`)

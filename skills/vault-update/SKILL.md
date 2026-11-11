@@ -28,8 +28,8 @@ Update a note with new information while preserving original meaning. This is th
    - expect: vmem refuses a stale `expectedSha`, an invalid frontmatter value, a new unresolved wiki link and an edit inside `## Topics`
 5. Check connected notes (via `vmem_links(path)` and `vmem_search`); propose cascading updates if needed
 6. Record update in note body (timestamp or changelog line)
-7. Run `/vault-lint note=<path>` on updated note
-8. vmem logs every write with a default `EXTRACT` line; when wiki-links changed, pass `log: {type: "CONNECT", ...}` on the write that changed them
+7. Run `/vault-lint note=<path>` on the updated note; `--note` is CLI-only, so an MCP-only run finishes with one vault-wide `vmem_lint` instead
+8. vmem logs every write with a default `EXTRACT` line; when wiki-links changed, pass `log: {type: "CONNECT", ...}` on the write that changed them (see §Log Append)
 
 ## Vault Access
 
@@ -53,13 +53,11 @@ Update a note with new information while preserving original meaning. This is th
 
 ## Log Append
 
-If wiki-links or MOC membership changed, append:
+Each vmem write records exactly one line: its default `EXTRACT` event, or the event the call passes in `log`. Nothing suppresses it, so a body-only edit is logged too and is never silent. When the edit adds or removes a wiki link or MOC membership, pass `log: {type: "CONNECT", project, source: "notes/<note>.md", dest, note: "updated: <summary>"}` on the write that changed them:
 
 ```
 YYYY-MM-DD HH:MM  CONNECT  <project>  notes/<note>.md  — updated: <summary>
 ```
-
-If only body text or frontmatter changed (no link impact), **do not append** — /vault-update is not an ingest chain stage, so body-only edits stay silent.
 
 ## Output
 

@@ -4,7 +4,7 @@
 
 **L04: stale seed**
 1. `Glob <ideation>/seeds/*.md` + vault 쪽 ideation 노트 (있으면)
-2. 각 파일 mtime 확인 (work은 Bash stat, vault은 MCP `get_notes_info`)
+2. 각 파일 mtime 확인 (work은 Bash stat, vault 노트는 `vmem_list`가 주는 `mtime`, `reports/`·`ops/` 파일은 `vmem_list_files`)
 3. 현재 - mtime > `scratchpad.ideation_review_days`(기본 90) → 위반
 
 **L06: 신 스키마 불일치 (marker-based scope)**

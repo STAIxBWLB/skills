@@ -132,7 +132,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 - For each confirmed proposal:
   1. Read the source document fully
   2. **create** proposals: extract insights per `/vault-extract` methodology → create vault note(s) → update relevant MOCs
-  3. **update** proposals: hand off to the `/vault-update` procedure (MCP `patch_note`/`write_note` with the original insight preserved, `## Update YYYY-MM-DD` section, `/vault-lint note=` afterwards) — this skill does not carry its own update path
+  3. **update** proposals: hand off to the `/vault-update` procedure (MCP `vmem_patch`/`vmem_append`/`vmem_set_frontmatter` with the original insight preserved, `## Update YYYY-MM-DD` section, `/vault-lint note=` afterwards when the CLI is available) — this skill does not carry its own update path
   4. Show created/updated note for review
 
 ### Step 3.5: R4 Sibling Merge (Method Evidence 자동 갱신)

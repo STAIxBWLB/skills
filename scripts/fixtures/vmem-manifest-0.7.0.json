@@ -1,0 +1,155 @@
+{
+  "name": "@staix/vault-mem",
+  "version": "0.7.0",
+  "configVersion": 4,
+  "mcp": {
+    "server": "vmem",
+    "tools": [
+      {
+        "name": "vmem_status",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_search",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_brief",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_read",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_read_many",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_list",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_links",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_mocs",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_check",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_log_tail",
+        "readOnly": true
+      },
+      "vmem_create",
+      "vmem_patch",
+      "vmem_append",
+      "vmem_set_frontmatter",
+      "vmem_link",
+      "vmem_supersede",
+      "vmem_log_append",
+      "vmem_move",
+      "vmem_merge",
+      "vmem_delete",
+      "vmem_promote_from_amem",
+      "vmem_lint",
+      "vmem_graph_build",
+      {
+        "name": "vmem_graph_neighbors",
+        "readOnly": true
+      },
+      "vmem_promote",
+      {
+        "name": "vmem_skills_mine",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_read_file",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_list_files",
+        "readOnly": true
+      },
+      "vmem_report",
+      {
+        "name": "vmem_stats",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_spec_get",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_spec_graph",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_spec_grep",
+        "readOnly": true
+      },
+      {
+        "name": "vmem_spec_validate",
+        "readOnly": true
+      },
+      "vmem_spec_create",
+      "vmem_spec_update",
+      "vmem_spec_delete"
+    ]
+  },
+  "commands": [
+    "spec get",
+    "spec graph",
+    "spec grep",
+    "spec validate",
+    "spec create",
+    "spec update",
+    "spec delete",
+    "lint",
+    "graph build",
+    "graph neighbors",
+    "skills mine",
+    "rebuild",
+    "brief",
+    "search",
+    "show",
+    "links",
+    "status",
+    "doctor",
+    "recover",
+    "vaults list",
+    "vaults add",
+    "vaults remove",
+    "vaults pii",
+    "specs list",
+    "specs add",
+    "specs remove",
+    "new",
+    "patch",
+    "append",
+    "frontmatter",
+    "link",
+    "supersede",
+    "merge",
+    "move",
+    "delete",
+    "tidy",
+    "report",
+    "check",
+    "log tail",
+    "log grep",
+    "log append",
+    "promote-from-amem",
+    "promote",
+    "sync",
+    "mcp",
+    "setup",
+    "manifest",
+    "completion",
+    "stats"
+  ]
+}

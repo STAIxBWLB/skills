@@ -41,23 +41,23 @@ Find relationships between a note and existing vault notes, create wiki links.
 
 ## Log Append (Step 5 — REQUIRED)
 
-Every wiki link /vault-connect creates produces one `log` line, written by `vmem_link` itself; set its content with the `log` argument. Never append to the log file directly.
+Every wiki link /vault-connect creates produces one `log` line, written by `vmem_link` itself; set its content with the `log` argument. `vmem_link` links one `from` to one `to`, so one call writes one line naming that one target: a note that gains three links takes three calls and three lines. Never append to the log file directly.
 
 **Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
 
 ```
-YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`, `[[b]]`, `[[c]]`
+YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 ```
 
 - `<project>`: project id from the target note's source registry classification, or `-` if unclassified
-- `<vault/notes/x.md>`: target note being connected
-- "linked target list": list of newly created wiki-link targets (cap at 5; if more, use overflow style with "+N more" suffix)
+- `<vault/notes/x.md>`: the `from` note this call linked from (vmem uses it as the line's source even when the link is bidirectional)
+- `[[a]]`: the one target this call linked
 
 **No connections made**: no line is written (an `unchanged: true` link writes nothing). Report zero-connection runs in chat output instead.
 
 **Bidirectional links**: one `vmem_link` call updates both notes and writes one line.
 
-**Failure**: inspect each refused receipt's `applied`, `changes` and `logged`. With `applied: false` nothing was written: report its issues and keep the links that succeeded. With `applied: true` the write partly persisted: stop, report the receipt and reconcile the notes and log before any retry (`lib/vault_adapter.md` §Write results).
+**Failure**: read `ok`, `applied`, `changes` and `logged` on each link's receipt. `ok: false` with `applied: false` wrote nothing: report its issues and keep the links that succeeded. `ok: false` with `applied: true` partly persisted: stop, report the receipt and reconcile the notes and log before any retry (`lib/vault_adapter.md` §Write results).
 
 **Vault access**: vmem MCP only.
 

@@ -69,7 +69,7 @@ If any check fails:
    - Body: the insight with context
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
-6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the result is `{refused: true, issues}` with `applied: false`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller. If `applied: true` despite `refused`, stop and reconcile per `lib/vault_adapter.md` §Write results.
+6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the receipt is `ok: false` with `applied: false`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller. If `ok` is false while `applied: true`, changes persisted: stop and reconcile per `lib/vault_adapter.md` §Write results.
 7. After creating notes, invoke /vault-connect with entities hint (from summary.md):
    - Read `entities` field from source summary.md (if present — list of 인물/기관 names)
    - Pass entities list to `/vault-connect` as wiki-link candidate seeds (`entities_hint` parameter)
@@ -98,7 +98,7 @@ YYYY-MM-DD HH:MM  EXTRACT  <project>  <source> → <vault/notes/x.md>  — <type
 
 **Update vs create**: for updates, use `— updated: <type>` to distinguish.
 
-**Failure**: inspect `applied`, `changes` and `logged` on every receipt. `ok: true`, `applied: true`, `logged: false`: the note saved but its log line did not; warn the user and proceed (do not roll back). `refused` with `applied: false`: nothing was written; record only the `failed:` line. `refused` with `applied: true`: the write partly persisted; stop, report the receipt and reconcile the note and log before any retry (`lib/vault_adapter.md` §Write results).
+**Failure**: test `ok` first, then `applied`, `changes` and `logged` on every receipt. `ok: true`, `applied: true`, `logged: false`: the note saved but its log line did not; warn the user and proceed (do not roll back). `ok: false` with `applied: false`: nothing was written; record only the `failed:` line. `ok: false` with `applied: true`: changes persisted; stop, report the receipt and reconcile the note and log before any retry (`lib/vault_adapter.md` §Write results).
 
 **Vault access**: vmem MCP only. No filesystem Write/Edit on vault paths.
 

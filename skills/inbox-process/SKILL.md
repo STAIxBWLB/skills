@@ -73,7 +73,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    idea from already-committed task from scope decision.
 7. Propose a route using `project-registry.yaml` and the configured scoring
    spec. When the top score is weak (< 3) and `hooks.enrichment` is set, run the
-   context-enrichment §2 entity resolution and `search_notes` to disambiguate
+   context-enrichment §2 entity resolution and `vmem_search` to disambiguate
    before leaving the item pending, and attach the matched `vault_note` /
    `relatedMeetings` to the proposal. Resolve the destination **subfolder** (not
    just the project) per `naming-and-placement.md` §C — map the item kind to the
