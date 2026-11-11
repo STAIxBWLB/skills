@@ -9,7 +9,7 @@ The skill implements the lint stage of Karpathy's "LLM Wiki Method": a periodic 
 ## Retired checks
 
 - **L05** was retired on 2026-08-19. Its input, `inbox/INDEX.md`, was replaced by `inbox/_state/index.jsonl` (the intake receipt log), and routing-receipt consistency moved to inbox-intake and inbox-process.
-- **L11b** (workspace-graph freshness) was retired on 2026-08-19 because nothing queried that output (`_meta/rules/knowledge-graph-integration.md` §7). The `--work-root` graph build remains available on demand.
+- **L11b** (workspace-graph freshness) was retired on 2026-08-19 because nothing queried that output (the workspace rules directory, `ssot.rules`). The `--work-root` graph build remains available on demand.
 
 ## Script history
 

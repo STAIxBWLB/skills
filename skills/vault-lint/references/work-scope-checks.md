@@ -29,7 +29,7 @@ inbox summary 스키마 강제는 inbox item에서 만든 파일에만 적용한
 1. `Glob work/**/*` 결과에서 파일명 또는 경로에 `[가-힣]` 포함 여부
 2. 있으면 → 위반
 3. 예외 (§Legacy Exemptions 참조): `trips/**`, legacy 계약/MOU/연구 과제 경로
-4. `meetings/**` 는 **무조건 면제하지 않는다**. 날짜 게이트 적용 (`_meta/rules/naming-and-placement.md` §A4 권위):
+4. `meetings/**` 는 **무조건 면제하지 않는다**. 날짜 게이트 적용 (워크스페이스 `ssot.rules`의 naming-and-placement 규칙이 권위):
    legacy 회의록(mtime/파일명 날짜가 2026-05-26 이전, 또는 신규 `YYMMDD-meeting-<slug>.md` 패턴에 맞지 않는 한글 파일)만 면제하고,
    영문화 대상(2026-05-26 이후 신규 생성 또는 마이그레이션 대상)인 한글 회의록 파일명은 여전히 위반으로 플래그한다.
 

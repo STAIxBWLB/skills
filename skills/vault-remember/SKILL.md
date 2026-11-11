@@ -28,7 +28,7 @@ Record an observation about methodology, process, or friction for later review.
 2. Create timestamped entry in `ops/observations/` with `vmem_report(path: "ops/observations/<filename>", body)` (vmem screens the text and logs the write). expect: vmem refuses secret-looking text and an unsafe path
 3. Filename: YYYYMMDD-brief-description.md
 4. Content: observation text, category, context
-5. Check observation count against rethink threshold (10+)
+5. Check the observation count against the rethink threshold: read `maintenance.rethink_observations_threshold` from `ops/config.yaml` (`vmem_read_file`; default 10 when unset) and count the entries with `vmem_list_files(dir: "ops/observations")`
 
 ## Rule Zero
 The methodology is the spec. Observations accumulate evidence for methodology changes, but changes require explicit /vault-rethink review.

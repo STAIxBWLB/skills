@@ -65,7 +65,7 @@ Accept: [a] new, [b] update, [c] promote, [s] skip, [q] quit
 ### Step 4: Execute (on accept)
 - New note: `vmem_create(stem, type, domain, topics, description, confidence, source, body, log: {type: "LEARN", project, source, note: "promoted: <type>"})`
 - Update: `vmem_patch(path, oldString, newString, expectedSha, log)` or `vmem_append(path, section, markdown, log)` with `log: {type: "LEARN", project, source, dest, note: "updated: <title>"}`
-- Promote an agent-mem entry (Option C): list candidates with `amem_vault_candidates` (CLI `amem vault-candidates`), then call `vmem_promote_from_amem(id: "mem:<id>", stem, type, domain, topics, description, body, project)` for the preview — full note text, the possible duplicates and a fingerprint — and confirm with `vmem_promote_from_amem(..., confirm: true, fingerprint)`. A listed duplicate is not a refusal: the preview carries `choices` (`create` or `link-existing <path>`), so pick one before confirming, or pass `linkTo` to link an existing note instead of creating one. That confirm creates the note, writes `promoted_from` and its back-link, and records the `LEARN  <project>  mem:<id> → notes/<stem>.md  — promoted: <kind>` line itself; pass no `log`, and add none afterwards. expect: vmem refuses a stale fingerprint, and a `stem`, `type` or `domain` outside the schema
+- Promote an agent-mem entry (Option C): list candidates with `amem_vault_candidates` (CLI `amem vault-candidates`), then call `vmem_promote_from_amem(id: "mem:<id>", stem, type, domain, topics, description, body, project)` for the preview — full note text, the possible duplicates and a fingerprint — and confirm with `vmem_promote_from_amem(..., confirm: true, fingerprint)`. A listed duplicate is not a refusal: the preview carries `choices` (`create` or `link-existing <path>`), so pick one before confirming, or pass `linkTo` to link an existing note instead of creating one. That confirm creates the note, writes `promoted_from` and its back-link, and records the `LEARN  <project>  mem:<id> → notes/<stem>.md  — promoted: <kind>` line itself; pass no `log`, and add none afterwards. expect: vmem refuses a stale fingerprint, and a `stem`, `type` or `domain` outside the schema; an existing stem or the same normalized H1 (hard V08) makes the preview `ok: false`, so change the stem or H1 before confirming
 - Body: atomic insight, context, relevant notes section
 - expect: vmem refuses a missing or duplicated note field, a `confidence` outside the schema, a `topics` entry that is not an existing MOC, a new unresolved wiki link and secret-looking text; report the named issues instead of retrying with guessed values
 
@@ -107,5 +107,5 @@ YYYY-MM-DD HH:MM  LEARN  <project>  <source> → <vault/notes/x.md>  — <note>
 ## Related
 
 - `vault/AGENTS.md` §"Query → Wiki 환원 루프" — the policy
-- `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷" — log line format
+- `lib/vault_adapter.md` §Log Append — log line format
 - `/vault-extract`, `/vault-connect` — downstream skills invoked in steps 4-5
