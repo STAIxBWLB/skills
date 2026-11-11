@@ -25,6 +25,7 @@ At the start of a vault-facing workflow:
    - `ssot.ingest_chain` (log TYPE set and normalization table)
 3. If a key is missing, ask for the workspace-local value instead of hardcoding a personal path.
 4. Bind the vmem vault id: run `vmem vaults list --json` and take the id whose `path` equals the canonical `vault.path`. Pass that id as `vault` on **every** vmem call. If no registered vault matches, or more than one does, stop and report it; an omitted `vault` falls back to the first personal vault, which may be a different vault.
+5. Confirm the installed vmem meets this bundle's floor: `manifest.json` declares `requires.vmem: >=0.7.0`, so run `vmem --version` before the first call. The receipt rule under §Write results needs 0.6.0 and `vmem_brief` starts at 0.7.0; on an older build stop and report the upgrade instead of substituting a different tool.
 
 ## Access Rules
 
@@ -38,7 +39,11 @@ All vault writes go through vmem, which validates before it saves (schema, enums
 
 Reads: `notes/` through `vmem_read` / `vmem_read_many` / `vmem_search` / `vmem_list`. `ops/`, `reports/`, `self/`, `templates/` and root docs through `vmem_read_file` / `vmem_list_files` (bounded, paged like `vmem_read`); read-only filesystem access also works. Do not use filesystem write/edit, shell redirection or another MCP server for any vault file.
 
-**Write results**: a receipt with `ok: true` and `applied: true` saved its changes. `refused: true` usually means nothing was written, but check `applied`, `changes` and `logged`: a rollback or cleanup failure can return `refused: true` with `applied: true` and persisted bytes. In that case stop, report the receipt, and reconcile the note and log before any retry.
+### Write results
+
+Read the whole receipt, never one field. `ok: true` with `applied: true` saved its changes. A write that persisted changes and then failed returns `ok: false` with `applied: true` — that is the one partial-write signal, for direct note writes since vmem 0.6.0 and for `vmem_promote` / `vmem_promote_from_amem` since 0.7.0. In that case stop, report the receipt, reconcile the note and log, and never retry blindly. `ok: false` with `applied: false` wrote nothing, so its issues are the whole result. Always check `changes` and `logged` too: a saved note whose log line failed is `applied: true, logged: false`, which is a warning, not a rollback.
+
+Skills link to this section (§Write results) instead of restating the rule.
 
 Declared exceptions (machine I/O, not agent writes):
 
@@ -59,10 +64,14 @@ Typical mappings:
 | Edit frontmatter or tags | `vmem_set_frontmatter` |
 | Typed relation link | `vmem_link` |
 | Supersede | `vmem_supersede` |
+| Merge two notes | `vmem_merge`: call once for the merged body, source/topic unions, inbound rewrites and `fingerprint`, then again with `confirm: true`, that fingerprint and `log` |
+| Intent-scoped pointers | `vmem_brief` (`intent`, optional `paths` and `bytes`; screened pointer lines without bodies) |
+| Promote an agent-mem entry | `vmem_promote_from_amem`: two-step like `vmem_move`; its confirm logs `LEARN` itself and takes no `log` |
+| Recent log events | `vmem_log_tail` (read-only) |
 | Move / delete | `vmem_move`, `vmem_delete`: call once for `{preview, fingerprint}`, then again with `confirm: true` and that fingerprint |
 | MOCs / stats | `vmem_mocs`, `vmem_stats` (counts by type, domain and status, recent edits, log events), `vmem_status` |
 | `ops/` / `reports/` file | `vmem_report` |
-| Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-*.md`), `vmem_graph_build` |
+| Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-report-YYMMDD.md`; it takes no note argument), `vmem_graph_build` |
 | Dry validation | `vmem_check` |
 
 Pass `expectedSha` (from `vmem_read`) on edits that must not race another writer. Every successful write changes the note's sha256, so re-read before the next `expectedSha` edit of the same note.
@@ -80,8 +89,8 @@ Workspace-local operational files are not vault markdown. They may be read or ed
 
 vmem owns the vault log (`vault.log_file`). Every vmem write appends one attributed line itself:
 
-- Every write tool (`vmem_create`, `vmem_patch`, `vmem_append`, `vmem_set_frontmatter`, `vmem_link`, `vmem_supersede`, `vmem_report`, and `vmem_move` / `vmem_delete` on the confirm call) accepts an optional `log` argument (`{type, project, source, dest?, note}`) that sets that line's TYPE, project and note. vmem refuses the whole write when the event is invalid.
-- Without `log`, a write records a default line (`EXTRACT`/`ROUTE`/`RETHINK`/`CONNECT  -  vmem:<op> → path`); `vmem_lint(write: true)` and `vmem_graph_build` record `LINT` / `GRAPH`.
+- Every write tool (`vmem_create`, `vmem_patch`, `vmem_append`, `vmem_set_frontmatter`, `vmem_link`, `vmem_supersede`, `vmem_merge`, `vmem_report`, and `vmem_move` / `vmem_delete` on the confirm call) accepts an optional `log` argument (`{type, project, source, dest?, note}`) that sets that line's TYPE, project and note. vmem refuses the whole write when the event is invalid. `vmem_promote_from_amem` is the exception: its confirm logs `LEARN` itself and takes no `log`.
+- Without `log`, a write records vmem's default for that operation: `vmem_link` records `CONNECT`, `vmem_move` records `ROUTE`, `vmem_merge` / `vmem_supersede` record `RETHINK`, every other write records `EXTRACT` (`…  -  vmem:<op> → path`); `vmem_lint(write: true)` and `vmem_graph_build` record `LINT` / `GRAPH`.
 - When a workflow's contract needs a TYPE (for example a LEARN line for an update), pass it as `log` on that write. Use `vmem_log_append` only for an event with no write (a failure, a batch summary, a promoted TASK).
 
 Do not append to the log with `>>` or any other filesystem write.
@@ -90,7 +99,7 @@ Do not append to the log with `>>` or any other filesystem write.
 YYYY-MM-DD HH:MM  TYPE  project  source → dest  — note
 ```
 
-`TYPE` is workspace-defined (`ssot.ingest_chain`): the canonical set is `INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`; historical non-standard TYPEs are interpreted via that rule's normalization table and must not be written anew (structure changes such as rename/refactor log as `EXTRACT`). vmem refuses a TYPE outside the set.
+`TYPE` is workspace-defined (`ssot.ingest_chain`): the canonical set is `INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`; historical non-standard TYPEs are interpreted via that rule's normalization table and must not be written anew (a split or MOC refactor logs as `EXTRACT`, while vmem records a rename as `ROUTE` and a merge as `RETHINK` on its own). vmem refuses a TYPE outside the set.
 
 ## Summary To Vault Fields
 

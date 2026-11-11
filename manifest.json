@@ -4,7 +4,7 @@
   "channelTag": "skills-channel",
   "minAppVersion": "1.1.6",
   "requires": {
-    "vmem": ">=0.4.0"
+    "vmem": ">=0.7.0"
   },
   "skillsSubdir": "skills",
   "envSubdir": "envs/default",

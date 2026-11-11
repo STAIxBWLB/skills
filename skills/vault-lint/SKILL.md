@@ -4,7 +4,7 @@ trigger: /vault-lint
 description: >
   work/ + vault/ 정합성 검증 리포트 생성. dead wiki-link, orphan note,
   스키마 위반, 명명규칙 위반, 스테일 seed, 로그 포맷 위반, 그래프 신선도 등 체크셋을
-  실행하여 vault/reports/lint-YYMMDD.md로 리포트. vault 스코프는 `vmem lint`가
+  실행하여 vault/reports/lint-report-YYMMDD.md로 리포트. vault 스코프는 `vmem lint`가
   판정하고 work 스코프는 에이전트가 검사. 자동 수정 하지 않음(제안만).
   트리거: vault-lint, /vault-lint, lint, 정합성 검사, 건강검진, vault lint, work lint,
   스키마 검사, 명명 검사, orphan 검사, 교차참조 검사, 린트
@@ -19,7 +19,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 ## 기본 원칙
 
 - **읽기 전용**: 자동 수정 하지 않는다. 제안만 한다.
-- **리포트 출력 1곳**: `vault/reports/lint-YYMMDD.md`
+- **리포트 출력 1곳**: `vault/reports/lint-report-YYMMDD.md`
 - **log append**: `vault/log`에 `LINT` 이벤트 1줄 추가
 - **vault 스코프 판정은 vmem**: `vmem lint`(=`vmem_lint`)가 vmem 인덱스로 L01·L02·L03·L09·L10·L11·L12·L13·L14를 판정한다.
   vault 쓰기(리포트)도 vmem만 사용.
@@ -76,19 +76,20 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 | `work` | L06, L07, L08 |
 | `inbox` | L06 |
 | `names` | L07, L08 |
-| `note=<path>` | L01·L02·L03·L10·L13·L14 (`--note`) + 단일 note quality gates |
+| `note=<path>` | L01·L02·L03·L10·L13·L14 (CLI `--note` 전용) + 단일 note quality gates |
 
 ### 2단계: vault 스코프 — `vmem lint` (L01, L02, L03, L09~L14)
 
 ```bash
 vmem lint <vault> --json
-# 단일 노트: vmem lint <vault> --note notes/<x>.md --json   (MCP: vmem_lint)
+# 단일 노트(CLI 전용): vmem lint <vault> --note notes/<x>.md --json
 ```
 
 - 결과 JSON: `findings`(코드별 목록), `errors`, `warnings`, `markdown`(리포트 본문, 체크별 섹션), `summary`(`SUMMARY errors=N warnings=M`)
 - 읽기 전용. project id는 vault에 등록된 `registry`로 검사한다
 - finding을 설명하거나 수정 제안을 쓰기 전, `note=<path>` 결과를 판정하기 전에 `references/vault-scope-rules.md`를 읽는다.
 - `note=<path>` 스코프: `--note`로 L01/L02/L03/L10/L13/L14를 해당 노트로 제한한 뒤, 에이전트가 note quality gates(description test·composability·source)를 추가 검토
+- MCP `vmem_lint` 인자는 `{vault, write, dryRun}`뿐이라 note를 좁힐 수 없다: `note=<path>`는 CLI 전용이고, MCP만 쓰는 경로는 배치가 끝난 뒤 vault 전체 lint 1회로 마무리한다.
 
 ### 3단계: work 스코프 — 에이전트 검사 (L04, L06, L07, L08)
 
@@ -96,7 +97,7 @@ scope가 `full`·`work`·`inbox`·`names`이면 검사 전에 `references/work-s
 
 ### 4단계: 리포트 생성
 
-`vault/reports/lint-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem_report(path: "reports/lint-YYMMDD.md", body, log)`(5단계 LINT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`(`reports/lint-report-YYMMDD.md`, LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 `markdown`을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
+`vault/reports/lint-report-YYMMDD.md`를 생성한다. 두 경로 중 하나만 쓴다: (a) work 스코프 포함 리포트는 `vmem_report(path: "reports/lint-report-YYMMDD.md", body, log)`(5단계 LINT 1줄 기록), (b) vault 스코프만이면 `vmem_lint(write: true)`가 같은 파일에 쓴다(LINT 1줄 기록). expect: vmem refuses secret-looking text and an unsafe report path. vault 스코프 섹션은 2단계 `markdown`을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)을 에이전트가 채운다. 작성 전에 `references/lint-output.md`를 읽고 그 구조(frontmatter, 요약, 체크별 섹션, 제안 조치)를 따른다.
 
 ### 5단계: log append
 
@@ -116,7 +117,7 @@ log 파일 직접 append(`>>`) 금지.
 - **CI 등록 금지**: 로컬 vault 접근이 필요하므로 CI 파이프라인에 등록하지 않는다. 권장 주기는 주간 `full` 1회, 대규모 ingest 후 `vault`.
 - **성능**: vault 스코프는 `vmem lint` 1회 실행. work 스코프(L07/L08 `Glob work/**/*`)가 비용의 대부분이므로 필요 시 `/vault-lint vault`로 분리.
 - **대용량 log**: L09가 라인 수 20k 초과 감지 시 "수동 아카이브 권장" warn만 추가 (자동 롤오버 안 함).
-- **중복 리포트**: 같은 날 여러 번 실행 시 `vault/reports/lint-YYMMDD.md`를 덮어쓴다 (최신 상태 유지). 이력은 `vault/log`의 `LINT` 이벤트로 추적.
+- **중복 리포트**: 같은 날 여러 번 실행 시 `vault/reports/lint-report-YYMMDD.md`를 덮어쓴다 (최신 상태 유지). 이력은 `vault/log`의 `LINT` 이벤트로 추적.
 
 ## 응답 원칙
 

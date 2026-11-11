@@ -24,8 +24,8 @@ Restructure vault content for better organization. **Never auto-executes** — a
 2. **Present approval gate** (see format below)
 3. On explicit accept → execute
 4. Update all affected wiki links via `vmem_patch` (bidirectional); a merge that retires a note uses `vmem_supersede(old, next)` or the two-step `vmem_delete`. expect: vmem refuses an edit or delete that would newly break an inbound link or MOC topic
-5. Run `/vault-lint note=<path>` on each affected note
-6. `EXTRACT` events in `log` come from the vmem writes themselves (structure change — `ingest-chain.md` §비표준 TYPE 처리)
+5. Run `/vault-lint note=<path>` on each affected note; `--note` is CLI-only, so an MCP-only run finishes with one vault-wide `vmem_lint` instead
+6. `EXTRACT` events in `log` come from the vmem writes themselves, except a rename or merge: `vmem_move` records `ROUTE` and `vmem_merge` / `vmem_supersede` record `RETHINK` (`ingest-chain.md` §비표준 TYPE 처리)
 7. Commit the vault submodule, then bump the parent pointer
 
 ## Approval Gate Format
@@ -83,13 +83,14 @@ Filesystem access (Read/Write/Edit/Bash) is forbidden on vault paths.
 
 ## Log Append
 
-Every vmem write appends its own default `log` line. After the batch, add one summary line with `vmem_log_append(type: "EXTRACT", project: "-", source: "refactor:<operation>", note: "<summary> (N notes, M links)")` (no direct log-file append):
+Every vmem write appends its own default `log` line. After the batch, add one summary line with `vmem_log_append(type: "RETHINK", project: "-", source: "refactor:<operation>", note: "<summary> (N notes, M links)")` whose TYPE matches the operation — `RETHINK` for merge, `EXTRACT` for split, moc or promote (no direct log-file append):
 
 ```
-YYYY-MM-DD HH:MM  EXTRACT  -  refactor:<operation>  — <summary> (N notes, M links)
+YYYY-MM-DD HH:MM  RETHINK  -  refactor:merge  — <summary> (N notes, M links)
 ```
 
-- `<operation>`: split | merge | rename | moc | promote
+- `<type>`: `RETHINK` for merge | `EXTRACT` for split, moc, promote
+- `<operation>`: split | merge | moc | promote (a rename adds no summary line: its ROUTE line is the whole record)
 - `<summary>`: one-line describing the change
 
 vmem records one default line per write plus this one summary line.
@@ -106,5 +107,5 @@ vmem records one default line per write plus this one summary line.
 
 - Proposed changes with reasoning (approval gate block)
 - On accept: execution report (per-note status)
-- `/vault-lint note=` results for all affected notes
+- `/vault-lint note=` results for all affected notes, or the final vault-wide `vmem_lint` result when only MCP is available
 - log append confirmation

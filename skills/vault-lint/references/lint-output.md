@@ -1,6 +1,6 @@
 # Lint 출력 노트 구조
 
-`vault/reports/lint-YYMMDD.md` 구조. vault 스코프 섹션(L01·L02·L03·L09·L10·L11·L12)은 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)은 에이전트가 채운다.
+`vault/reports/lint-report-YYMMDD.md` 구조. vault 스코프 섹션(L01·L02·L03·L09·L10·L11·L12)은 스크립트 출력을 그대로 붙이고, work 스코프 섹션(L04·L06·L07·L08)은 에이전트가 채운다.
 
 ```markdown
 ---
