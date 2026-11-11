@@ -30,6 +30,9 @@ Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
    (`{name, path: "skills/<name>", tier, tags}`) and a `SKILL_INDEX.md` line.
 3. `make skills-verify` — manifest/directory agreement, frontmatter,
    tracked-inventory rules (NFC filenames, no symlinks, no runtime junk),
+   the vmem tool contract (`scripts/check-vmem-tools.mjs`: every `vmem_*`
+   name in the bundle must exist in the checked-in `vmem manifest --json`
+   snapshot `scripts/fixtures/vmem-manifest-<version>.json`),
    plus warnings for workspace-private references in shipped text.
 4. PR to `main`. Merge triggers the publish workflow; there is nothing
    else to do.
@@ -53,7 +56,9 @@ uploaded bundle is invisible to clients.
   `vmem`/`amem` floors as `">=X.Y.Z"`; an app with the floor gate (maru#466)
   does not apply a bundle whose floor the installed tool misses. A skill that needs the floor checks
   `vmem --version` itself and names it as `vmem >= X.Y.Z`; `make
-  skills-verify` fails when that text and `requires` disagree.
+  skills-verify` fails when that text and `requires` disagree, and the tool
+  drift check picks up `scripts/fixtures/vmem-manifest-<version>.json` by that
+  same floor, so raising it needs a fresh `vmem manifest --json` capture.
 - **`envHash`** in the metadata JSON is the digest of `envs/**`
   (`uv.lock` and `pnpm-lock.yaml` included), so the app can build a new env
   beside the old one when it changes.

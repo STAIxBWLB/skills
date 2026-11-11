@@ -1,6 +1,7 @@
 .PHONY: skills-verify
-skills-verify: ## Validate manifest, frontmatter, and tracked inventory
+skills-verify: ## Validate manifest, frontmatter, tracked inventory, and the vmem tool contract
 	node scripts/skills-bundle.mjs verify
+	node scripts/check-vmem-tools.mjs
 
 .PHONY: skills-package
 skills-package: ## Build the OTA bundle (REVISION required, e.g. make skills-package REVISION=123)

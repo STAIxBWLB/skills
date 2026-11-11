@@ -73,9 +73,14 @@ instructions.
 ## Verification
 
 Run `make skills-verify` from the repository root. A successful run prints
-`skills-verify ok: <N> skills, <M> tracked files` and exits zero;
-private-reference and host-compat warnings print to stderr and do not change
-the exit code; a rule promoted to `fail` does.
+`skills-verify ok: <N> skills, <M> tracked files`, then
+`check-vmem-tools: ok (vmem <version>, <N> tools, <M> bundle files)`, and
+exits zero; private-reference and host-compat warnings print to stderr and do
+not change the exit code; a rule promoted to `fail` does.
+A `vmem_*` name that the snapshot does not list is a failure: fix the skill
+text, or, when vmem really gained or renamed the tool, capture
+`vmem manifest --json` into `scripts/fixtures/vmem-manifest-<version>.json`
+and raise `requires.vmem` to match.
 Review LinkedIn setup changes against `REVIEW.md`, especially evidence
 boundaries, idempotent writes, and on-demand cadence behavior.
 
