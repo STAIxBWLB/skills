@@ -31,7 +31,7 @@ Review observations, tensions, and methodology drift.
 
 1. **Config ↔ Derivation 일치**: `ops/derivation.md` **§Design Dimensions 표** ↔ `ops/config.yaml` `dimensions`(8키) + `domains`(6) 를 키별로 대조. 한쪽에만 있는 키도 mismatch. 출력은 키별 match/mismatch 표 + 최종 판정(예: "8/8 dimensions + 6/6 domains match")
 2. **AGENTS.md consistency**: vault AGENTS.md·work AGENTS.md 규칙이 최신 methodology와 일치하는지
-3. **Skill SKILL.md vs 실제 사용**: M1 (spec-practice audit)에 따라 아래 14종 중 하나를 순환 선택하여 audit — `vault-connect extract graph learn lint next pipeline refactor remember rename rethink stats sync update`
+3. **Skill SKILL.md vs 실제 사용**: M1 (spec-practice audit)에 따라 아래 11종 중 하나를 순환 선택하여 audit — `vault-connect extract graph learn lint refactor remember rethink stats sync update`
 4. **Report deviations**: drift table (Check / Status / Action)
 
 ### full mode
@@ -58,4 +58,4 @@ Changes require explicit approval. This skill proposes, user decides.
 
 - `ops/methodology/260418-rethink-report.md` — M4 compaction 근거
 - `ops/methodology/260422-rethink-report.md` — M4-2·M7 근거 (이번 라운드)
-- `/vault-rename` 스킬 (M7, 2026-04-22 신설) — note rename 워크플로우
+- `/vault-refactor rename` (M7, 2026-04-22 신설) — note rename 워크플로우

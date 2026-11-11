@@ -1,18 +1,19 @@
 ---
 name: vault-sync
 trigger: /vault-sync
-description: Scan work/ for changes and propose vault extractions with confirmation
+description: Scan work/ for changes, or take an explicit list of work sources, and propose vault extractions with confirmation
 ---
 
-# /vault-sync [scope]
+# /vault-sync [scope] [path...]
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 
 Scan work/ for new or changed content and propose vault extractions. Nothing is created without explicit user confirmation.
 
 ## Input
-- scope (optional): "full" (all work/), "meetings" (meetings only), "projects" (projects only), "diff" (git diff only)
+- scope (optional): "full" (all work/), "meetings" (meetings only), "projects" (projects only), "diff" (git diff only), "targets" (the work files or directories that follow, no scan)
 - Default: "full"
+- Single work source: call `/vault-extract` directly. A work `inbox/` item is processed by `inbox-process` first and its summary is the target (the vault has no inbox).
 
 Raw recordings and unreviewed transcripts are not scanned by `/vault-sync`. Only refined meeting notes under `work/meetings/YYYY/YYYY-MM/` are considered vault-worthy sources. Any transcript provider output must be processed through `meeting-notes` first.
 
@@ -168,6 +169,15 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 - Git diff only (skip meeting scanners)
 - Work root + all submodules
 - Useful for catching project doc changes between meeting-heavy days
+
+### /vault-sync targets <path>...
+- Skip Step 1. Enumerate eligible sources under the given work paths (`.md` with frontmatter, or summary output); at most 20 per run (collector's-fallacy guard: split larger batches)
+- Step 1.5 classification and deduplication run once for the whole batch, and the classification is passed to each extraction (no registry reload per item)
+- The named targets are the user's choice of sources: Step 2 shows the proposal list once and one accept covers the batch (per-item select still works)
+- Step 3 runs the `/vault-extract` method per source, then `/vault-connect` on the notes it created. Check quality once after the batch with one `vmem_lint` call (or the CLI `vmem lint <vault> --note <path>` per note when the CLI is available)
+- Stop on a refusal or a persisted partial write (see `lib/vault_adapter.md` §Write results); continue past warnings
+- Output adds: sources skipped by vault-extract preconditions, per-note lint error/warning counts
+- Step 4 writes the session record but does not move `ops/sessions/last-sync-timestamp`: a targets run covers only the named sources, not every change since the last sync
 
 ### /vault-sync full
 - All of the above in priority order: meetings → git diff → submodules

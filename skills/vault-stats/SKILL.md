@@ -1,14 +1,14 @@
 ---
 name: vault-stats
 trigger: /vault-stats
-description: Show vault statistics and health overview
+description: Show vault statistics and health, then recommend the highest-value next action
 ---
 
 # /vault-stats
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 
-Display comprehensive vault statistics. Numbers only; the "what to do next" recommendation is `/vault-next`.
+Display comprehensive vault statistics, then recommend the most valuable next action from them (§Next action). `/vault-stats next` skips the full report and gives only the recommendation.
 
 ## Metrics
 
@@ -30,6 +30,18 @@ Do not recompute what the lint/graph pipeline already produces:
 4. Read `ops/sessions/last-sync-timestamp`
 5. Assemble metrics
 
+## Next action
+
+Rank maintenance conditions from the metrics above and recommend one action:
+
+- Orphan notes or island communities → `/vault-connect`
+- Notes not updated for more than 90 days → `/vault-update`
+- Work sources changed since `ops/sessions/last-sync-timestamp` → `/vault-sync` (or `/vault-sync targets` for a known list)
+- Observation or tension count at or above the `ops/config.yaml` thresholds → `/vault-rethink`
+
+Priority: 1. critical (schema violations, broken links); 2. high (unsynced work sources, orphan drift); 3. medium (stale notes, pending observations); 4. low (optimization, MOC refinement).
+
 ## Output
 - Formatted statistics report
 - Highlight any metrics outside healthy thresholds
+- Recommended next action with reasoning, estimated effort and the command to run
