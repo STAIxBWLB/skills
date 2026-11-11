@@ -24,14 +24,12 @@ Find relationships between a note and existing vault notes, create wiki links.
 1. Read the target note completely (`vmem_read`; `vmem_links` shows its current in/out links)
 2. Search vault/notes/ for related notes by:
    - **entities_hint first pass** (if provided): for each entity name, run `vmem_brief(intent: "<entity>", bytes: 1024)` and confirm a hit with `vmem_search`; its pointers already cover `glossary`, `people` and note titles, so no manual grep of those notes. These are highest-priority link candidates since they're pre-identified by summaries or source metadata.
-   - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` (context-enrichment §4) are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
+   - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
    - Title keyword matching
    - Description similarity
    - Shared topics/MOCs
    - Same domain or cross-domain relevance
-   - Project affinity via registry: if source is from work/, read `<workspace-root>/project-registry.yaml` to identify project, then prioritize sibling notes sharing the same `vault_note` topic as connection candidates
-
-> **Registry fallback**: when project registry scoring < 3 → content-based similarity → prompt user. SSOT: `<workspace-root>/_meta/rules/project-registry-scoring.md`
+   - Project affinity via registry: if source is from work/, classify it per `lib/vault_adapter.md` §Project Registry Pattern (scoring and fallback), then prioritize sibling notes sharing the same `vault_note` topic as connection candidates
 3. For each discovered relationship:
    - Determine relationship type (supports, contradicts, extends, applies-to, context-for)
    - `vmem_link(from, to, relation, context, log: {type: "CONNECT", project, source: "notes/<x>.md", dest: "notes/<y>.md", note: "linked [[y]] (<relation>)"})` adds the typed link to both notes (bidirectional by default) and skips a side that already links the target
@@ -44,7 +42,7 @@ Find relationships between a note and existing vault notes, create wiki links.
 
 Every wiki link /vault-connect creates produces one `log` line, written by `vmem_link` itself; set its content with the `log` argument. `vmem_link` links one `from` to one `to`, so one call writes one line naming that one target: a note that gains three links takes three calls and three lines. Never append to the log file directly.
 
-**Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
+**Format** (`lib/vault_adapter.md` §Log Append):
 
 ```
 YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
@@ -58,7 +56,7 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 
 **Bidirectional links**: one `vmem_link` call updates both notes and writes one line.
 
-**Failure**: read `ok`, `applied`, `changes` and `logged` on each link's receipt. `ok: false` with `applied: false` wrote nothing: report its issues and keep the links that succeeded. `ok: false` with `applied: true` partly persisted: stop, report the receipt and reconcile the notes and log before any retry (`lib/vault_adapter.md` §Write results).
+**Failure**: `lib/vault_adapter.md` §Log failure handling, per link; keep the links that succeeded.
 
 **Vault access**: vmem MCP only.
 

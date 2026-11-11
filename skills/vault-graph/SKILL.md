@@ -22,10 +22,10 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 | Item | Path |
 |------|------|
 | Vault/workspace builder | `vmem graph build <vault> [--workspace]` (MCP `vmem_graph_build`) |
-| Code builder | `~/.maru/skills/vault-graph/scripts/run.sh -m graphify update <path>` (graphify from the shared skills runtime) |
-| Python | `~/.maru/env/.venv/bin/python` |
-| Skill runner (graphify query) | `~/.maru/skills/vault-graph/scripts/run.sh` |
-| graphifyignore template | `<workspace-root>/_meta/templates/graphifyignore` |
+| Code builder | `<skill-dir>/scripts/run.sh -m graphify update <path>` (`<skill-dir>` = this skill's installed directory; the runner resolves graphify from the shared skills runtime) |
+| Python | the interpreter `scripts/run.sh` resolves (host-injected runtime env first, then the shared runtime env) |
+| Skill runner (graphify query) | `<skill-dir>/scripts/run.sh` |
+| graphifyignore template | the workspace's graphifyignore template (path from the workspace config; ask when none is set) |
 
 ## Commands
 
@@ -42,7 +42,7 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 - **build**: Run community detection + analysis pipeline. Outputs:
   - `vault/reports/vault-graph.json` (node-link JSON)
   - `vault/reports/graph-report-YYMMDD.md` (audit report; 구 리포트는 보존되고 `graph-trend.md`에 빌드마다 행 1개가 추가된다)
-- **build --workspace**: Add the work operational layer → `vault/reports/workspace-graph.json` (vault-graph.json untouched; no report written). **온디맨드 전용** — 주간 리츄얼에서 제외(L11b 폐기, `_meta/rules/knowledge-graph-integration.md` §7). See below.
+- **build --workspace**: Add the work operational layer → `vault/reports/workspace-graph.json` (vault-graph.json untouched; no report written). **On demand only**; the weekly ritual does not build it. See below.
 - **neighbors [note]**: 1-hop neighborhood + community of a note through `vmem_graph_neighbors` (no build, no report or `vault-graph.json` read).
 - **report**: Read the latest graph report (if < 7 days old)
 - **communities**: List detected communities from latest build
@@ -53,7 +53,7 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 
 Options:
 - `--vault`: build the vault graph
-- `--workspace`: build the vault layer **plus** the work operational layer (DR-019 §2) → `workspace-graph.json`
+- `--workspace`: build the vault layer **plus** the work operational layer → `workspace-graph.json`
 - `--code <path>`: build a code repository graph
 - `<target>`: a wiki vault directory takes the `--vault` route; any other directory takes `--code`
 
@@ -61,10 +61,10 @@ Options:
    ```bash
    vmem graph build <vault>               # --vault (MCP: vmem_graph_build)
    vmem graph build <vault> --workspace   # --workspace (MCP: vmem_graph_build workspace: true)
-   ~/.maru/skills/vault-graph/scripts/run.sh -m graphify update <path>    # --code
+   <skill-dir>/scripts/run.sh -m graphify update <path>    # --code
    ```
-   For code builds, ensure `<path>/.graphifyignore` exists first. If missing, offer to copy `<workspace-root>/_meta/templates/graphifyignore`.
-2. Pipeline: read notes/code → extract graph → deterministic Leiden community detection → god node analysis → surprising connections → report. vmem's graph block carries `partitioner: "leiden"` and its report prints the same name, so use Leiden everywhere (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
+   For code builds, ensure `<path>/.graphifyignore` exists first. If missing, offer to copy the workspace graphifyignore template.
+2. Pipeline: read notes/code → extract graph → deterministic Leiden community detection → god node analysis → surprising connections → report. vmem's graph block carries `partitioner: "leiden"` and its report prints the same name, so use Leiden everywhere (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지).
 3. Outputs:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 추가, 구 리포트 보존)
    - workspace: `<vault.path>/reports/workspace-graph.json` only (no report or trend row; the result lists the work counters)
@@ -74,7 +74,7 @@ Options:
 
 ## Neighbors Process (`/vault-graph neighbors <note>`)
 
-1-hop neighborhood + community of a note, read through `vmem_graph_neighbors` on the built graph (no report read, no `jq`, no rebuild). Used by context-enrichment §3 Graph Neighborhood injection.
+1-hop neighborhood + community of a note, read through `vmem_graph_neighbors`, which builds the graph from the current index on each call (no report read, no `jq`, no rebuild). Used by the workspace's context-enrichment graph-neighborhood step.
 
 ```text
 vmem_graph_neighbors(path: "<stem>", hops: 1, limit: 50)   # MCP
@@ -84,7 +84,7 @@ vmem graph neighbors <vault> <stem> --hops 1 --limit 50     # CLI
 - The result carries `nodes` (each with `community` and `degree`), the `edges` among them and `truncated`; `hops: 2` widens the walk and `relation` (`wiki_link` or one typed relation) narrows the edge set.
 - Report the node's `community`, its degree-ranked neighbors (≤10), and same-community co-members.
 - Backlinks, orphans and staleness come from vmem too: `vmem_links(path, direction: "in")`, `vmem_lint` L03, and `vmem_list` `mtime` — never a ripgrep pass over `notes/`.
-- expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note. If the graph is stale (newest `graph-report-YYMMDD.md` over 7 days) surface the staleness with the answer; never block on it.
+- expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note.
 
 ## Report Process (`/vault-graph report [target]`)
 
@@ -100,7 +100,7 @@ vmem graph neighbors <vault> <stem> --hops 1 --limit 50     # CLI
 Use graphify query against the selected `graph.json`.
 
 ```bash
-~/.maru/skills/vault-graph/scripts/run.sh \
+<skill-dir>/scripts/run.sh \
   -m graphify query "<question>" \
   --graph <graph.json> [--dfs] [--budget N]
 ```
@@ -113,10 +113,7 @@ Options:
 ## Setup Process (`/vault-graph setup [path]`)
 
 1. Resolve target path, default current directory.
-2. If `.graphifyignore` is missing, copy:
-   ```bash
-   cp <workspace-root>/_meta/templates/graphifyignore <target>/.graphifyignore
-   ```
+2. If `.graphifyignore` is missing, copy the workspace graphifyignore template to `<target>/.graphifyignore`.
 3. Run `/vault-graph build --code <target>`.
 4. For large projects, optionally add project graph MCP config.
 
@@ -128,7 +125,7 @@ Options:
    ```json
    {
      "<project-name>-graph": {
-       "command": "~/.maru/env/.venv/bin/python",
+       "command": "<python resolved by scripts/run.sh>",
        "args": ["-c", "from graphify.serve import serve; serve('<graph_path>')"]
      }
    }
@@ -148,4 +145,4 @@ Superseded by the vmem reads above: an ad-hoc query maps to `vmem_search`, `vmem
 - `/vault-sync` duplicates come from `vmem_brief` with the source path; the graph report is not a dedup signal
 - `/vault-lint` checks L11 (graph staleness > 7 days), L12 (island communities, reported by member list)
 - `skill-mine` mines skill candidates with `vmem skills mine`, which uses the same deterministic Leiden communities
-- `<workspace-root>/AGENTS.md` §"Vault-First" Graph Report shortcut: T2/T3 ops read report before full vault search
+- The workspace agent guide may point T2/T3 operations at the graph report before a full vault search

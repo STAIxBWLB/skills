@@ -11,11 +11,11 @@
 - **L13**: 파일명이 소문자 ASCII kebab-case가 아니면 error. 이름 변경은 `vmem move`(legacy 이름 원본 허용)
 - **L14**: frontmatter `source:` 경로가 해소되지 않으면 warn
 - **L15**: `confidence: proven`인데 `source`가 비어 있으면 warn — 근거(memory id·URL·workspace 경로)를 넣거나 confidence를 낮춘다. `--note` 스코프에서도 함께 필터된다
-- **L12**: `vault-graph.json`에서 cross-community edge 0인 커뮤니티 → warn, **멤버 목록(≤10 + N more)으로 보고**. 커뮤니티 번호는 빌드 로컬이라 인용 금지(KG 규칙 §5.1). singleton은 정보 줄
+- **L12**: `vault-graph.json`에서 cross-community edge 0인 커뮤니티 → warn, **멤버 목록(≤10 + N more)으로 보고**. 커뮤니티 번호는 빌드 로컬이라 인용 금지. singleton은 정보 줄
 
 ## L09
 
-**L09: 로그 포맷** (스코프 정본: `_meta/rules/ingest-chain.md` §"lint L09 스코프")
+**L09: 로그 포맷** (스코프 정본: 워크스페이스 `ssot.ingest_chain` 규칙)
 
 `vault/log`는 append-only라 과거 라인은 소급 수정하지 않는다(제안 조치에도 넣지 않음). warn은 **해결 가능한 신규 위반**에 한정한다:
 

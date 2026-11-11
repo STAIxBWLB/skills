@@ -95,9 +95,19 @@ vmem owns the vault log (`vault.log_file`). Every vmem write appends one attribu
 
 Do not append to the log with `>>` or any other filesystem write.
 
+### Log failure handling
+
+Read `ok`, `applied`, `changes` and `logged` on every write receipt (§Write results):
+
+- `ok: true, applied: true, logged: false`: the write saved but its log line did not. Warn the user and continue; do not roll back.
+- `ok: false, applied: false`: nothing was written. Record a `failed: <reason or issue codes>` line with `vmem_log_append` under the workflow's TYPE and report the issues.
+- `ok: false, applied: true`: changes persisted. Stop, report the receipt and reconcile the note and log before any retry.
+
 ```text
 YYYY-MM-DD HH:MM  TYPE  project  source → dest  — note
 ```
+
+Each field is two spaces apart; `project` is a registry id or `-` when unclassified; `source` and `dest` use workspace-relative and `notes/<x>.md` paths.
 
 `TYPE` is workspace-defined (`ssot.ingest_chain`): the canonical set is `INGEST ROUTE EXTRACT CONNECT DIGEST LEARN LINT TASK GRAPH SYNC RETHINK SOURCE`; historical non-standard TYPEs are interpreted via that rule's normalization table and must not be written anew (a split or MOC refactor logs as `EXTRACT`, while vmem records a rename as `ROUTE` and a merge as `RETHINK` on its own). vmem refuses a TYPE outside the set.
 
@@ -120,10 +130,11 @@ If required fields are missing, fail before writing. Do not synthesize blank or 
 ## Project Registry Pattern
 
 1. Load `ssot.project_registry` from `workspace.config.yaml`.
-2. Score workspace-defined signals such as people, acronyms, keywords, orgs, and tags.
-3. Use a clear match when the top score passes the workspace threshold.
-4. If ambiguous, use registry disambiguation fields or ask the user.
-5. If still unresolved, record the source as unclassified and continue only when the calling workflow allows it.
+2. Consider `status: active` entries only. Extract signals from the source (people, acronyms, keywords, orgs, tags).
+3. Score with the workspace weights; the default is people +3, acronyms +2, keywords +2, orgs +1, tags +1, with a match threshold of 3. A workspace scoring rule under `ssot.rules` overrides these defaults.
+4. A single top score at or above the threshold is the match: use its `vault_note` for `topics` and its `path` to validate the source.
+5. Tie or ambiguity: use the registry disambiguation fields, then ask the user.
+6. Below the threshold (registry fallback): fall back to content-based domain analysis; if still ambiguous, ask the user, or record the source as unclassified (`project: -`) when the calling workflow allows it.
 
 ## Boundary
 

@@ -33,20 +33,10 @@ If any check fails:
 - **Do NOT synthesize empty values. Do NOT guess. Do NOT proceed to write.**
 - User must fix summary.md and re-run. `inbox-process` must re-emit summary with correct fields when the summary came from an inbox item.
 
-**Why strict**:
-- 2026-04-11 L02 incident — 2 notes created via automated EXTRACT without these fields, caught only by later `/vault-lint`.
-- 2026-05-22 L01 incident — 21 notes accumulated 26 unique dead `topics` wiki-links (e.g., `[[credit-recognition]]`, `[[partnership-mapping]]`) because `topics` was copied verbatim from summary.md without MOC existence check. The MOC check above prevents recurrence at the write site.
-
 ## Process
 
 1. Read the source document completely
-2. Classify the source document's project via registry:
-   - Read `<workspace-root>/project-registry.yaml` (status: active only)
-   - Extract signals from the source (keywords, people, organizations, acronyms)
-   - Score: people +3, acronyms +2, keywords +2, orgs +1, tags +1
-   - top score >= 3 & single match → use `vault_note` for topics, `path` to validate source
-   - tie/ambiguous → disambiguation field → ask user
-   - score < 3 → fall back to content-based domain analysis
+2. Classify the source document's project per `lib/vault_adapter.md` §Project Registry Pattern (scoring and fallback)
 3. Identify extractable items by domain:
    - research: claims, methods, contradictions, open-questions, tech-trends
    - projects: decisions, rationale, lessons-learned, risks, milestones
@@ -58,12 +48,12 @@ If any check fails:
 5. For each item, create a note in vault/notes/:
    - Filename: prose-as-title (lowercase, hyphens, .md)
    - YAML frontmatter with required fields (`description`, `type`, `domain`, `topics`)
-   - **Copy source-derived fields verbatim**: `description`, `domain`, `topics` are copied directly from summary.md frontmatter (verified in preconditions above). See `~/.maru/skills/_builtin/lib/vault_adapter.md` for the summary-to-vault field policy.
+   - **Copy source-derived fields verbatim**: `description`, `domain`, `topics` are copied directly from summary.md frontmatter (verified in preconditions above). See `lib/vault_adapter.md` §Summary To Vault Fields.
    - **type remapping**: summary `type` (regulation|report|plan|...) maps to vault `type` (insight|decision|observation|person|project|method|moc|reference) based on semantic intent. Common mappings: report→observation, plan→decision, memo→insight, proposal→decision, regulation→observation.
    - If registry matched in step 2, add `vault_note` wiki link to topics array
    - Set source field to the work/ relative path. If the source carries backref
      frontmatter (`source_doc`, `meetingSourcePath`, `relatedMeetings`,
-     `relatedTasks` — context-enrichment §4), preserve those origins in the
+     `relatedTasks`), preserve those origins in the
      note's source / Relevant Notes; emit a `[[wiki-link]]` only for targets that
      resolve (consistent with the MOC dead-link gate above)
    - Body: the insight with context
@@ -82,19 +72,16 @@ If any check fails:
    - **Note**: `keywords` field is NOT carried forward to vault notes — it exists only for route scoring reproducibility
 8. **EXTRACT event in vault/log** (ingest chain audit trail) comes from the step 6 `log` argument
 
-> **Registry fallback**: when project registry scoring < 3 → content-based domain analysis → if still ambiguous, prompt user. SSOT: `<workspace-root>/_meta/rules/project-registry-scoring.md`
-
 ## Log Append (Step 8 — REQUIRED)
 
 Every note created or updated by /vault-extract must produce one `log` line. `vmem_create` writes it from its `log` argument. An update (`vmem_patch` / `vmem_append`) records a default EXTRACT line; when the contract needs the `updated: <type>` note text, pass it as that write's `log` argument. Failures use `vmem_log_append`. Never append to the log file directly.
 
-**Format** (see `<workspace-root>/_meta/rules/ingest-chain.md` §"vault/log 포맷"):
+**Format** (`lib/vault_adapter.md` §Log Append):
 
 ```
 YYYY-MM-DD HH:MM  EXTRACT  <project>  <source> → <vault/notes/x.md>  — <type>
 ```
 
-- `<project>`: project id from registry (`project-registry.yaml`), or `-` if unclassified
 - `<source>`: work/ relative path of the source document
 - `<vault/notes/x.md>`: newly created note path (use `notes/x.md` form)
 - `<type>`: note type (`insight | decision | observation | person | project | method | moc | reference`)
@@ -103,11 +90,11 @@ YYYY-MM-DD HH:MM  EXTRACT  <project>  <source> → <vault/notes/x.md>  — <type
 
 **Update vs create**: for updates, use `— updated: <type>` to distinguish.
 
-**Failure**: test `ok` first, then `applied`, `changes` and `logged` on every receipt. `ok: true`, `applied: true`, `logged: false`: the note saved but its log line did not; warn the user and proceed (do not roll back). `ok: false` with `applied: false`: nothing was written; record only the `failed:` line. `ok: false` with `applied: true`: changes persisted; stop, report the receipt and reconcile the note and log before any retry (`lib/vault_adapter.md` §Write results).
+**Failure**: `lib/vault_adapter.md` §Log failure handling.
 
 **Vault access**: vmem MCP only. No filesystem Write/Edit on vault paths.
 
-## Sibling Meeting Merge Rule (2026-04-16)
+## Sibling Meeting Merge Rule
 
 복수 회의 소스(같은 프로젝트·같은 날·보완적 관점)를 **단일 vault 노트**로 merge할지, **분리**할지 결정:
 

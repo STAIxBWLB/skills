@@ -44,7 +44,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 ## 체크셋 (L01-L15)
 
 `<ideation>` = `<paths.scratchpad>/<scratchpad.ideation_subdir>` (기본
-`work/scratchpad/ideation`). 해석 절차는 `~/.maru/skills/_builtin/lib/scratchpad_adapter.md`.
+`work/scratchpad/ideation`). 해석 절차는 `lib/scratchpad_adapter.md`.
 임계값도 설정에서 읽는다 (`scratchpad.ideation_review_days`,
 `scratchpad.temp_stale_days`).
 
@@ -130,9 +130,8 @@ log 파일 직접 append(`>>`) 금지.
 
 ## 관련 문서
 
-- `_meta/rules/ingest-chain.md` — 체인 전체 그림과 log 포맷
-- `~/.maru/skills/_builtin/lib/vault_adapter.md` — vault 접근·스키마 정책
-- `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` — scratchpad 경로·임계값 해석
-- `~/.maru/skills/inbox-process/SKILL.md` — inbox processing skill
-- `work/project-registry.yaml` — 프로젝트 id 단일 소스
-- `~/.maru/skills/inbox-process/references/summary-schema.md` — 요약 스키마
+- `lib/vault_adapter.md` §Log Append — log 포맷 (체인 전체 그림은 워크스페이스 `ssot.ingest_chain`)
+- `lib/vault_adapter.md` — vault 접근·스키마 정책
+- `lib/scratchpad_adapter.md` — scratchpad 경로·임계값 해석
+- `inbox-process` 스킬 (SKILL.md, `references/summary-schema.md`) — inbox 처리와 요약 스키마
+- `ssot.project_registry` — 프로젝트 id 단일 소스

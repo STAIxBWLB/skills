@@ -43,8 +43,9 @@ SINCE_DATE=$(echo $LAST_SYNC | sed 's/\(....\)\(..\)\(..\)\(..\)\(..\)/\1-\2-\3 
 git log --oneline --since="$SINCE_DATE" --name-only -- . \
   ':!.claude' ':!.obsidian' ':!meetings' ':!tasks' \
   | grep -v '^\w\{7\} ' | grep -v '^$' | grep -v '\.json$' \
-  | grep -v '_meta/' | grep -v 'uv.lock' | grep -v 'pyproject.toml' \
+  | grep -v 'uv.lock' | grep -v 'pyproject.toml' \
   | sort -u
+# The workspace system directory is dropped by the Step 1.5 filter rules
 
 # Submodule changes: detect which submodules have new commits
 git submodule status --recursive | grep '^+' | awk '{print $2}'
@@ -59,27 +60,20 @@ git submodule status --recursive | grep '^+' | awk '{print $2}'
     | grep -v '^\w\{7\} ' | grep -v '^$' | sort -u
   ```
 
-**Work repo submodules**: 목록은 `.gitmodules`가 정본(런타임 뷰 `_meta/config/submodules.yaml`). `vault`는 스캔 대상이 아니라 목적지이고, `dev`·`sites/*`(코드 저장소)는 명시 요청 시에만 스캔한다. 그 외 work 트리는 일반 디렉토리이므로 루트 git diff 스캔이 덮는다.
+**Work repo submodules**: 목록은 `.gitmodules`가 정본. `vault`는 스캔 대상이 아니라 목적지이고, 코드 저장소 서브모듈은 명시 요청 시에만 스캔한다. 그 외 work 트리는 일반 디렉토리이므로 루트 git diff 스캔이 덮는다.
 
 ### Step 1.5: Filter & Classify
 
 **Filter rules** (reduce noise):
-- Skip: `_meta/`, `.json`, `uv.lock`, `pyproject.toml`, `*.css`, `*.js`, `*.html`
-- Skip: draft versions if final exists (e.g., `drafts/260331-v2-*` if `final/260402-v4-*` exists)
-- Skip: personal/, dev/ submodules unless explicitly requested
+- Skip: the workspace system directory, `.json`, `uv.lock`, `pyproject.toml`, `*.css`, `*.js`, `*.html`
+- Skip: draft versions if final exists (e.g., `drafts/YYMMDD-v2-*` if `final/YYMMDD-v4-*` exists)
+- Skip: personal and code-repository submodules unless explicitly requested
 - Include: `README.md`, `*-plan-*.md`, `*-report-*.md`, `*-summary-*.md`, `*-strategy-*.md`
-- Include: any `.md` in `admin/`, `external/`, `projects/collabs/`, `projects/govt/`
+- Include: any `.md` under the workspace's configured document roots
 
-**Classify via project registry**:
-1. Read `<workspace-root>/project-registry.yaml` (status: active only)
-2. Extract signals from the candidate file (keywords, people, organizations, acronyms)
-3. Score: people +3, acronyms +2, keywords +2, orgs +1, tags +1
-4. top score >= 3 → attach project name + `vault_note` to proposal
-5. Ambiguous → mark as "project: TBD (user confirm)"
+**Classify** per `lib/vault_adapter.md` §Project Registry Pattern (scoring and fallback). A match attaches the project name and `vault_note` to the proposal; ambiguity marks it "project: TBD (user confirm)".
 
-> **Entity resolution**: people/orgs/projects 해소는 `<workspace-root>/_meta/rules/context-enrichment.md` §2 절차 사용 (fast cache → registry → vault MOC, 충돌 시 vault 우선).
->
-> **Registry fallback**: score < 3 → content-based domain analysis → if still ambiguous, prompt user via disambiguation field. SSOT: `<workspace-root>/_meta/rules/project-registry-scoring.md`
+> **Entity resolution**: people/orgs/projects 해소는 워크스페이스 context-enrichment 규칙(`ssot.rules`)의 절차 사용 (fast cache → registry → vault MOC, 충돌 시 vault 우선).
 
 **Deduplication** (multi-signal):
 
@@ -104,25 +98,25 @@ Scanned: meetings 9건, git-diff 5건, submodules 1건
 
 ─── MEETINGS (HIGH) ───
 
-[1] MEETING: 04-08 협력회의 - Diquest AI플랫폼
-    -> Proposed: update [[diquest-ai-education-platform-mou]]
+[1] MEETING: MM-DD partner meeting - example platform
+    -> Proposed: update [[example-partner-platform-mou]]
     -> Domain: projects
 
 ─── GIT DIFF (MEDIUM-HIGH) ───
 
-[2] DIFF: admin/innovation/260405-org-restructuring.md (new file)
-    -> Proposed: update [[chu-ai-headquarters-establishment-vp-level]]
+[2] DIFF: admin/example-unit/YYMMDD-org-restructuring.md (new file)
+    -> Proposed: update [[example-org-restructuring-decision]]
     -> Domain: operations
 
-[3] DIFF: projects/hope/planning/260403-plan-masterplan.md (new file)
-    -> Proposed: update [[hope-tuition-free-global-online-degree-idea]]
+[3] DIFF: projects/example-project/planning/YYMMDD-plan-masterplan.md (new file)
+    -> Proposed: update [[example-project-masterplan-idea]]
     -> Domain: projects
 
 ─── SUBMODULE CHANGES ───
 
-[4] SUBMODULE: sites/halla-ai (+1 commit, requested)
+[4] SUBMODULE: sites/example-site (+1 commit, requested)
     -> Changed: src/pages/
-    -> Proposed: update [[halla-ai-department-home]]
+    -> Proposed: update [[example-site-home]]
     -> Domain: teaching
 
 Accept: [a]ll, [1-4] select, [s]kip, [q]uit
@@ -149,8 +143,8 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 - Log sync results in `ops/sessions/YYYYMMDD-sync.md` with `vmem_report(path: "ops/sessions/YYYYMMDD-sync.md", body)` (expect: vmem refuses secret-looking text and an unsafe path)
 - Promote vault-relevant `TASK` events from the work-local `.maru/tasks-log.md`
   to `vault/log` with `vmem_log_append(type: "TASK", ...)` (task-management does not write the
-  vault directly — context-enrichment §6)
-- **Graph freshness (DR-019 §6)**: run vault-lint L11 (graph staleness). If `vault-graph.json`
+  vault directly)
+- **Graph freshness**: run vault-lint L11 (graph staleness). If `vault-graph.json`
   is > 7 days stale, propose `/vault-graph build`. Suggest only — do not auto-build.
 
 ## Scope Details
