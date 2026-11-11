@@ -19,6 +19,7 @@ At the start of a vault-facing workflow:
    - `vault.path`
    - `vault.log_file`
    - `ssot.project_registry`
+   - `ssot.registry_scoring` (registry signal weights and threshold)
    - `ssot.rules`
    - `ssot.glossary`
    - `ssot.people`
@@ -97,11 +98,7 @@ Do not append to the log with `>>` or any other filesystem write.
 
 ### Log failure handling
 
-Read `ok`, `applied`, `changes` and `logged` on every write receipt (§Write results):
-
-- `ok: true, applied: true, logged: false`: the write saved but its log line did not. Warn the user and continue; do not roll back.
-- `ok: false, applied: false`: nothing was written. Record a `failed: <reason or issue codes>` line with `vmem_log_append` under the workflow's TYPE and report the issues.
-- `ok: false, applied: true`: changes persisted. Stop, report the receipt and reconcile the note and log before any retry.
+Read the whole receipt per §Write results. The one rule this section adds: on `ok: false, applied: false`, record a `failed: <reason or issue codes>` line with `vmem_log_append` under the workflow's TYPE and report the issues.
 
 ```text
 YYYY-MM-DD HH:MM  TYPE  project  source → dest  — note
@@ -131,7 +128,7 @@ If required fields are missing, fail before writing. Do not synthesize blank or 
 
 1. Load `ssot.project_registry` from `workspace.config.yaml`.
 2. Consider `status: active` entries only. Extract signals from the source (people, acronyms, keywords, orgs, tags).
-3. Score with the workspace weights; the default is people +3, acronyms +2, keywords +2, orgs +1, tags +1, with a match threshold of 3. A workspace scoring rule under `ssot.rules` overrides these defaults.
+3. Score with the workspace weights; the default is people +3, acronyms +2, keywords +2, orgs +1, tags +1, with a match threshold of 3. A workspace scoring rule under `ssot.registry_scoring` overrides these defaults.
 4. A single top score at or above the threshold is the match: use its `vault_note` for `topics` and its `path` to validate the source.
 5. Tie or ambiguity: use the registry disambiguation fields, then ask the user.
 6. Below the threshold (registry fallback): fall back to content-based domain analysis; if still ambiguous, ask the user, or record the source as unclassified (`project: -`) when the calling workflow allows it.
