@@ -28,7 +28,7 @@ Do not recompute what the lint/graph pipeline already produces:
 2. Connections (edges, density, top hubs): read the latest `reports/graph-report-YYMMDD.md` and `reports/graph-trend.md`
 3. Orphan count, broken links and schema compliance: run `vmem lint <vault> --json` (or `vmem_lint`) and take the L03 / L01 / L02 counts (same numbers `/vault-lint vault` reports)
 4. Read `ops/sessions/last-sync-timestamp`
-5. For the next-action conditions: notes whose `mtime` is older than 90 days from a paged `vmem_list`; observation and tension counts from `vmem_list_files` on `ops/observations` and `ops/tensions`, and their thresholds from `ops/config.yaml` (`vmem_read_file`); work files changed since the sync timestamp from a read-only `git log --since` in the workspace (count only, as `/vault-sync` Step 1B scans)
+5. For the next-action conditions: notes whose `mtime` is older than 90 days from a paged `vmem_list`; observation and tension counts from `vmem_list_files` on `ops/observations` and `ops/tensions` (a directory that does not exist yet counts as 0), and their thresholds from `ops/config.yaml` (`vmem_read_file`); work files changed since the sync timestamp from a read-only `git log --since` in the workspace (count only, as `/vault-sync` Step 1B scans)
 6. Assemble metrics
 
 ## Next action
