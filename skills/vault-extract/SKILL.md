@@ -29,7 +29,7 @@ Before writing ANY vault note, verify the source summary.md frontmatter has **al
 If any check fails:
 - **ABORT** the extract for this summary
 - Emit failed event with `vmem_log_append(type: "EXTRACT", project: <proj>, source: <summary>, note: "failed: <reason>")` (reasons include: `missing required fields: <field list>`, `dead topic: [[<target>]] not in vault/notes/`)
-- Return error to caller (`inbox-process`, /vault-sync, /vault-pipeline) — caller decides whether to continue with other items
+- Return error to caller (`inbox-process`, /vault-sync) — caller decides whether to continue with other items
 - **Do NOT synthesize empty values. Do NOT guess. Do NOT proceed to write.**
 - User must fix summary.md and re-run. `inbox-process` must re-emit summary with correct fields when the summary came from an inbox item.
 

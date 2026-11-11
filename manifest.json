@@ -274,24 +274,6 @@
       ]
     },
     {
-      "name": "vault-next",
-      "path": "skills/vault-next",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "planning"
-      ]
-    },
-    {
-      "name": "vault-pipeline",
-      "path": "skills/vault-pipeline",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "pipeline"
-      ]
-    },
-    {
       "name": "vault-refactor",
       "path": "skills/vault-refactor",
       "tier": "core",
@@ -307,15 +289,6 @@
       "tags": [
         "vault",
         "memory"
-      ]
-    },
-    {
-      "name": "vault-rename",
-      "path": "skills/vault-rename",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "rename"
       ]
     },
     {

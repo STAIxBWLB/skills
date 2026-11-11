@@ -19,7 +19,7 @@ sync with it.
 - IO and inbox/outbox: `io-mso`, `io-gws`, `io-telegram`, `io-kakao`, `inbox-intake`, `inbox-process`, `meeting-notes`, `meeting-source-review`, `share-outbox`
 - Task and git: `task-management`, `git-sync`, `ship`
 - Ideation and drafts: `ideation-drafts`, `draft-writer`
-- Vault workflows: `vault-extract`, `vault-connect`, `vault-sync`, `vault-learn`, `vault-lint`, `vault-graph`, `vault-pipeline`, `vault-refactor`, `vault-rename`, `vault-update`, `vault-next`, `vault-remember`, `vault-rethink`, `vault-stats`
+- Vault workflows: `vault-extract`, `vault-connect`, `vault-sync`, `vault-learn`, `vault-lint`, `vault-graph`, `vault-refactor`, `vault-update`, `vault-remember`, `vault-rethink`, `vault-stats`
 - Skill analysis: `skill-mine`
 
 ## Install
