@@ -16,13 +16,14 @@ Find relationships between a note and existing vault notes, create wiki links.
 
 ## Process
 
-0. **Graph Report + Smart Connections 사전 조회** (있으면):
-   a. `vault/reports/graph-report-YYMMDD.md`가 7일 이내 존재 시 읽기 → 대상 노트의 community 소속 확인, surprising connections 중 미연결 항목 우선 연결 후보로 설정
-   b. Obsidian Smart Connections 플러그인이 활성 상태면 대상 노트의 semantic neighbors 상위 5개를 추가 연결 후보로 포함 (키워드 매칭으로 놓치는 cross-domain 연결 보완)
-   c. 위 후보를 Step 2의 검색 결과와 병합 (중복 제거)
+0. **Candidate pre-fetch through vmem** (never a graph-report or `vault-graph.json` read):
+   a. `vmem_brief(intent: "<target note title> <description>", bytes: 2048)` returns screened pointer lines `notes/<path> | title | type | description` — no note bodies — with one-hop rows marked `[neighbor]`, so this is the cheap first pass.
+   b. `vmem_graph_neighbors(path: "<stem>", hops: 1)` returns the note's community and its one-hop neighbours (each node carries `community` and `degree`, so rank by degree); widen with `hops: 2` or narrow with `relation` (`wiki_link` or one typed relation). expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note.
+   c. Obsidian Smart Connections 플러그인이 활성 상태면 대상 노트의 semantic neighbors 상위 5개를 추가 연결 후보로 포함 (키워드 매칭으로 놓치는 cross-domain 연결 보완)
+   d. 위 후보를 Step 2의 검색 결과와 병합 (중복 제거)
 1. Read the target note completely (`vmem_read`; `vmem_links` shows its current in/out links)
 2. Search vault/notes/ for related notes by:
-   - **entities_hint first pass** (if provided): for each entity name, search `glossary.md`, `people.md`, and vault/notes/ titles for exact or fuzzy matches. These are highest-priority link candidates since they're pre-identified by summaries or source metadata.
+   - **entities_hint first pass** (if provided): for each entity name, run `vmem_brief(intent: "<entity>", bytes: 1024)` and confirm a hit with `vmem_search`; its pointers already cover `glossary`, `people` and note titles, so no manual grep of those notes. These are highest-priority link candidates since they're pre-identified by summaries or source metadata.
    - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` (context-enrichment §4) are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
    - Title keyword matching
    - Description similarity

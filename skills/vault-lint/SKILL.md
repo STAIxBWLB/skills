@@ -21,7 +21,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 - **읽기 전용**: 자동 수정 하지 않는다. 제안만 한다.
 - **리포트 출력 1곳**: `vault/reports/lint-report-YYMMDD.md`
 - **log append**: `vault/log`에 `LINT` 이벤트 1줄 추가
-- **vault 스코프 판정은 vmem**: `vmem lint`(=`vmem_lint`)가 vmem 인덱스로 L01·L02·L03·L09·L10·L11·L12·L13·L14를 판정한다.
+- **vault 스코프 판정은 vmem**: `vmem lint`(=`vmem_lint`)가 vmem 인덱스로 L01·L02·L03·L09·L10·L11·L12·L13·L14·L15를 판정한다.
   vault 쓰기(리포트)도 vmem만 사용.
 - **work/ 접근**: Read / Grep / Glob (서브모듈 내부 깊이 검사는 위임)
 
@@ -41,7 +41,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 | `names` | 파일명 규칙만 (work/ + vault/) |
 | `note=<path>` | 단일 vault note 품질·스키마 검증 |
 
-## 체크셋 (L01-L12)
+## 체크셋 (L01-L15)
 
 `<ideation>` = `<paths.scratchpad>/<scratchpad.ideation_subdir>` (기본
 `work/scratchpad/ideation`). 해석 절차는 `~/.maru/skills/_builtin/lib/scratchpad_adapter.md`.
@@ -64,6 +64,7 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 | L12 | `vault/reports/vault-graph.json` | island community (cross-community edge 0개인 커뮤니티) — 멤버 목록으로 보고, 번호 인용 금지 | warn |
 | L13 | `vault/notes/` | 파일명이 소문자 ASCII kebab-case가 아님 (`vmem move`로 수정) | **error** |
 | L14 | `vault/notes/` | frontmatter `source:` 경로가 해소되지 않음 | warn |
+| L15 | `vault/notes/` | `confidence: proven`인데 `source`가 비어 있음 — 근거(memory id·URL·workspace 경로)를 넣거나 confidence를 낮춘다 | warn |
 
 ## 실행 절차
 
@@ -71,24 +72,25 @@ work/ + vault/ 정합성 검증 리포트 생성기.
 
 | scope | 활성 체크 |
 |-------|----------|
-| `full` | L01~L14 (L05 제외) |
-| `vault` | L01, L02, L03, L09~L14 — 전부 `vmem lint` |
+| `full` | L01~L15 (L05 제외) |
+| `vault` | L01, L02, L03, L09~L15 — 전부 `vmem lint` |
 | `work` | L06, L07, L08 |
 | `inbox` | L06 |
 | `names` | L07, L08 |
-| `note=<path>` | L01·L02·L03·L10·L13·L14 (CLI `--note` 전용) + 단일 note quality gates |
+| `note=<path>` | L01·L02·L03·L10·L13·L14·L15 (CLI `--note` 전용) + 단일 note quality gates |
 
-### 2단계: vault 스코프 — `vmem lint` (L01, L02, L03, L09~L14)
+### 2단계: vault 스코프 — `vmem lint` (L01, L02, L03, L09~L15)
 
 ```bash
 vmem lint <vault> --json
 # 단일 노트(CLI 전용): vmem lint <vault> --note notes/<x>.md --json
 ```
 
-- 결과 JSON: `findings`(코드별 목록), `errors`, `warnings`, `markdown`(리포트 본문, 체크별 섹션), `summary`(`SUMMARY errors=N warnings=M`)
+- 결과 JSON: `findings`(코드별 목록), `errors`, `warnings`, `markdown`(리포트 본문, 체크별 섹션), `summary`(`SUMMARY errors=N warnings=M`). `findings`는 vmem이 만든 판정이고, 스킬이 다시 계산하지 않는다
 - 읽기 전용. project id는 vault에 등록된 `registry`로 검사한다
 - finding을 설명하거나 수정 제안을 쓰기 전, `note=<path>` 결과를 판정하기 전에 `references/vault-scope-rules.md`를 읽는다.
-- `note=<path>` 스코프: `--note`로 L01/L02/L03/L10/L13/L14를 해당 노트로 제한한 뒤, 에이전트가 note quality gates(description test·composability·source)를 추가 검토
+- L01 finding은 해결 후보를 함께 준다: vmem이 제안한 `suggested` 타깃(존재하는 노트, 점수 포함)을 먼저 검토하고, 없거나 틀렸을 때만 직접 후보를 찾는다. 한 노트만 볼 때는 `vmem_links(path)`가 같은 제안을 dead link마다 하나씩 준다
+- `note=<path>` 스코프: `--note`로 L01/L02/L03/L10/L13/L14/L15를 해당 노트로 제한한 뒤, 에이전트가 note quality gates(description test·composability·source)를 추가 검토
 - MCP `vmem_lint` 인자는 `{vault, write, dryRun}`뿐이라 note를 좁힐 수 없다: `note=<path>`는 CLI 전용이고, MCP만 쓰는 경로는 배치가 끝난 뒤 vault 전체 lint 1회로 마무리한다.
 
 ### 3단계: work 스코프 — 에이전트 검사 (L04, L06, L07, L08)

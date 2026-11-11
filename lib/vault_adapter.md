@@ -58,21 +58,21 @@ Typical mappings:
 | Read note / several notes | `vmem_read` (frontmatter, body, sha256), `vmem_read_many` (<=20) |
 | Search / list | `vmem_search`, `vmem_list` (page with the returned `nextCursor` as `cursor`) |
 | Read / list non-note files | `vmem_read_file`, `vmem_list_files` |
-| Links / neighbourhood | `vmem_links`, `vmem_graph_neighbors` |
+| Links / neighbourhood | `vmem_links` (out, in or both, each dead link with at most one `suggested` target), `vmem_graph_neighbors` (`hops` 1–2, `limit` 1–500, `relation`; each node carries `community` and `degree`). Neighbour or community questions never read `reports/vault-graph.json` or the graph report |
 | Create note | `vmem_create` |
 | Edit body | `vmem_patch` (exact old/new text, or `edits` for up to 32 at once), `vmem_append` (into an H2 section) |
 | Edit frontmatter or tags | `vmem_set_frontmatter` |
 | Typed relation link | `vmem_link` |
 | Supersede | `vmem_supersede` |
 | Merge two notes | `vmem_merge`: call once for the merged body, source/topic unions, inbound rewrites and `fingerprint`, then again with `confirm: true`, that fingerprint and `log` |
-| Intent-scoped pointers | `vmem_brief` (`intent`, optional `paths` and `bytes`; screened pointer lines without bodies) |
+| Intent-scoped pointers | `vmem_brief` (`intent` <=1024 bytes, optional `paths` as extra basename word hints — not a citation filter — and `bytes` 256–4096; screened pointer lines without bodies, one-hop rows marked `[neighbor]`) |
 | Promote an agent-mem entry | `vmem_promote_from_amem`: two-step like `vmem_move`; its confirm logs `LEARN` itself and takes no `log` |
 | Recent log events | `vmem_log_tail` (read-only) |
 | Move / delete | `vmem_move`, `vmem_delete`: call once for `{preview, fingerprint}`, then again with `confirm: true` and that fingerprint |
-| MOCs / stats | `vmem_mocs`, `vmem_stats` (counts by type, domain and status, recent edits, log events), `vmem_status` |
+| MOCs / stats | `vmem_mocs`, `vmem_stats` (counts by type, domain and status, `size` bytes and words by type and domain, note-to-source `ratio`, recent edits, log events), `vmem_status` |
 | `ops/` / `reports/` file | `vmem_report` |
 | Lint / graph reports | `vmem_lint` (`write: true` saves `reports/lint-report-YYMMDD.md`; it takes no note argument), `vmem_graph_build` |
-| Dry validation | `vmem_check` |
+| Dry validation | `vmem_check` (prospective note text, no write; run it before `vmem_create` so a refusal costs no write) |
 
 Pass `expectedSha` (from `vmem_read`) on edits that must not race another writer. Every successful write changes the note's sha256, so re-read before the next `expectedSha` edit of the same note.
 

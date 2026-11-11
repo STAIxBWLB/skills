@@ -83,6 +83,7 @@ git submodule status --recursive | grep '^+' | awk '{print $2}'
 
 **Deduplication** (multi-signal):
 
+0. **`vmem_brief` first**: `vmem_brief(intent: "<source title> <key topics>", paths: ["<source work file>"], bytes: 1024)` ranks screened pointer lines by the intent words plus the source file's basename words (`paths` is a word hint, not a citation filter). Run it once per source before the checks below, then confirm a pointer with `vmem_search`; the checks below decide the verdict
 1. **source field exact match**: `source: work/meetings/...` 경로 직접 일치
 2. **Title similarity ≥70%**: fuzzy compare against vault note titles
 3. **Recent update-section detection**: 대상 회의 날짜 헤더(`## Update (YYYY-MM-DD)` 또는 `## YYYY-MM-DD ...`)가 vault 노트에 이미 존재하면 "이미 반영됨"으로 판정

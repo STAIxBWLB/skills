@@ -28,8 +28,9 @@ Promote a research finding or conversation answer into the vault graph **only af
 - If conversation mode: collect the question, the files cross-referenced, and the synthesized answer
 
 ### Step 2: Vault duplicate check
-- `vmem_search(query: "...")` on the topic + key terms
-- `vmem_read(path: "glossary", section: "<term>")` or `vmem_read(path: "glossary")` for term collisions
+- `vmem_brief(intent: "<topic> <key terms>", paths: ["<work file or the source of the answer>"], bytes: 1024)` — screened pointer lines over titles, descriptions and types; `paths` adds the file's basename words to the ranked terms (a hint, not a citation filter)
+- `vmem_search(query: "...")` on the topic + key terms to confirm a pointer, and `vmem_read(path: "glossary", section: "<term>")` for a term collision
+- A pointer that already carries this insight makes the proposal an UPDATE (Option B) or a `vmem_merge`, not a new note
 
 ### Step 3: Propose (user approval gate — MANDATORY)
 Present a proposal block:
@@ -51,7 +52,12 @@ Option B (UPDATE existing):
   - path: notes/<existing-note>.md
   - change: <add wiki-link to [[new-term]] + 1 paragraph>
 
-Accept: [a] new, [b] update, [s] skip, [q] quit
+Option C (PROMOTE an agent-mem entry):
+  - candidate: mem:<id> — <title> (kind, project), from `amem_vault_candidates`
+  - path: notes/<kebab-case-stem>.md (prefilled from the entry: title → H1 and stem, text → body)
+  - source: mem:<id> (the confirm writes `promoted_from: mem:<id>` and the back-link itself)
+
+Accept: [a] new, [b] update, [c] promote, [s] skip, [q] quit
 ```
 
 **Do NOT write to vault without explicit accept.** If user skips, append `— proposed, skipped` LEARN line anyway (see Step 6).
@@ -59,6 +65,7 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 ### Step 4: Execute (on accept)
 - New note: `vmem_create(stem, type, domain, topics, description, confidence, source, body, log: {type: "LEARN", project, source, note: "promoted: <type>"})`
 - Update: `vmem_patch(path, oldString, newString, expectedSha, log)` or `vmem_append(path, section, markdown, log)` with `log: {type: "LEARN", project, source, dest, note: "updated: <title>"}`
+- Promote an agent-mem entry (Option C): list candidates with `amem_vault_candidates` (CLI `amem vault-candidates`), then call `vmem_promote_from_amem(id: "mem:<id>", stem, type, domain, topics, description, body, project)` for the preview — full note text, the possible duplicates and a fingerprint — and confirm with `vmem_promote_from_amem(..., confirm: true, fingerprint)`. A listed duplicate is not a refusal: the preview carries `choices` (`create` or `link-existing <path>`), so pick one before confirming, or pass `linkTo` to link an existing note instead of creating one. That confirm creates the note, writes `promoted_from` and its back-link, and records the `LEARN  <project>  mem:<id> → notes/<stem>.md  — promoted: <kind>` line itself; pass no `log`, and add none afterwards. expect: vmem refuses a stale fingerprint, and a `stem`, `type` or `domain` outside the schema
 - Body: atomic insight, context, relevant notes section
 - expect: vmem refuses a missing or duplicated note field, a `confidence` outside the schema, a `topics` entry that is not an existing MOC, a new unresolved wiki link and secret-looking text; report the named issues instead of retrying with guessed values
 
@@ -67,7 +74,7 @@ Accept: [a] new, [b] update, [s] skip, [q] quit
 
 ### Step 6: LEARN event in vault/log
 
-Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 create or update records it through its `log` argument, so add none for it; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
+Always record one LEARN line — even when user skips — so the query history is preserved. A Step 4 create or update records it through its `log` argument, and an Option C promotion records its own `LEARN  mem:<id> → notes/<stem>.md` line on confirm, so add none for either; for `proposed, skipped` and `failed: <reason>` call `vmem_log_append(type: "LEARN", project, source, dest, note)`. Never append to the log file directly.
 
 **Format**:
 
