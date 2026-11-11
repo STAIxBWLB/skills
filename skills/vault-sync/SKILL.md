@@ -174,7 +174,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 - Skip Step 1. Enumerate eligible sources under the given work paths (`.md` with frontmatter, or summary output); at most 20 per run (collector's-fallacy guard: split larger batches)
 - Step 1.5 classification and deduplication run once for the whole batch, and the classification is passed to each extraction (no registry reload per item)
 - The named targets are the user's choice of sources: Step 2 shows the proposal list once and one accept covers the batch (per-item select still works)
-- Step 3 runs the `/vault-extract` method per source, then `/vault-connect` on the notes it created. Check quality once after the batch with one `vmem_lint` call (or the CLI `vmem lint <vault> --note <path>` per note when the CLI is available)
+- Step 3 runs the `/vault-extract` method per accepted create proposal and hands accepted update proposals to `/vault-update` as in other scopes, then `/vault-connect` on the notes it created. Check quality once after the batch with one `vmem_lint` call (or the CLI `vmem lint <vault> --note <path>` per note when the CLI is available)
 - Stop on a refusal or a persisted partial write (see `lib/vault_adapter.md` §Write results); continue past warnings
 - Output adds: sources skipped by vault-extract preconditions, per-note lint error/warning counts
 - Step 4 writes the session record but does not move `ops/sessions/last-sync-timestamp`: a targets run covers only the named sources, not every change since the last sync
@@ -187,7 +187,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 ## Quality Gates
 - Same as /vault-extract quality gates
 - Additional: deduplication check before creation
-- Confirmation required for every note creation
+- Confirmation required for every note creation (in `targets`, the one batch accept is that confirmation)
 
 ## Output
 - Summary of scan results (per source: meetings, diff, submodules)
