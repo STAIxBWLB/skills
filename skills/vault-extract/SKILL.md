@@ -69,7 +69,11 @@ If any check fails:
    - Body: the insight with context
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
-6. **Write and check the receipt** (MANDATORY): create the note with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written. If the receipt is `ok: false` with `applied: false`, nothing was written: record `failed: <issue codes>` with `vmem_log_append` and return the named issues to the caller. If `ok` is false while `applied: true`, changes persisted: stop and reconcile per `lib/vault_adapter.md` §Write results.
+6. **Pre-validate, write, and read the receipt** (MANDATORY):
+   a. `vmem_check(path: "notes/<stem>.md", text: <the full note text>)` validates the prospective note without writing, so a schema, link or secret problem surfaces before the write budget is spent. Fix what it reports; do not "fix" a refusal by loosening the note.
+   b. Duplicate check: `vmem_brief(intent: "<title> <description>", paths: ["<source work file>"], bytes: 1024)`. `paths` only adds the file's basename words to the ranked terms (a hint, not a citation filter), so also confirm a pointer with `vmem_search`. A pointer that is already this insight is a merge, not a second note: run `vmem_merge(keep, absorb)` as a preview, then confirm it with the fingerprint.
+   c. Create with `vmem_create(stem, type, domain, topics, description, source, body, log: {type: "EXTRACT", project, source, dest: "notes/<stem>.md", note: "<type>"})`. vmem validates the full frontmatter before it saves, so a stripped or invalid note is never written.
+   d. Read the whole receipt. `possibleDuplicates` (V08 warnings: FTS title terms or the same normalized H1 match an existing note) means a near-duplicate exists that you did not merge — stop and surface it with the merge option instead of writing a sibling. `ok: false` with `applied: false` wrote nothing: record `failed: <issue codes>` with `vmem_log_append` and return the issues. `ok` false with `applied: true` persisted: reconcile per `lib/vault_adapter.md` §Write results.
 7. After creating notes, invoke /vault-connect with entities hint (from summary.md):
    - Read `entities` field from source summary.md (if present — list of 인물/기관 names)
    - Pass entities list to `/vault-connect` as wiki-link candidate seeds (`entities_hint` parameter)

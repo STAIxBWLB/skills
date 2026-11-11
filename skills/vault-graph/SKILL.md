@@ -11,7 +11,7 @@ description: >
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 >
-> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic communities and `--workspace` need it. The ripgrep queries, `neighbors` and code builds do not need vmem.
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic Leiden communities, `--workspace` and the vmem-backed queries (`neighbors`, `orphans`, `backlinks`, `stale`) need it. Only a code-repository build (`--code`) runs without vmem.
 
 Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
 
@@ -29,21 +29,21 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 
 ## Commands
 
-### Query Commands (ripgrep-based, always available)
-- **orphans**: notes with no incoming links
-- **hubs**: notes with most connections
-- **domain [name]**: all notes in a domain
-- **cross [domain1] [domain2]**: notes linking across domains
-- **backlinks [note]**: all notes linking to a specific note
-- **density**: connection density metrics
-- **stale [days]**: notes not modified in N days
+### Query Commands (vmem reads, always available)
+- **orphans**: notes with no incoming links (`vmem_lint` L03 — an in-link-0, topics-0 finding, so the count matches `/vault-lint`)
+- **hubs**: notes with most connections (`vmem_graph_neighbors` `hops: 1` returns `degree` per node; a hub sweep uses the graph report's god-node table)
+- **domain [name]**: all notes in a domain (`vmem_search` with `domain`)
+- **cross [domain1] [domain2]**: notes linking across domains (`vmem_graph_neighbors` per note with `hops: 1`, comparing the two neighbours' domains)
+- **backlinks [note]**: all notes linking to a specific note (`vmem_links` with `direction: "in"`)
+- **density**: connection density metrics (graph report totals: nodes, edges, communities, isolates, density)
+- **stale [days]**: notes not modified in N days (`vmem_list` `mtime`)
 
 ### Build Commands
 - **build**: Run community detection + analysis pipeline. Outputs:
   - `vault/reports/vault-graph.json` (node-link JSON)
   - `vault/reports/graph-report-YYMMDD.md` (audit report; 구 리포트는 보존되고 `graph-trend.md`에 빌드마다 행 1개가 추가된다)
 - **build --workspace**: Add the work operational layer → `vault/reports/workspace-graph.json` (vault-graph.json untouched; no report written). **온디맨드 전용** — 주간 리츄얼에서 제외(L11b 폐기, `_meta/rules/knowledge-graph-integration.md` §7). See below.
-- **neighbors [note]**: 1-hop neighborhood + community of a note from `vault-graph.json` (jq, no build).
+- **neighbors [note]**: 1-hop neighborhood + community of a note through `vmem_graph_neighbors` (no build, no report or `vault-graph.json` read).
 - **report**: Read the latest graph report (if < 7 days old)
 - **communities**: List detected communities from latest build
 - **surprises**: List cross-community surprising connections
@@ -64,7 +64,7 @@ Options:
    ~/.maru/skills/vault-graph/scripts/run.sh -m graphify update <path>    # --code
    ```
    For code builds, ensure `<path>/.graphifyignore` exists first. If missing, offer to copy `<workspace-root>/_meta/templates/graphifyignore`.
-2. Pipeline: read notes/code → extract graph → community detection → god node analysis → surprising connections → report. vmem uses deterministic label propagation (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
+2. Pipeline: read notes/code → extract graph → deterministic Leiden community detection → god node analysis → surprising connections → report. vmem's graph block carries `partitioner: "leiden"` and its report prints the same name, so use Leiden everywhere (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지, KG 규칙 §5.1).
 3. Outputs:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 추가, 구 리포트 보존)
    - workspace: `<vault.path>/reports/workspace-graph.json` only (no report or trend row; the result lists the work counters)
@@ -74,15 +74,17 @@ Options:
 
 ## Neighbors Process (`/vault-graph neighbors <note>`)
 
-1-hop neighborhood + community of a note, read directly from `vault-graph.json` (no rebuild, no new lib — DR-019 §4). Used by context-enrichment §3 Graph Neighborhood injection.
+1-hop neighborhood + community of a note, read through `vmem_graph_neighbors` on the built graph (no report read, no `jq`, no rebuild). Used by context-enrichment §3 Graph Neighborhood injection.
 
-```bash
-jq --arg id "<stem>" '{node: (.nodes[]|select(.id==$id)),
-  neighbors: [(.edges // .links)[]|select(.source==$id or .target==$id)]}' \
-  <vault.path>/reports/vault-graph.json
+```text
+vmem_graph_neighbors(path: "<stem>", hops: 1, limit: 50)   # MCP
+vmem graph neighbors <vault> <stem> --hops 1 --limit 50     # CLI
 ```
 
-Report the node's `community`, its degree-ranked neighbors (≤10), and same-community co-members. If the graph is missing or its `graph-report` is > 7 days old, skip and surface the staleness (never block).
+- The result carries `nodes` (each with `community` and `degree`), the `edges` among them and `truncated`; `hops: 2` widens the walk and `relation` (`wiki_link` or one typed relation) narrows the edge set.
+- Report the node's `community`, its degree-ranked neighbors (≤10), and same-community co-members.
+- Backlinks, orphans and staleness come from vmem too: `vmem_links(path, direction: "in")`, `vmem_lint` L03, and `vmem_list` `mtime` — never a ripgrep pass over `notes/`.
+- expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note. If the graph is stale (newest `graph-report-YYMMDD.md` over 7 days) surface the staleness with the answer; never block on it.
 
 ## Report Process (`/vault-graph report [target]`)
 
@@ -133,16 +135,17 @@ Options:
    ```
 
 ## Query Process (legacy)
+Superseded by the vmem reads above: an ad-hoc query maps to `vmem_search`, `vmem_links`, `vmem_graph_neighbors` or `vmem_lint` rather than a ripgrep pass over `notes/`, and a question none of them answers is a question for `/vault-graph build` plus the report. Keep this list only to recognise an old request:
 1. Parse query type and parameters
-2. Use ripgrep to scan vault/notes/ for wiki links and frontmatter
-3. Build in-memory graph representation
+2. Scan vault/notes/ for wiki links and frontmatter
+3. Build an in-memory graph representation
 4. Execute query
 5. Format results
 
 ## Integration
 
-- `/vault-connect` Step 0 reads graph report for connection candidates
-- `/vault-sync` checks graph report for unconnected surprising connections
+- `/vault-connect` Step 0 discovers candidates with `vmem_brief` and `vmem_graph_neighbors`, never by reading this report
+- `/vault-sync` duplicates come from `vmem_brief` with the source path; the graph report is not a dedup signal
 - `/vault-lint` checks L11 (graph staleness > 7 days), L12 (island communities, reported by member list)
 - `skill-mine` mines skill candidates with `vmem skills mine`, which uses the same deterministic Leiden communities
 - `<workspace-root>/AGENTS.md` §"Vault-First" Graph Report shortcut: T2/T3 ops read report before full vault search

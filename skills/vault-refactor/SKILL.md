@@ -13,7 +13,7 @@ Restructure vault content for better organization. **Never auto-executes** — a
 ## Operations
 
 - **split [note]**: Break a note into multiple atomic notes
-- **merge [note1] [note2]**: Combine related notes
+- **merge [note1] [note2]**: Combine related notes into the `keep` note — `vmem_merge` preview then confirm (body, source/topic union, inbound-link repointing, absorbed note superseded)
 - **rename [old] [new]**: Rename a note and update every reference (see §Rename). For a typo, acronym or scope change of the name; content changes use split or merge
 - **moc [domain]**: Reorganize a domain MOC
 - **promote [topic]**: Create topic MOC from tag cluster (20+ notes threshold)
@@ -23,7 +23,7 @@ Restructure vault content for better organization. **Never auto-executes** — a
 1. Analyze target for refactoring opportunity
 2. **Present approval gate** (see format below)
 3. On explicit accept → execute
-4. Update all affected wiki links via `vmem_patch` (bidirectional); a merge that retires a note uses `vmem_supersede(old, next)` or the two-step `vmem_delete`. expect: vmem refuses an edit or delete that would newly break an inbound link or MOC topic
+4. Update all affected wiki links via `vmem_patch` (bidirectional). A merge does not need that pass: `vmem_merge(keep, absorb)` previews the merged body, the source/topic unions, the inbound-link rewrites and a fingerprint without writing, and the confirm (`confirm: true` with that fingerprint) writes the keep note, repoints every inbound link and marks the absorbed note superseded in one mutation-locked write. Use `vmem_supersede(old, next)` only when the two notes stay separate, and the two-step `vmem_delete` to retire a note with no successor. expect: vmem refuses a `vmem_merge` of different types, of a person or MOC note, of an oversized result, and an edit or delete that would newly break an inbound link or MOC topic
 5. Run `/vault-lint note=<path>` on each affected note; `--note` is CLI-only, so an MCP-only run finishes with one vault-wide `vmem_lint` instead
 6. `EXTRACT` events in `log` come from the vmem writes themselves, except a rename or merge: `vmem_move` records `ROUTE` and `vmem_merge` / `vmem_supersede` record `RETHINK` (`ingest-chain.md` §비표준 TYPE 처리)
 7. Commit the vault submodule, then bump the parent pointer
@@ -77,6 +77,7 @@ Runs inside the approval gate and replaces Process steps 4-6 and §Log Append: i
 - `vmem_create` for new notes
 - `vmem_patch` for targeted edits (preferred for link updates), `vmem_append` for new section content
 - `vmem_move` for renames (rewrites vault-wide links itself; preview, then `confirm: true` with the fingerprint)
+- `vmem_merge` for merges (preview carries the merged body, source/topic unions, inbound rewrites and the fingerprint; confirm with that fingerprint)
 - `vmem_delete` for deletions (preview lists backlinks; then `confirm: true` with the fingerprint)
 
 Filesystem access (Read/Write/Edit/Bash) is forbidden on vault paths.

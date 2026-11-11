@@ -24,9 +24,10 @@ Update a note with new information while preserving original meaning. This is th
    - minor edit → `vmem_patch(path, oldString, newString, expectedSha)`
    - new section → `vmem_append(path, section: "Update YYYY-MM-DD", markdown)`
    - major rewrite → there is no overwrite tool: patch section by section, or create a replacement note with `vmem_create` and retire the old one with `vmem_supersede(old, next)`
+   - the new information duplicates another note → do not update into a copy: offer `vmem_merge(keep, absorb)` at the approval gate, preview first and confirm with the fingerprint; it unions source and topics and repoints inbound links itself
    - frontmatter change → `vmem_set_frontmatter(path, set, unset, expectedSha)`
-   - expect: vmem refuses a stale `expectedSha`, an invalid frontmatter value, a new unresolved wiki link and an edit inside `## Topics`
-5. Check connected notes (via `vmem_links(path)` and `vmem_search`); propose cascading updates if needed
+   - expect: vmem refuses a stale `expectedSha`, an invalid frontmatter value, a new unresolved wiki link, an edit inside `## Topics`, and a `vmem_merge` of different types, a person or MOC note, or an oversized result
+5. Check connected notes (via `vmem_links(path)` and `vmem_brief(intent: "<title> <description>", bytes: 1024)`); propose cascading updates if needed
 6. Record update in note body (timestamp or changelog line)
 7. Run `/vault-lint note=<path>` on the updated note; `--note` is CLI-only, so an MCP-only run finishes with one vault-wide `vmem_lint` instead
 8. vmem logs every write with a default `EXTRACT` line; when wiki-links changed, pass `log: {type: "CONNECT", ...}` on the write that changed them (see §Log Append)
