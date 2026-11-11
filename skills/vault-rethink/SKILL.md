@@ -29,7 +29,7 @@ Review observations, tensions, and methodology drift.
 
 1. **Config ↔ Derivation 일치**: `ops/derivation.md` **§Design Dimensions 표** ↔ `ops/config.yaml` `dimensions`(8키) + `domains`(6) 를 키별로 대조. 한쪽에만 있는 키도 mismatch. 출력은 키별 match/mismatch 표 + 최종 판정(예: "8/8 dimensions + 6/6 domains match")
 2. **AGENTS.md consistency**: vault AGENTS.md·work AGENTS.md 규칙이 최신 methodology와 일치하는지
-3. **Skill SKILL.md vs 실제 사용**: spec-practice audit. 정식 스킬 목록은 vault의 derivation manifest(`ops/derivation.md`)에서 읽고(`vmem_read_file`), 그중 하나를 순환 선택하여 audit한다. manifest에 목록이 없으면 drift로 보고한다
+3. **Skill SKILL.md vs 실제 사용**: spec-practice audit. 정식 스킬 목록은 스킬 번들의 `SKILL_INDEX.md` "Vault workflows" 줄에서 읽고, 그중 하나를 순환 선택하여 audit한다
 4. **Report deviations**: drift table (Check / Status / Action)
 
 ### full mode

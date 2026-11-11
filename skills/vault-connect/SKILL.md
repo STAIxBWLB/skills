@@ -24,7 +24,7 @@ Find relationships between a note and existing vault notes, create wiki links.
 1. Read the target note completely (`vmem_read`; `vmem_links` shows its current in/out links)
 2. Search vault/notes/ for related notes by:
    - **entities_hint first pass** (if provided): for each entity name, run `vmem_brief(intent: "<entity>", bytes: 1024)` and confirm a hit with `vmem_search`; its pointers already cover `glossary`, `people` and note titles, so no manual grep of those notes. These are highest-priority link candidates since they're pre-identified by summaries or source metadata.
-   - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` (context-enrichment §4) are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
+   - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
    - Title keyword matching
    - Description similarity
    - Shared topics/MOCs

@@ -43,8 +43,9 @@ SINCE_DATE=$(echo $LAST_SYNC | sed 's/\(....\)\(..\)\(..\)\(..\)\(..\)/\1-\2-\3 
 git log --oneline --since="$SINCE_DATE" --name-only -- . \
   ':!.claude' ':!.obsidian' ':!meetings' ':!tasks' \
   | grep -v '^\w\{7\} ' | grep -v '^$' | grep -v '\.json$' \
-  | grep -v '<workspace system dir>/' | grep -v 'uv.lock' | grep -v 'pyproject.toml' \
+  | grep -v 'uv.lock' | grep -v 'pyproject.toml' \
   | sort -u
+# The workspace system directory is dropped by the Step 1.5 filter rules
 
 # Submodule changes: detect which submodules have new commits
 git submodule status --recursive | grep '^+' | awk '{print $2}'

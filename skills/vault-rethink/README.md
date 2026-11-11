@@ -8,7 +8,7 @@ An earlier review step checked inline task aging and warned at a reminder-file c
 
 ## Skill list source
 
-Drift mode used to carry a hardcoded list of the vault skills to audit. The list now comes from the vault's derivation manifest, so adding, merging or removing a skill needs no edit here.
+Drift mode used to carry a hardcoded list of the vault skills to audit. The list now comes from the bundle's `SKILL_INDEX.md` "Vault workflows" line, so adding, merging or removing a skill needs no edit here.
 
 ## Rename workflow
 
