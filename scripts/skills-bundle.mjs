@@ -300,7 +300,7 @@ function verify(root = repoRoot) {
       // Skip node properties (&anchor, !tag); a quoted, block or flow value is not a plain scalar.
       // In a plain scalar " #" starts a comment, and ":" followed by space or end of value is invalid.
       const v = value.replace(/^(?:[&!]\S*\s+)*/, "");
-      if (!/^["'|>[{]/.test(v) && /:(\s|$)/.test(v.replace(/\s#.*$/, ""))) errors.push(`frontmatter ${key} has an unquoted ": " (invalid YAML; quote the value): ${skillMd}`);
+      if (!/^["'|>[{]/.test(v) && /:(\s|$)/.test(v.replace(/(^|\s)#.*$/, ""))) errors.push(`frontmatter ${key} has an unquoted ": " (invalid YAML; quote the value): ${skillMd}`);
     }
   }
 
