@@ -8,7 +8,7 @@ license: MIT
 
 Derived from Gabberflast/academic-pptx-skill (MIT, see `LICENSE`); `README.md` holds provenance and the evidence behind the Korean rules.
 
-This skill governs content, structure and design. The technical work of writing the `.pptx` (pptxgenjs API gotchas, structured decks, `validate.py`) comes from the host's pptx skill: read both before writing code. A host without that skill follows the bundled fallback in Step 4. Where they conflict, this skill wins.
+This skill governs content, structure and design. The technical work of writing the `.pptx` (pptxgenjs API gotchas, structured decks, `validate.py`) comes from the host's pptx skill: read both before writing code. The skill requires that host skill for pptxgenjs build guidance, `validate.py` and text extraction; when the host has none, stop before building and tell the user the skill cannot run without it. Where they conflict, this skill wins.
 
 | Need | Read |
 |---|---|
@@ -55,9 +55,8 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
 
 1. Build per the pptx skill as a structured deck, then run `ko_fix.py` for Korean text.
 2. **File QA**: the pptx skill's `validate.py`. **Content QA**: its text extraction script; check order, typos and leftover placeholders.
-3. **Host without the pptx skill**: build with pptxgenjs from the bundle env (`envs/default`), following `references/slide_patterns.md`. Content QA is the bundled `pptx-toolkit` (python-pptx): `python skills/pptx-toolkit/scripts/pptx_cli.py outline deck.pptx` for the title order, and `... read deck.pptx` for the slide text to check order, typos and leftover placeholders; a successful read also proves the file opens. Report file QA at that level as unverified.
-4. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-*.png` (zero-padded numbers) through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
-5. **Academic QA**:
+3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-*.png` (zero-padded numbers) through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
+4. **Academic QA**:
    - every content slide has an action title, and the ghost deck test passes
    - one exhibit per results slide, each with its "so what" marked on the exhibit
    - every borrowed figure or data point is cited on its slide
@@ -75,4 +74,4 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
 
 ## Dependencies
 
-pptxgenjs from the bundle env (`envs/default`); the host pptx skill's scripts when the host has that skill (Step 4 names the fallback when it does not); Python 3 (`ko_fix.py` uses the standard library only, `pptx-toolkit` uses the env venv's python-pptx); for visual QA, macOS with Microsoft PowerPoint and `pdftoppm` (Poppler).
+pptxgenjs and the host pptx skill's scripts (the host requirement stated at the top); Python 3 (`ko_fix.py` uses the standard library only); for visual QA, macOS with Microsoft PowerPoint and `pdftoppm` (Poppler).
