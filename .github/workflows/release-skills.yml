@@ -76,15 +76,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          NOTES="Rolling channel for Maru OTA skill bundles. Assets are immutable and consumed by the app; the release workflow keeps the newest 10 revisions and prunes older ones. Do not edit or delete by hand."
           if ! gh release view skills-channel >/dev/null 2>&1; then
             gh release create skills-channel \
               --prerelease --latest=false \
               --title "Skills bundle channel" \
-              --notes "Rolling channel for Maru OTA skill bundles. Assets are immutable and consumed by the app; the release workflow keeps the newest 10 revisions and prunes older ones. Do not edit or delete by hand."
+              --notes "$NOTES"
           fi
           # Re-assert on every run so a manual edit can never flip this
-          # channel to "latest".
-          gh release edit skills-channel --prerelease --latest=false
+          # channel to "latest" and the notes match the prune policy.
+          gh release edit skills-channel --prerelease --latest=false --notes "$NOTES"
 
       - name: Upload immutable assets
         env:
