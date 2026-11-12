@@ -29,8 +29,9 @@ Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
    `SKILL_INDEX.md` line.
 2. Follow the authoring rules in [`AGENTS.md`](AGENTS.md) (frontmatter,
    Skill authoring, public-safe and host-neutral text).
-3. Run `make skills-verify`; [`AGENTS.md`](AGENTS.md) (Verification) states
-   what it enforces and what a pass prints.
+3. Run `make skills-verify`. It checks that `manifest.json` and `skills/`
+   agree and enforces the [`AGENTS.md`](AGENTS.md) rules; AGENTS.md
+   (Verification) says what a pass prints.
 4. PR to `main`. Merge triggers the publish workflow; there is nothing
    else to do.
 

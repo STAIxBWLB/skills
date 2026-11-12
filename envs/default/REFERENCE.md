@@ -30,9 +30,8 @@ envs/default/
     └── utils/file_detector.py
 ```
 
-Tracked: the scaffold above, with `pyproject.toml`, `uv.lock`, `package.json`
-and `pnpm-lock.yaml` as the dependency source of truth. Runtime outputs are
-ignored: `.venv/`, `node/`, `node_modules/`, `input/`, `output/`, `temp/` and
+`pyproject.toml`, `uv.lock`, `package.json` and `pnpm-lock.yaml` are the
+dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`, `node_modules/`, `input/`, `output/`, `temp/` and
 `logs/`.
 
 ## Processing Strategy
@@ -45,7 +44,7 @@ ignored: `.venv/`, `node/`, `node_modules/`, `input/`, `output/`, `temp/` and
 ## Provisioning and verification
 
 ```bash
-# Provision or repair the canonical runtime (venv + node_modules)
+# Provision or repair the canonical runtime (venv, bundled node/, node_modules)
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
 
 # Health-check it (no changes)
@@ -71,12 +70,16 @@ sync with it**:
 Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
 venvs cannot shadow the Maru runtime. The Maru host injects `MARU_SKILLS_ENV`,
 `VIRTUAL_ENV`, `PATH` (`+.venv/bin`), and `NODE_PATH` (`+node_modules`) for
-in-app runs; the shell wrappers export the same set so bare CLI sessions match.
+in-app runs; the shell wrappers export `VIRTUAL_ENV`, `PATH` and `NODE_PATH`
+so bare CLI sessions match.
 
 ## Session hook
 
-`.claude/hooks/init-env.sh` resolves the env (steps 2-4 above) and writes the
-same four variables into `CLAUDE_ENV_FILE`, so later tool calls in the session
-use the shared runtime. Register it as a SessionStart hook in the host's
-settings, or run `scripts/infuse-hooks.sh --all` (`--dry-run` to preview) to
-copy the hook and its settings template into workspace submodules.
+`.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then
+`~/.maru/env`, then a walk-up from the project directory, and, when
+`CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
+(when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
+session use the shared runtime. Register it as a SessionStart hook in the
+host's settings, or copy the hook and its settings template into workspace
+submodules with `scripts/infuse-hooks.sh --all` or
+`scripts/infuse-hooks.sh <submodule>...` (`--dry-run` to preview).

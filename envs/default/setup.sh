@@ -18,11 +18,11 @@ Options:
 EOF
 }
 
-# Health check: venv importable + node docx.
-# The canonical setup target carries both runtime surfaces:
-# .venv and node_modules.
+# Health check: venv importable + node docx + bundled node runtime.
+# The canonical setup target carries three runtime surfaces:
+# .venv, node/ and node_modules.
 verify_runtimes() {
-    local target="$1" ok=0 py jre c
+    local target="$1" ok=0 py c
     echo "🔍 Maru 런타임 헬스체크: $target"
 
     py="$target/.venv/bin/python3"

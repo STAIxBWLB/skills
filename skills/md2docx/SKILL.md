@@ -97,7 +97,7 @@ A4 여백 2cm, 머리말=문서 제목(저시인성), 바닥글=현재/전체 �
 
 ```bash
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env --verify
-# → venv / node: docx 존재 / node-runtime: vNN + docx require OK / jre 확인
+# → venv / node: docx 존재 / node-runtime: vNN + docx require OK
 ```
 
 Node 또는 docx 패키지가 없으면:
@@ -109,5 +109,5 @@ bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
 ## 참고
 
 - 변환기 구현: `scripts/md2docx.mjs` (self-contained, `docx`만 의존)
-- 런타임 해소 규약: `envs/default/REFERENCE.md` (Python/Node 해소 순서)
+- 런타임 해소 규약: Python은 `envs/default/REFERENCE.md`, Node는 `md2docx` 래퍼의 `find_env_node`
 - 공문서(.hwpx)는 released `hwp` 스킬의 `references/editing-recipes.md` (minimum `v1.2.0`), 스프레드시트는 `xlsx-toolkit`, 슬라이드는 `pptx-toolkit`.

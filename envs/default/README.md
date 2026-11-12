@@ -4,7 +4,7 @@ HWP/HWPX/PDF 파일 처리를 위한 공유 Python 가상환경 + 번들 Node �
 이 디렉토리(`envs/default`)는 source scaffold 이며, `setup.sh --target ~/.maru/env`
 로 정규 런타임 `~/.maru/env`(`.venv` + `node` + `node_modules`)에 프로비저닝된다.
 번들 Node(`node/`)는 md2docx(docx-js) 변환기를 시스템 node 의존 없이 실행한다.
-Claude Code SessionStart hook(`init-env.sh`)이 세션에서 이 환경을 자동 활성화한다.
+SessionStart hook(`init-env.sh`)을 등록하면 세션에서 이 환경이 활성화된다(등록: `REFERENCE.md` "Session hook").
 
 ## 구조
 
