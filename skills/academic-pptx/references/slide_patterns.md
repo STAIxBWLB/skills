@@ -78,7 +78,7 @@ Layout: Two-column (context left, gap/problem right) or single-column narrative.
 ```javascript
 // Action title
 slide.addText("Existing interventions show strong short-run effects but evidence on persistence is sparse", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.8,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.8,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true, valign: "top"
 });
 
@@ -92,7 +92,7 @@ slide.addText([
   { text: "Mechanism is unresolved: ", options: { bullet: true, bold: true, breakLine: false } },
   { text: "cognitive vs. non-cognitive channels remain debated (see Appendix A).", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 1.1, w: 9.0, h: 3.2,
+  x: MARGIN, y: 1.4, w: 9.0, h: 3.2,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 12
 });
@@ -113,19 +113,19 @@ slide.addText("Heckman et al. (2013), Science; Cunha & Heckman (2007), AER", {
 ```javascript
 // Action title
 slide.addText("This paper asks: do early childhood effects persist to age 35,\nand through which channels?", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.9,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
 
 // Research question in a prominent callout box
 slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
-  x: 1.5, y: 1.4, w: 7.0, h: 1.6,
+  x: 1.5, y: 1.5, w: 7.0, h: 1.6,
   fill: { color: COLORS.bg }, line: { color: COLORS.accent, width: 1.5 }, rectRadius: 0.1
 });
 
 slide.addText("Do effects of the X program on cognitive and socio-emotional skills\nat age 8 persist to age 35 outcomes (earnings, health, crime),\nand does the pathway run through skills or through schooling attainment?", {
-  x: 1.7, y: 1.55, w: 6.6, h: 1.3,
+  x: 1.7, y: 1.65, w: 6.6, h: 1.3,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.primary,
   bold: false, align: "left", valign: "middle"
 });
@@ -135,7 +135,7 @@ slide.addText([
   { text: "Contribution: ", options: { bold: true, breakLine: false } },
   { text: "First study to follow a randomized cohort from ages 3–5 to 35; administrative earnings and health records linked to original experimental data.", options: {} }
 ], {
-  x: MARGIN, y: 3.2, w: 9.0, h: 1.0,
+  x: MARGIN, y: 3.3, w: 9.0, h: 1.0,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body
 });
 ```
@@ -151,7 +151,7 @@ Target: 1–2 slides. Move all detail the audience doesn't need to Appendix.
 ```javascript
 // Action title
 slide.addText("Regression discontinuity exploits a sharp household income threshold\nfor program eligibility — treatment is as-good-as-random near the cutoff", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.9,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
@@ -159,7 +159,7 @@ slide.addText("Regression discontinuity exploits a sharp household income thresh
 // Two-column: design on left, key variables on right
 // Left column header
 slide.addText("Design", {
-  x: MARGIN, y: 1.25, w: 4.2, h: 0.35,
+  x: MARGIN, y: 1.5, w: 4.2, h: 0.35,
   fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: COLORS.accent, bold: true
 });
 
@@ -171,14 +171,14 @@ slide.addText([
   { text: "Follow-up: ", options: { bullet: true, bold: true, breakLine: false } },
   { text: "ages 5, 8, 18, 25, 35 — admin records linked", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 1.65, w: 4.2, h: 2.4,
+  x: MARGIN, y: 1.9, w: 4.2, h: 2.4,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 10
 });
 
 // Right column header
 slide.addText("Key outcomes", {
-  x: 5.3, y: 1.25, w: 4.2, h: 0.35,
+  x: 5.3, y: 1.5, w: 4.2, h: 0.35,
   fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: COLORS.accent, bold: true
 });
 
@@ -190,7 +190,7 @@ slide.addText([
   { text: "Mechanism: ", options: { bullet: true, bold: true, breakLine: false } },
   { text: "cognitive score age 8, years of schooling", options: { breakLine: true } },
 ], {
-  x: 5.3, y: 1.65, w: 4.2, h: 2.4,
+  x: 5.3, y: 1.9, w: 4.2, h: 2.4,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 10
 });
@@ -213,7 +213,7 @@ Layout: Figure left (~5.5"), interpretive text right (~3.5"). Action title state
 ```javascript
 // Action title — MUST state the finding, not just the topic
 slide.addText("Treated children earn 18% more at age 35 — effect is largest in the bottom income quartile", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.85,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.85,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
@@ -225,7 +225,7 @@ slide.addChart(pres.charts.BAR, [{
   labels: ["Q1 (lowest)", "Q2", "Q3", "Q4 (highest)"],
   values: [28, 22, 15, 8]
 }], {
-  x: MARGIN, y: 1.15, w: 5.4, h: 3.8,
+  x: MARGIN, y: 1.45, w: 5.4, h: 3.6,
   barDir: "col",
   chartColors: [COLORS.accent],
   chartArea: { fill: { color: COLORS.bg } },
@@ -248,17 +248,17 @@ slide.addChart(pres.charts.BAR, [{
 // KEY FINDING ANNOTATION — tell the audience exactly what to see
 // (In practice, add a call-out arrow/box over the chart image or use addText overlay)
 slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
-  x: 0.55, y: 1.2, w: 1.8, h: 0.5,
+  x: 0.55, y: 1.5, w: 1.8, h: 0.5,
   fill: { color: COLORS.highlight }, line: { color: COLORS.highlight, width: 1 }, rectRadius: 0.06
 });
 slide.addText("↑ 28% for Q1", {
-  x: 0.55, y: 1.2, w: 1.8, h: 0.5,
+  x: 0.55, y: 1.5, w: 1.8, h: 0.5,
   fontSize: FONTS.label, fontFace: FONTS.face, color: COLORS.primary, bold: true, align: "center", valign: "middle"
 });
 
 // INTERPRETIVE TEXT (right side)
 slide.addText("What to take away", {
-  x: 6.2, y: 1.15, w: 3.3, h: 0.35,
+  x: 6.2, y: 1.45, w: 3.3, h: 0.35,
   fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: COLORS.accent, bold: true
 });
 
@@ -267,7 +267,7 @@ slide.addText([
   { text: "Heterogeneity: effects are 3.5× larger for Q1 vs Q4", options: { bullet: true, breakLine: true } },
   { text: "Precision: 95% CI = [14%, 22%] for pooled estimate", options: { bullet: true, breakLine: true } },
 ], {
-  x: 6.2, y: 1.55, w: 3.3, h: 2.5,
+  x: 6.2, y: 1.85, w: 3.3, h: 2.5,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 12
 });
@@ -294,14 +294,14 @@ slide.addText("Administrative earnings records, Social Security Administration (
 ```javascript
 // Action title
 slide.addText("Results support a skill-formation pathway: the earnings effect is fully mediated\nby cognitive scores at age 8, not by schooling attainment", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.9,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
 
 // Interpretation
 slide.addText("Interpretation", {
-  x: MARGIN, y: 1.2, w: 9.0, h: 0.35,
+  x: MARGIN, y: 1.5, w: 9.0, h: 0.35,
   fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: COLORS.accent, bold: true
 });
 
@@ -309,14 +309,14 @@ slide.addText([
   { text: "Consistent with Cunha-Heckman (2007) skill complementarity: early investment compounds through the schooling years.", options: { bullet: true, breakLine: true } },
   { text: "Schooling channel: coefficient falls to zero when conditioning on age-8 cognitive score (mediation analysis, Appendix C).", options: { bullet: true, breakLine: true } },
 ], {
-  x: MARGIN, y: 1.6, w: 9.0, h: 1.3,
+  x: MARGIN, y: 1.9, w: 9.0, h: 1.3,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 10
 });
 
 // Main limitation — address it directly
 slide.addText("Main limitation", {
-  x: MARGIN, y: 3.0, w: 9.0, h: 0.35,
+  x: MARGIN, y: 3.3, w: 9.0, h: 0.35,
   fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: COLORS.accent, bold: true
 });
 
@@ -326,7 +326,7 @@ slide.addText([
   { text: "Partial identification: ", options: { bullet: true, bold: true, breakLine: false } },
   { text: "earnings records unavailable for 11% of cohort (attrition analysis → Appendix D).", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 3.4, w: 9.0, h: 1.3,
+  x: MARGIN, y: 3.7, w: 9.0, h: 1.3,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 10
 });
@@ -346,7 +346,7 @@ slide.background = { color: COLORS.primary };
 
 // Action title stating the overall conclusion (not a bare "Conclusions" label)
 slide.addText("Early intervention raises adult earnings most for the poorest children", {
-  x: MARGIN, y: 0.25, w: 9.0, h: 0.5,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.5,
   fontSize: FONTS.title, fontFace: FONTS.face, color: "FFFFFF", bold: true, align: "left"
 });
 
@@ -360,7 +360,7 @@ slide.addText([
   { text: "3. The pathway is cognitive, not schooling-mediated: ", options: { bold: true, breakLine: false } },
   { text: "consistent with skill complementarity models.", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 0.85, w: 9.0, h: 3.5,
+  x: MARGIN, y: 1.1, w: 9.0, h: 3.5,
   fontSize: FONTS.body + 1, fontFace: FONTS.face, color: "FFFFFF",
   paraSpaceAfter: 20
 });
@@ -372,7 +372,7 @@ slide.addText("<author email>  |  Working paper: <short link>", {
 });
 
 // Optional QR code (add as image)
-// slide.addImage({ path: "qr_preprint.png", x: 8.5, y: 4.5, w: 0.9, h: 0.9 });
+// slide.addImage({ path: "qr_preprint.png", x: 8.5, y: 4.7, w: 0.9, h: 0.9 });
 ```
 
 ---
@@ -410,7 +410,7 @@ A persistent row of section labels at the top of each content slide: labels only
 const sections = ["Motivation", "Data", "Strategy", "Results", "Discussion"];
 const currentSection = "Results";  // Changes per slide
 
-const rowY = 0.0;
+const rowY = MARGIN;
 const rowH = 0.28;
 
 // Section labels — the active one takes the accent colour and bold weight, nothing else
@@ -426,7 +426,7 @@ sections.forEach((section, i) => {
   });
 });
 
-// Shift all other content down by rowH to avoid collision
+// Shift all other content down by rowH to clear the row
 // (adjust y coordinates in the rest of the slide by +rowH)
 ```
 
@@ -440,7 +440,7 @@ sections.forEach((section, i) => {
 slide.background = { color: COLORS.bg };
 
 slide.addText("References", {
-  x: MARGIN, y: 0.2, w: 9.0, h: 0.5,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.5,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
@@ -457,7 +457,7 @@ const refItems = refs.flatMap((r, i) => [
 ]);
 
 slide.addText(refItems, {
-  x: MARGIN, y: 0.85, w: 9.0, h: 4.5,
+  x: MARGIN, y: 1.15, w: 9.0, h: 4.2,
   fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 8
 });
@@ -472,13 +472,13 @@ slide.addText(refItems, {
 ```javascript
 // Appendix label — muted to distinguish from main deck
 slide.addText("Appendix B — Robustness Checks", {
-  x: MARGIN, y: 0.15, w: 9.0, h: 0.4,
-  fontSize: 14, fontFace: FONTS.face, color: COLORS.muted, bold: false, italics: true
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.4,
+  fontSize: 14, fontFace: FONTS.face, color: COLORS.muted, bold: false, italic: true
 });
 
 // Action title (still required — appendix slides also use action titles)
 slide.addText("Earnings effect is stable across bandwidth choices and polynomial specifications", {
-  x: MARGIN, y: 0.6, w: 9.0, h: 0.75,
+  x: MARGIN, y: 1.0, w: 9.0, h: 0.75,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
