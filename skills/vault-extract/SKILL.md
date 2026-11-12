@@ -33,13 +33,13 @@ If any check fails:
 - **Do NOT synthesize empty values. Do NOT guess. Do NOT proceed to write.**
 - User must fix summary.md and re-run. `inbox-process` must re-emit summary with correct fields when the summary came from an inbox item.
 
-## Concurrent Extraction and Fact Fidelity
+## Extraction Fidelity and Concurrent Writers
 
-When several agents or sessions extract from the same sources in one pass, these three rules decide how the pages divide:
+These rules govern every extraction:
 
-1. **One writer per entity page.** Assign each entity (person, organization, project, document, contract) to one writer. Every other writer links to that page from the notes it owns and writes only the pages it owns.
-2. **Key facts stay verbatim.** Quote numbers, dates, amounts, contract terms and named obligations exactly as the source states them, with the source path on the same line. Keep analysis in a separate `## Synthesis` section of the note.
-3. **Conflicts stay conflicts.** When two sources disagree on a value, record both values with their sources; `## Synthesis` may say which source is later or more authoritative, and both attributed values remain.
+1. **Key facts stay verbatim.** Quote numbers, dates, amounts, contract terms and named obligations exactly as the source states them, with the source path on the same line. Keep analysis in a separate `## Synthesis` section of the note.
+2. **Conflicts stay conflicts.** When two sources disagree on a value, record both values with their sources; `## Synthesis` may say which source is later or more authoritative, and both attributed values remain.
+3. **One writer per entity page**, when more than one agent or session extracts from the same sources in one pass: assign each entity (person, organization, project, document, contract) to one writer, and every other writer links to that page from the notes it owns and writes only the pages it owns. Owners create their entity pages at the start of the pass, and another writer adds its link only after that create succeeded; vmem refuses a new unresolved wiki link (V03), so until then it records the pending link and adds it when the pass completes.
 
 ## Process
 
@@ -64,7 +64,7 @@ When several agents or sessions extract from the same sources in one pass, these
      `relatedTasks`), preserve those origins in the
      note's source / Relevant Notes; emit a `[[wiki-link]]` only for targets that
      resolve (consistent with the MOC dead-link gate above)
-   - Body: the insight with context
+   - Body: the insight with context, with quoted facts and `## Synthesis` placed per §Extraction Fidelity and Concurrent Writers
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
 6. **Pre-validate, write, and read the receipt** (MANDATORY):

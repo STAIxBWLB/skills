@@ -124,7 +124,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 
 ### Step 3: Confirm
 - User selects which proposals to execute
-- When several agents or sessions execute one batch, follow `/vault-extract` §Concurrent Extraction and Fact Fidelity before the first write
+- Follow `/vault-extract` §Extraction Fidelity and Concurrent Writers on every extraction; its one-writer rule applies when several agents or sessions execute one batch
 - For each confirmed proposal:
   1. Read the source document fully
   2. **create** proposals: extract insights per `/vault-extract` methodology → create vault note(s) → update relevant MOCs
