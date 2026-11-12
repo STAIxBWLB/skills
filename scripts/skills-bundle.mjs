@@ -295,6 +295,13 @@ function verify(root = repoRoot) {
       errors.push(`frontmatter name "${fm.get("name")}" != directory "${entry.name}"`);
     }
     if (!fm.has("description")) errors.push(`frontmatter description missing: ${skillMd}`);
+    // A plain (unquoted) YAML scalar cannot contain ": "; hosts that parse frontmatter as YAML refuse the skill.
+    for (const [key, value] of fm) {
+      // Skip node properties (&anchor, !tag); a quoted, block or flow value is not a plain scalar.
+      // In a plain scalar " #" starts a comment, and ":" followed by space or end of value is invalid.
+      const v = value.replace(/^(?:[&!]\S*\s+)*/, "");
+      if (!/^["'|>[{]/.test(v) && /:(\s|$)/.test(v.replace(/(^|\s)#.*$/, ""))) errors.push(`frontmatter ${key} has an unquoted ": " (invalid YAML; quote the value): ${skillMd}`);
+    }
   }
 
   // Every skill directory on disk is listed in the manifest.

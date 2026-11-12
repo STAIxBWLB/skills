@@ -1,7 +1,7 @@
 ---
 name: vault-refactor
 trigger: /vault-refactor
-description: Restructure notes: split, merge, rename with vault-wide link rewrite, reorganize MOCs, promote topic MOCs (with mandatory approval gate)
+description: "Restructure notes: split, merge, rename with vault-wide link rewrite, reorganize MOCs, promote topic MOCs (with mandatory approval gate)"
 ---
 
 # /vault-refactor [target]
