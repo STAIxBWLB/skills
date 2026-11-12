@@ -14,9 +14,9 @@ from tqdm import tqdm
 @lru_cache(maxsize=1)
 def _find_hwp_cli():
     """agent-hwp(Rust) 바이너리 탐색.
-    우선순위: $HWP_CLI → PATH의 ahwp → PATH의 hwp(호환 이름), 각각 `cat --help` 종료 코드 0으로 검증.
-    호환 이름 'hwp'는 (구) hwp-toolkit 래퍼와 충돌하므로 PATH 후보는 'cat' 서브커맨드
-    유무로 검증해 오인 호출을 막는다."""
+    우선순위: $HWP_CLI(실행 가능 파일이면 그대로 사용) → PATH의 ahwp → PATH의 hwp(v1.6.0 이전 릴리스 이름).
+    이름 'hwp'는 (구) hwp-toolkit 래퍼와 충돌하므로 PATH 후보는 `cat --help` 종료 코드 0으로
+    검증해 오인 호출을 막는다."""
     env = os.environ.get("HWP_CLI")
     if env and Path(env).is_file() and os.access(env, os.X_OK):
         return env
