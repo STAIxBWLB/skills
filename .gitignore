@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+.agenthub/state/
+.agenthub/config.local.json
+.agenthub/routing.local.toml
