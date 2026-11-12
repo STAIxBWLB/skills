@@ -9,11 +9,12 @@ Answer "what vmem runs here and is it healthy" in one report. Every step is read
 
 ## Process
 
-1. **Build**: run `vmem --version`. Read `requires.vmem` from `manifest.json` at the bundle root (beside `lib/`) and compare; when it cannot be read, report the floor as unknown. Below the floor, the vault skills in this bundle stop; say so.
+1. **Build**: run `vmem --version`. Read `requires.vmem` from the bundle's `manifest.json`, `../../manifest.json` from this skill directory's real (symlink-resolved) path, and compare; when it cannot be read, report the floor as unknown. Below the floor, the vault skills in this bundle stop; say so.
 2. **Other installs**: list every `vmem` on PATH (`which -a vmem`, `where vmem` on Windows) and run `--version` on each distinct resolved file. When versions differ, the lower one is stale. A stale install that runs is replaced by fixing PATH order or removing it; a stale shadowed install runs whenever PATH order changes, so remove it.
 3. **Registry**: run `vmem status --json`. Take `version`, `home`, `source`, `healthy`, and per vault `id`, `kind`, `write`, `pii`, `healthy`, `path`.
-4. **Doctor**: run `vmem doctor --json`. Its top-level `healthy` and exit code (1 means unhealthy, a finding to report, not a failure of this skill) are the verdict. Report each vault with `healthy: false` and its `issue`, each `checks.<name>` with `ok: false` and its `issue`, each `specs[]` entry with `healthy: false` and its `issue`, and each vault's `tidy` (pending migration) as a warning.
-5. **MCP**: when the vmem MCP tools are available, call `vmem_status`. A vault list that differs from step 3 means the MCP server runs another build or home; report it.
+4. **Doctor**: run `vmem doctor --json`. Its top-level `healthy` and exit code (1 means unhealthy, a finding to report, not a failure of this skill) are the verdict. Report each vault with `healthy: false` and its `issue`, each `vaults[].checks.<name>` with `ok: false` and its `issue`, each `specs[]` entry with `healthy: false` and its `issue`, and each vault's `tidy` (pending migration) as a warning.
+5. **Leftovers**: run `vmem recover --json` without `--confirm`; it only previews. Report a stale registry lock or leftover temporary files it lists.
+6. **MCP**: when the vmem MCP tools are available, call `vmem_status`. A vault list that differs from step 3 means the MCP server runs another build or home; report it.
 
 ## Output
 
@@ -21,4 +22,4 @@ Answer "what vmem runs here and is it healthy" in one report. Every step is read
 - Other installs with versions, only when step 2 found any.
 - Vaults table: id, kind, write, pii, health, path.
 - Doctor failures and tidy warnings from step 4; "healthy" only when doctor's `healthy` is true.
-- At most one next action with its command: upgrade below the floor, the repair a doctor `issue` names, `vmem tidy <vault> --all` (preview) for pending migration, or removing a stale install with the package manager that owns it.
+- At most one next action with its command: upgrade below the floor, the repair a doctor `issue` names, `vmem recover --confirm` for what step 5 listed, `vmem tidy <vault> --all` (preview) for pending migration, or removing a stale install with the package manager that owns it.
