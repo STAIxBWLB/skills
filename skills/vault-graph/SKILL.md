@@ -2,18 +2,17 @@
 name: vault-graph
 trigger: /vault-graph
 description: >
-  지식그래프 빌드·분석·질의 스킬. vault 그래프와 workspace 레이어는 `vmem graph build`가,
-  코드 AST 그래프는 graphify CLI(`graphify update`)가 빌드한다. 커뮤니티 탐지, god node 분석, surprising connections, graphify MCP serve
-  안내를 제공한다.
+  지식그래프 빌드·분석·질의 스킬. vault 그래프와 workspace 레이어를 `vmem graph build`로 빌드한다.
+  커뮤니티 탐지, god node 분석, surprising connections를 제공한다.
 ---
 
 # /vault-graph [command]
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 >
-> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic Leiden communities, `--workspace` and the vmem-backed queries (`neighbors`, `orphans`, `backlinks`, `stale`) need it. Only a code-repository build (`--code`) runs without vmem.
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic Leiden communities, `--workspace` and the vmem-backed queries (`neighbors`, `orphans`, `backlinks`, `stale`) need it.
 
-Knowledge graph build, query, report, and Graphify MCP setup for vault notes and code repos.
+Knowledge graph build, query, and report for vault notes and the workspace layer. No code graph and no graph MCP server.
 
 `vault-graph` owns the graph workflow.
 
@@ -22,10 +21,6 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 | Item | Path |
 |------|------|
 | Vault/workspace builder | `vmem graph build <vault> [--workspace]` (MCP `vmem_graph_build`) |
-| Code builder | `<skill-dir>/scripts/run.sh -m graphify update <path>` (`<skill-dir>` = this skill's installed directory; the runner resolves graphify from the shared skills runtime) |
-| Python | the interpreter `scripts/run.sh` resolves (host-injected runtime env first, then the shared runtime env) |
-| Skill runner (graphify query) | `<skill-dir>/scripts/run.sh` |
-| graphifyignore template | the workspace's graphifyignore template (path from the workspace config; ask when none is set) |
 
 ## Commands
 
@@ -54,21 +49,16 @@ Knowledge graph build, query, report, and Graphify MCP setup for vault notes and
 Options:
 - `--vault`: build the vault graph
 - `--workspace`: build the vault layer **plus** the work operational layer → `workspace-graph.json`
-- `--code <path>`: build a code repository graph
-- `<target>`: a wiki vault directory takes the `--vault` route; any other directory takes `--code`
 
 1. Execute:
    ```bash
    vmem graph build <vault>               # --vault (MCP: vmem_graph_build)
    vmem graph build <vault> --workspace   # --workspace (MCP: vmem_graph_build workspace: true)
-   <skill-dir>/scripts/run.sh -m graphify update <path>    # --code
    ```
-   For code builds, ensure `<path>/.graphifyignore` exists first. If missing, offer to copy the workspace graphifyignore template.
-2. Pipeline: read notes/code → extract graph → deterministic Leiden community detection → god node analysis → surprising connections → report. vmem's graph block carries `partitioner: "leiden"` and its report prints the same name, so use Leiden everywhere (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지).
+2. Pipeline: read notes → extract graph → deterministic Leiden community detection → god node analysis → surprising connections → report. vmem's graph block carries `partitioner: "leiden"` and its report prints the same name, so use Leiden everywhere (MOCs and business-unit hubs excluded). 커뮤니티 제목은 **anchor 노트**(degree 최대 멤버)로 붙고 정수 id는 "do not cite" 줄에만 남는다(빌드마다 재배정되므로 인용 금지).
 3. Outputs:
    - vault: `<vault.path>/reports/vault-graph.json`, `<vault.path>/reports/graph-report-YYMMDD.md` (+ `graph-trend.md` 행 추가, 구 리포트 보존)
    - workspace: `<vault.path>/reports/workspace-graph.json` only (no report or trend row; the result lists the work counters)
-   - code: `<path>/graphify-out/graph.json`, `<path>/graphify-out/GRAPH_REPORT.md`
 4. vmem writes the vault and workspace outputs and records the GRAPH event itself; add no log line. A build whose receipt is `ok: false` names the rule that stopped it; stop and report it.
    The weekly ritual is a **single** vault build, run by the workspace's weekly job (`--workspace` is on-demand only). Order: build → lint → vault push → work pointer bump.
 
@@ -88,56 +78,22 @@ vmem graph neighbors <vault> <stem> --hops 1 --limit 50     # CLI
 
 ## Report Process (`/vault-graph report [target]`)
 
-1. Resolve report directory:
-   - vault: `<vault.path>/reports/graph-report-*.md`
-   - code: `<target>/graphify-out/GRAPH_REPORT.md`
+1. Resolve report directory: `<vault.path>/reports/graph-report-*.md`.
 2. Select newest report and warn if older than 7 days.
-3. Read vault reports with `vmem_read_file` and code reports through filesystem read.
+3. Read it with `vmem_read_file`.
 4. Summarize overview, god nodes, top communities, surprising connections, and isolate count.
 
 ## Query Process (`/vault-graph query "<question>" [options]`)
 
-Use graphify query against the selected `graph.json`.
+An ad-hoc graph question is a vmem read, never a pass over `graph.json`. Pick the read that matches the question:
 
-```bash
-<skill-dir>/scripts/run.sh \
-  -m graphify query "<question>" \
-  --graph <graph.json> [--dfs] [--budget N]
-```
-
-Options:
-- `--graph <path>`: override graph path
-- `--dfs`: use DFS instead of BFS
-- `--budget N`: token budget, default 2000
-
-## Setup Process (`/vault-graph setup [path]`)
-
-1. Resolve target path, default current directory.
-2. If `.graphifyignore` is missing, copy the workspace graphifyignore template to `<target>/.graphifyignore`.
-3. Run `/vault-graph build --code <target>`.
-4. For large projects, optionally add project graph MCP config.
-
-## Serve Process (`/vault-graph serve [graph_path]`)
-
-1. Resolve `graph.json`, default `<vault.path>/reports/vault-graph.json`.
-2. If missing, run `/vault-graph build` first.
-3. Print MCP config block:
-   ```json
-   {
-     "<project-name>-graph": {
-       "command": "<python resolved by scripts/run.sh>",
-       "args": ["-c", "from graphify.serve import serve; serve('<graph_path>')"]
-     }
-   }
-   ```
-
-## Query Process (legacy)
-Superseded by the vmem reads above: an ad-hoc query maps to `vmem_search`, `vmem_links`, `vmem_graph_neighbors` or `vmem_lint` rather than a ripgrep pass over `notes/`, and a question none of them answers is a question for `/vault-graph build` plus the report. Keep this list only to recognise an old request:
-1. Parse query type and parameters
-2. Scan vault/notes/ for wiki links and frontmatter
-3. Build an in-memory graph representation
-4. Execute query
-5. Format results
+| Question | Read |
+|---|---|
+| open question about a topic | `vmem_brief` with the question as `intent` |
+| words that must appear in a note | `vmem_search` |
+| what surrounds one note | `vmem_graph_neighbors` (`hops: 2`, optional `relation`) |
+| what links to one note | `vmem_links` with `direction: "in"` |
+| vault-wide shape (hubs, communities, cross-community links) | latest graph report, after `/vault-graph build` when it is stale |
 
 ## Integration
 
