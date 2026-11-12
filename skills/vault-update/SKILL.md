@@ -19,8 +19,7 @@ Update a note with new information while preserving original meaning. This is th
 2. Identify what's changed (new context, superseded info, additional evidence)
 3. Draft the update:
    - preserve core insight
-   - a revised value that came from a source keeps the earlier value and its source beside it, e.g. `amount 3,000,000 (source: work/<contract>.md); revised 4,000,000 (source: work/<minutes>.md)`, so the note carries both attributions
-   - add new content in an explicit section (e.g., `## Update YYYY-MM-DD`) OR inline-revise with preservation
+   - add new content in an explicit section (e.g., `## Update YYYY-MM-DD`) OR inline-revise with preservation: a revised value that came from a source keeps the earlier value and its source beside it, e.g. `amount 3,000,000 (source: work/<contract>.md); revised 4,000,000 (source: work/<minutes>.md)`
 4. Apply via vmem:
    - minor edit → `vmem_patch(path, oldString, newString, expectedSha)`
    - new section → `vmem_append(path, section: "Update YYYY-MM-DD", markdown)`

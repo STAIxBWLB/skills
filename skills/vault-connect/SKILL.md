@@ -21,7 +21,7 @@ Find relationships between a note and existing vault notes, create wiki links.
    b. `vmem_graph_neighbors(path: "<stem>", hops: 1)` returns the note's community and its one-hop neighbours (each node carries `community` and `degree`, so rank by degree); widen with `hops: 2` or narrow with `relation` (`wiki_link` or one typed relation). expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note.
    c. Obsidian Smart Connections 플러그인이 활성 상태면 대상 노트의 semantic neighbors 상위 5개를 추가 연결 후보로 포함 (키워드 매칭으로 놓치는 cross-domain 연결 보완)
    d. 위 후보를 Step 2의 검색 결과와 병합 (중복 제거)
-1. Read the target note completely (`vmem_read`; `vmem_links` shows its current in/out links)
+1. Read the target note completely (`vmem_read`; `vmem_links` shows its current in/out links; on a page you own, each in-link that lacks a back-link is a link candidate for step 3)
 2. Search vault/notes/ for related notes by:
    - **entities_hint first pass** (if provided): for each entity name, run `vmem_brief(intent: "<entity>", bytes: 1024)` and confirm a hit with `vmem_search`; its pointers already cover `glossary`, `people` and note titles, so no manual grep of those notes. These are highest-priority link candidates since they're pre-identified by summaries or source metadata.
    - **Backref seeds** (if present in target frontmatter): `relatedMeetings`, `relatedTasks`, `source_doc` / `meetingSourcePath` are pre-identified origins — treat their resolved `[[targets]]` as high-priority bidirectional link candidates.
@@ -64,13 +64,12 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 ## Quality Gates
 
 - Every connection must have stated reasoning
-- Bidirectional: if A links to B, B should link to A, except on a page whose owner adds the back-link itself (step 3)
+- Bidirectional: if A links to B, B should link to A, except a one-way link a non-owner wrote into a page another writer owns (step 3)
 - Don't force connections — quality over quantity
 - **CONNECT event appended to log for every run with ≥1 link created**
 
 ## Output
 - List of connections made with reasoning
-- One-way links written into pages another writer owns, for the owner's back-link (`/vault-extract` §Extraction Fidelity and Concurrent Writers rule 3)
 - Cross-domain patterns noted (if any)
 - Updated MOCs (if any)
 - log append status
