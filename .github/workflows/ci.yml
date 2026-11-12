@@ -11,6 +11,11 @@ on:
 permissions:
   contents: read
 
+# A new push to the same PR supersedes the running check.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     name: make skills-verify

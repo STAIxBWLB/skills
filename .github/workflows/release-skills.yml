@@ -76,15 +76,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          NOTES="Rolling channel for Maru OTA skill bundles. Assets are immutable and consumed by the app; the release workflow keeps the newest 10 revisions and prunes older ones. Do not edit or delete by hand."
           if ! gh release view skills-channel >/dev/null 2>&1; then
             gh release create skills-channel \
               --prerelease --latest=false \
               --title "Skills bundle channel" \
-              --notes "Rolling channel for Maru OTA skill bundles. Assets are immutable and consumed by the app; do not edit or delete."
+              --notes "$NOTES"
           fi
           # Re-assert on every run so a manual edit can never flip this
-          # channel to "latest".
-          gh release edit skills-channel --prerelease --latest=false
+          # channel to "latest" and the notes match the prune policy.
+          gh release edit skills-channel --prerelease --latest=false --notes "$NOTES"
 
       - name: Upload immutable assets
         env:
@@ -103,3 +104,20 @@ jobs:
           for file in dist-skills/*.zip dist-skills/*.zip.sig dist-skills/*.json.sig dist-skills/*.json; do
             gh release upload skills-channel "$file"
           done
+
+      - name: Prune old revisions (keep newest 10)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The app applies only the highest revision, so older bundles are
+          # dead weight. Keep the newest 10 revisions and always the current
+          # one; names that do not parse as maru-skills-r<rev>- are never
+          # touched (see scripts/prune-channel.py).
+          gh release view skills-channel --json assets > assets.json
+          python3 scripts/prune-channel.py --keep 10 --current "${{ github.run_id }}" < assets.json > prune.txt
+          echo "Pruning $(wc -l < prune.txt) assets"
+          while IFS= read -r name; do
+            [ -n "$name" ] || continue
+            gh release delete-asset skills-channel "$name" -y
+          done < prune.txt

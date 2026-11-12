@@ -17,7 +17,8 @@ Guidance for AI agents working in this repository.
   Do not add executables that assume a specific machine; portable
   Python/Node helpers go in `lib/` or `envs/default/`.
 - Releases are automatic on push to `main` (see README.md). Never hand-edit
-  the `skills-channel` prerelease or its assets.
+  the `skills-channel` prerelease or its assets; the release workflow
+  prunes all but the newest 10 revisions.
 - `minAppVersion` in `manifest.json` changes only when a bundle needs newer
   app code, and is coordinated with a Maru app release.
 - Commit messages: Conventional Commits, English (e.g.
