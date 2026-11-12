@@ -328,6 +328,15 @@
       ]
     },
     {
+      "name": "vmem-status",
+      "path": "skills/vmem-status",
+      "tier": "core",
+      "tags": [
+        "vault",
+        "vmem"
+      ]
+    },
+    {
       "name": "xlsx-toolkit",
       "path": "skills/xlsx-toolkit",
       "tier": "core",
