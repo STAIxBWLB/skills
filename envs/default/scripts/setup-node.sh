@@ -13,12 +13,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"          # skills/envs/default
+ENV_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"          # envs/default
 
 NODE_MAJOR="${NODE_MAJOR:-22}"                      # LTS line (override via env)
 
 # Optional target ($1): install Node at <target>/node (or at <target> when it
-# already ends in /node). Default: skills/envs/default/node (dev/source location).
+# already ends in /node). Default: envs/default/node (dev/source location).
 if [[ -n "${1:-}" ]]; then
   case "$1" in
     */node) NODE_DIR="$1" ;;

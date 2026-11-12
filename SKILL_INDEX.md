@@ -7,7 +7,8 @@ sync with it.
 ## Runtime And Shared Helpers
 
 - `envs/default/` — shared Python/Node runtime scaffold for document, graph, and workspace skills.
-- `lib/vault_adapter.md` — shared vault access policy for Obsidian MCP workflows.
+- `lib/vault_adapter.md` — vault access contract for vault-facing skills (vmem tools).
+- `lib/scratchpad_adapter.md` — scratchpad path contract for skills that read or write scratchpad collections.
 
 ## Skills
 
@@ -27,4 +28,4 @@ sync with it.
 
 Skills are installed by the Maru app (Skills UI) or `maru skills sync`;
 deployment ships through the `skills-channel` OTA bundle. See
-`skills/README.md` for the pipeline.
+`README.md` (Release flow) for the pipeline.
