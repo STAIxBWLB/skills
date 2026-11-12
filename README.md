@@ -48,8 +48,10 @@ uploaded bundle is invisible to clients.
 
 - **Revision** = GitHub `run_id`, globally increasing; clients apply only
   `revision > installed`.
-- **Assets are immutable.** Never edit or delete them; publish a new
-  revision instead.
+- **Assets are immutable.** Never edit or delete them by hand; publish a
+  new revision instead. After each upload the workflow deletes every
+  revision except the newest 10 (`scripts/prune-channel.py`); the app only
+  applies the highest revision.
 - **`minAppVersion`** (`manifest.json`) gates which apps may apply a
   bundle. Bump it only when a bundle genuinely needs newer app code.
 - **`requires`** (`manifest.json`, copied into the metadata JSON) holds the
