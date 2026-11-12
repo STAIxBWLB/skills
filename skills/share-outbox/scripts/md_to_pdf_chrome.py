@@ -3,7 +3,7 @@
 
 Outgoing-PDF path for share-outbox: renders Markdown to HTML with a print
 stylesheet, then prints it with Chrome headless. Browser print paginates
-tables row-by-row with repeating header rows, unlike the hwp-cli PDF
+tables row-by-row with repeating header rows, unlike the agent-hwp PDF
 renderer, which silently drops every table row after a page boundary.
 
 Runs on the bundled env's markdown-it-py (no python-markdown dependency).

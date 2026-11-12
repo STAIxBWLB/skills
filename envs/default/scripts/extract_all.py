@@ -12,21 +12,22 @@ from tqdm import tqdm
 
 @lru_cache(maxsize=1)
 def _find_hwp_cli():
-    """hwp-cli(Rust) 'hwp' 바이너리 탐색.
-    우선순위: $HWP_CLI → PATH의 hwp 릴리스 바이너리(`hwp cat --help` 종료 코드 0으로 검증).
-    바이너리 이름 'hwp'는 (구) hwp-toolkit 래퍼와 충돌하므로 PATH 후보는 'cat' 서브커맨드
+    """agent-hwp(Rust) 바이너리 탐색.
+    우선순위: $HWP_CLI → PATH의 ahwp → PATH의 hwp(호환 이름), 각각 `cat --help` 종료 코드 0으로 검증.
+    호환 이름 'hwp'는 (구) hwp-toolkit 래퍼와 충돌하므로 PATH 후보는 'cat' 서브커맨드
     유무로 검증해 오인 호출을 막는다."""
     env = os.environ.get("HWP_CLI")
     if env and Path(env).is_file() and os.access(env, os.X_OK):
         return env
-    path_hwp = shutil.which("hwp")
-    if path_hwp and _is_hwp_cli(path_hwp):
-        return path_hwp
+    for name in ("ahwp", "hwp"):
+        found = shutil.which(name)
+        if found and _is_hwp_cli(found):
+            return found
     return None
 
 
 def _is_hwp_cli(binary: str) -> bool:
-    """주어진 'hwp'가 hwp-cli(Rust)인지 확인 (구 hwp-toolkit 래퍼 배제). hwp-cli만 'cat' 서브커맨드를 가짐."""
+    """주어진 바이너리가 agent-hwp(Rust)인지 확인 (구 hwp-toolkit 래퍼 배제). agent-hwp만 'cat' 서브커맨드를 가짐."""
     try:
         r = subprocess.run([binary, "cat", "--help"], capture_output=True, timeout=5)
         return r.returncode == 0
@@ -35,33 +36,37 @@ def _is_hwp_cli(binary: str) -> bool:
 
 
 def extract_via_hwp_cli(filepath: Path, fmt: str = "plain") -> str:
-    """hwp-cli로 .hwp/.hwpx 텍스트 추출. stdout만 사용(경고는 stderr이므로 무시).
+    """agent-hwp로 .hwp/.hwpx 텍스트 추출. stdout만 사용(경고는 stderr이므로 무시).
     미설치·비정상 종료·빈 출력 시 예외를 던져 호출부의 폴백을 유도한다."""
     binary = _find_hwp_cli()
     if not binary:
-        raise FileNotFoundError("hwp-cli('hwp') not found")
+        raise FileNotFoundError(
+            "agent-hwp not found (tried $HWP_CLI, 'ahwp', 'hwp' on PATH). "
+            "Install agent-hwp (https://github.com/STAIxBWLB/agent-hwp/releases) "
+            "or set HWP_CLI to the ahwp binary path."
+        )
     r = subprocess.run(
         [binary, "cat", str(filepath), "--format", fmt],
         capture_output=True, timeout=120,
     )
     if r.returncode != 0:
-        raise RuntimeError(f"hwp cat failed (rc={r.returncode})")
+        raise RuntimeError(f"{Path(binary).name} cat failed (rc={r.returncode})")
     text = r.stdout.decode("utf-8", errors="ignore")
     if not text.strip():
-        raise ValueError("hwp cat produced empty output")
+        raise ValueError(f"{Path(binary).name} cat produced empty output")
     return text
 
 
 def extract_hwp(filepath: Path) -> str:
     """HWP v5 파일에서 텍스트 추출
-    1순위: hwp-cli (Rust 'hwp cat', 빠르고 외부 의존성 없음)
+    1순위: agent-hwp (Rust 'ahwp cat', 빠르고 외부 의존성 없음)
     2순위: libhwp (Rust 기반)
     3순위: pyhwp hwp5txt (정확, 제어코드 없음)
     4순위: olefile 직접 파싱 (최후 수단)
     """
     import sys
 
-    # 1순위: hwp-cli
+    # 1순위: agent-hwp
     try:
         return extract_via_hwp_cli(filepath, fmt="plain")
     except Exception:
@@ -119,10 +124,10 @@ def extract_hwp(filepath: Path) -> str:
 
 def extract_hwpx(filepath: Path) -> str:
     """HWPX 파일에서 텍스트 추출
-    1순위: hwp-cli (Rust 'hwp cat')
+    1순위: agent-hwp (Rust 'ahwp cat')
     2순위: zipfile + BeautifulSoup (단락 구분 보존)
     """
-    # 1순위: hwp-cli
+    # 1순위: agent-hwp
     try:
         return extract_via_hwp_cli(filepath, fmt="plain")
     except Exception:
