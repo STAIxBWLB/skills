@@ -44,7 +44,12 @@ def run(fn, path):
 
 
 def main():
-    tmp = Path(tempfile.mkdtemp())
+    with tempfile.TemporaryDirectory() as d:
+        check(Path(d))
+    print("ok")
+
+
+def check(tmp):
     hwpx = tmp / "doc.hwpx"
     with zipfile.ZipFile(hwpx, "w") as z:
         z.writestr("Contents/section0.xml", HWPX_XML)
@@ -75,7 +80,6 @@ def main():
     out, err = run(ea.extract_hwpx, hwpx)
     assert out == "fallback text", out
     assert ea.ENGINE_MISSING_MESSAGE not in err, err
-    print("ok")
 
 
 if __name__ == "__main__":

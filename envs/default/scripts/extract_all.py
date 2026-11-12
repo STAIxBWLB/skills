@@ -47,8 +47,8 @@ ENGINE_MISSING_MESSAGE = (
 def _report_engine_missing() -> None:
     """엔진 부재를 stderr에 한 번만 알린다. 호출부가 폴백을 위해 예외를 삼켜도
     사용자는 설치 방법을 보게 된다."""
-    print(f"warning: {ENGINE_MISSING_MESSAGE} Falling back to built-in parsers.",
-          file=sys.stderr)
+    tqdm.write(f"warning: {ENGINE_MISSING_MESSAGE} Falling back to built-in parsers.",
+               file=sys.stderr)
 
 
 def extract_via_hwp_cli(filepath: Path, fmt: str = "plain") -> str:
