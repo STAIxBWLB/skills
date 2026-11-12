@@ -39,7 +39,7 @@ These rules govern every extraction:
 
 1. **Key facts stay verbatim.** Quote numbers, dates, amounts, contract terms and named obligations exactly as the source states them, with the source path on the same line. Keep analysis in a separate `## Synthesis` section of the note.
 2. **Conflicts stay conflicts.** When two sources disagree on a value, record both values with their sources; `## Synthesis` may say which source is later or more authoritative, and both attributed values remain.
-3. **One writer per entity page**, when more than one agent or session extracts from the same sources in one pass: assign each entity (person, organization, project, document, contract) to one writer, and every other writer links to that page from the notes it owns and writes only the pages it owns. Owners create their entity pages at the start of the pass, and another writer adds its link only after that create succeeded; vmem refuses a new unresolved wiki link (V03), so until then it records the pending link and adds it when the pass completes.
+3. **One writer per entity page**, when more than one agent or session writes vault notes in one pass: assign each entity (person, organization, project, document, contract) to one writer, and every other writer links to that page from the notes it owns and writes only the pages it owns. Owners create, or confirm the existence of, their entity pages at the start of the pass, and another writer adds its link only after that create succeeded; vmem refuses a new unresolved wiki link (V03), so until then it records the pending link as plain text in the run output (never as a `[[link]]` in a note), adds it once the target resolves, and reports it as unresolved if the owner's create never succeeds.
 
 ## Process
 
