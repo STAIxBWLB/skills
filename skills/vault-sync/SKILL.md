@@ -124,6 +124,7 @@ Accept: [a]ll, [1-4] select, [s]kip, [q]uit
 
 ### Step 3: Confirm
 - User selects which proposals to execute
+- Follow `/vault-extract` §Extraction Fidelity and Concurrent Writers on every extraction; its one-writer rule's condition, stated in that rule, decides when it applies
 - For each confirmed proposal:
   1. Read the source document fully
   2. **create** proposals: extract insights per `/vault-extract` methodology → create vault note(s) → update relevant MOCs
