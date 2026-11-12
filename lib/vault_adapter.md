@@ -26,7 +26,7 @@ At the start of a vault-facing workflow:
    - `ssot.ingest_chain` (log TYPE set and normalization table)
 3. If a key is missing, ask for the workspace-local value instead of hardcoding a personal path.
 4. Bind the vmem vault id: run `vmem vaults list --json` and take the id whose `path` equals the canonical `vault.path`. Pass that id as `vault` on **every** vmem call. If no registered vault matches, or more than one does, stop and report it; an omitted `vault` falls back to the first personal vault, which may be a different vault.
-5. Confirm the installed vmem meets this bundle's floor: `manifest.json` declares `requires.vmem: >=0.7.0`, so run `vmem --version` before the first call. The receipt rule under §Write results needs 0.6.0 and `vmem_brief` starts at 0.7.0; on an older build stop and report the upgrade instead of substituting a different tool.
+5. Confirm the installed vmem meets this bundle's floor: `manifest.json` declares `requires.vmem: >=0.8.0`, so run `vmem --version` before the first call. The receipt rule under §Write results needs 0.6.0, `vmem_brief` starts at 0.7.0 and `vmem_graph_path` at 0.8.0; on an older build stop and report the upgrade instead of substituting a different tool.
 
 ## Access Rules
 
@@ -59,7 +59,7 @@ Typical mappings:
 | Read note / several notes | `vmem_read` (frontmatter, body, sha256), `vmem_read_many` (<=20) |
 | Search / list | `vmem_search`, `vmem_list` (page with the returned `nextCursor` as `cursor`) |
 | Read / list non-note files | `vmem_read_file`, `vmem_list_files` |
-| Links / neighbourhood | `vmem_links` (out, in or both, each dead link with at most one `suggested` target), `vmem_graph_neighbors` (`hops` 1–2, `limit` 1–500, `relation`; each node carries `community` and `degree`). Neighbour or community questions never read `reports/vault-graph.json` or the graph report |
+| Links / neighbourhood | `vmem_links` (out, in or both, each dead link with at most one `suggested` target), `vmem_graph_neighbors` (`hops` 1–2, `limit` 1–500, `relation`; each node carries `community` and `degree`), `vmem_graph_path` (`from`/`to` stems, `maxHops` 1–6 default 6, `relation`, `viaHubs`; `found: false` when no route within `maxHops`). Neighbour, path or community questions never read `reports/vault-graph.json` or the graph report |
 | Create note | `vmem_create` |
 | Edit body | `vmem_patch` (exact old/new text, or `edits` for up to 32 at once), `vmem_append` (into an H2 section) |
 | Edit frontmatter or tags | `vmem_set_frontmatter` |

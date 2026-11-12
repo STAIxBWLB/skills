@@ -32,6 +32,7 @@ Find relationships between a note and existing vault notes, create wiki links.
    - Project affinity via registry: if source is from work/, classify it per `lib/vault_adapter.md` §Project Registry Pattern (scoring and fallback), then prioritize sibling notes sharing the same `vault_note` topic as connection candidates
 3. For each discovered relationship:
    - Determine relationship type (supports, contradicts, extends, applies-to, context-for)
+   - **Existing short path**: when the proposed link joins two notes that already sit close together, read `vmem_graph_path(from: "<x>", to: "<y>", maxHops: 3)` and show the hops beside the proposal (`x -[supports]-> m -[context-for]-> y`, 2 hops), in the same step and with no extra approval gate. `found: false` means no short route to show (raise `maxHops` to 6, or set `viaHubs` for a route through a MOC).
    - `vmem_link(from, to, relation, context, log: {type: "CONNECT", project, source: "notes/<x>.md", dest: "notes/<y>.md", note: "linked [[y]] (<relation>)"})` adds the typed link to both notes (bidirectional by default) and skips a side that already links the target
    - expect: vmem refuses a relation outside `supports | contradicts | extends | applies-to | context-for` and an unknown or ambiguous note; an already-linked pair returns `unchanged: true`
 4. Update relevant MOCs if new connections span topics (`vmem_append` into the MOC's list section)
