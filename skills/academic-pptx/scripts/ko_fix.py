@@ -1,22 +1,30 @@
 """Korean layout fix for a written .pptx.
 
-Usage: python ko_fix.py deck.pptx [--font "Noto Sans CJK KR"] [-o out.pptx]
+Usage: python3 ko_fix.py deck.pptx [--font "Noto Sans CJK KR"] [-o out.pptx]
 
-- Re-tags runs written as lang="en-US" to lang="ko-KR" (altLang="en-US").
+- Re-tags runs written as lang="en-US" to lang="ko-KR" (altLang="en-US"), in
+  slides, layouts, masters, charts and speaker notes.
   PowerPoint then wraps Hangul at word boundaries instead of mid-word.
 - With --font, sets the theme's East Asian (<a:ea>) and Hangul (script="Hang")
   fonts, which pptxgenjs leaves empty, so Hangul does not fall back to the host default.
-Rewrites the deck in place unless -o is given. Runs its self-checks first.
+Rewrites the deck in place unless -o is given, keeping the deck's file mode.
+Runs its self-checks first.
 """
 import argparse
 import os
 import re
+import stat
 import tempfile
 import zipfile
 from xml.sax.saxutils import quoteattr
 
-TEXT_PARTS = re.compile(r"ppt/(slides|slideLayouts|slideMasters|charts)/[^/]+\.xml$")
+TEXT_PARTS = re.compile(r"ppt/(slides|slideLayouts|slideMasters|charts|notesSlides)/[^/]+\.xml$")
 THEME_PART = re.compile(r"ppt/theme/theme\d+\.xml$")
+
+
+def copy_mode(src: str, dst: str) -> None:
+    """Give dst the mode src has: a rewritten deck keeps its permissions (0600 otherwise)."""
+    os.chmod(dst, stat.S_IMODE(os.stat(src).st_mode))
 
 
 def retag(xml: str) -> str:
@@ -47,6 +55,19 @@ def selftest():
     assert set_theme_font(t2, "F").count('typeface="F"') == 2
     assert 'typeface="A &amp; B"' in set_theme_font(t, "A & B")
 
+    # Speaker notes carry runs too, so they are retagged with the slides.
+    assert TEXT_PARTS.match("ppt/notesSlides/notesSlide2.xml")
+    assert not TEXT_PARTS.match("ppt/notesSlides/_rels/notesSlide2.xml.rels")
+
+    # A rewritten deck keeps the mode it arrived with instead of mkstemp's 0600.
+    with tempfile.TemporaryDirectory() as d:
+        src, dst = os.path.join(d, "src.pptx"), os.path.join(d, "dst.pptx")
+        for p in (src, dst):
+            open(p, "w").close()
+        os.chmod(src, 0o640)
+        copy_mode(src, dst)
+        assert stat.S_IMODE(os.stat(dst).st_mode) == 0o640
+
 
 def main():
     selftest()
@@ -70,6 +91,7 @@ def main():
                 elif a.font and THEME_PART.match(item.filename):
                     data = set_theme_font(data.decode("utf-8"), a.font).encode("utf-8")
                 zo.writestr(item, data)
+        copy_mode(a.deck, tmp)
         os.replace(tmp, out)
     except BaseException:
         os.remove(tmp)

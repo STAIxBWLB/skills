@@ -22,7 +22,7 @@ const COLORS = {
 
 const FONTS = {
   face: "Noto Sans KR",  // Single Hangul-capable typeface throughout (see SKILL.md)
-  title: 26,             // Action title: 24–28 pt
+  title: 26,             // Action title: 26–28 pt
   sectionHeader: 22,     // Within-slide section headers
   body: 20,              // Body bullets: 20 pt minimum
   label: 16,             // Chart annotations, inline labels
@@ -52,14 +52,14 @@ slide.addText("Treatment effect of early childhood interventions\npersists into 
 // Subtitle / conference context
 slide.addText("Annual Conference of the Society for Labor Economics  ·  May 2025", {
   x: 0.7, y: 3.2, w: 8.6, h: 0.4,
-  fontSize: 16, fontFace: FONTS.face, color: "A0BBDD",
+  fontSize: 16, fontFace: FONTS.face, color: "FFFFFF",
   align: "left"
 });
 
 // Author and affiliation
-slide.addText("Jane Smith¹  ·  John Doe²\n¹ University of X   ²aboratory for Y", {
+slide.addText("Jane Smith¹  ·  John Doe²\n¹ University of X   ² Laboratory for Y", {
   x: 0.7, y: 3.7, w: 8.6, h: 0.6,
-  fontSize: 15, fontFace: FONTS.face, color: "CADCFC",
+  fontSize: 15, fontFace: FONTS.face, color: "FFFFFF",
   align: "left"
 });
 
@@ -121,7 +121,7 @@ slide.addText("This paper asks: do early childhood effects persist to age 35,\na
 // Research question in a prominent callout box
 slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
   x: 1.5, y: 1.4, w: 7.0, h: 1.6,
-  fill: { color: "EBF3FA" }, line: { color: COLORS.accent, width: 1.5 }, rectRadius: 0.1
+  fill: { color: COLORS.bg }, line: { color: COLORS.accent, width: 1.5 }, rectRadius: 0.1
 });
 
 slide.addText("Do effects of the X program on cognitive and socio-emotional skills\nat age 8 persist to age 35 outcomes (earnings, health, crime),\nand does the pathway run through skills or through schooling attainment?", {
@@ -231,15 +231,15 @@ slide.addChart(pres.charts.BAR, [{
   chartArea: { fill: { color: COLORS.bg } },
   catAxisLabelColor: COLORS.muted,
   valAxisLabelColor: COLORS.muted,
-  valGridLine: { color: "E2E8F0", size: 0.5 },
+  valGridLine: { color: COLORS.muted, size: 0.5 },
   catGridLine: { style: "none" },
   showValue: true,
-  dataLabelColor: "1E293B",
+  dataLabelColor: COLORS.body,
   showLegend: false,
   valAxisTitle: "Log earnings effect (%)",
   showValAxisTitle: true,
   valAxisTitleColor: COLORS.muted,
-  valAxisTitleFontSize: 12,
+  valAxisTitleFontSize: FONTS.label,
 });
 
 // KEY FINDING ANNOTATION — tell the audience exactly what to see
@@ -362,10 +362,10 @@ slide.addText([
   paraSpaceAfter: 20
 });
 
-// Contact + link
+// Contact + link (this slide stays up during Q&A, so the contact is read here, not on a slide after it)
 slide.addText("<author email>  |  Working paper: <short link>", {
   x: MARGIN, y: 4.8, w: 7.0, h: 0.4,
-  fontSize: 14, fontFace: FONTS.face, color: "A0BBDD", align: "left"
+  fontSize: 14, fontFace: FONTS.face, color: "FFFFFF", align: "left"
 });
 
 // Optional QR code (add as image)
@@ -379,13 +379,13 @@ slide.addText("<author email>  |  Working paper: <short link>", {
 **Purpose:** Orient the audience at the start of each major section.
 
 ```javascript
-// Use same dark treatment as title/conclusions
-slide.background = { color: "1A3A5C" };  // Slightly lighter navy for variety
+// Use same dark treatment as title/conclusions — the palette's primary, no extra navy
+slide.background = { color: COLORS.primary };
 
 // Section number / label
 slide.addText("Part 2", {
   x: MARGIN, y: 1.8, w: 9.0, h: 0.4,
-  fontSize: 16, fontFace: FONTS.face, color: "7BAFD4", bold: false, align: "left"
+  fontSize: FONTS.sectionHeader, fontFace: FONTS.face, color: "FFFFFF", bold: false, align: "left"
 });
 
 // Section title
@@ -400,7 +400,7 @@ slide.addText("Empirical Strategy", {
 
 ## 9. Breadcrumb Bar (optional, for long talks)
 
-A persistent header strip showing the current section. Add to every content slide for talks > 15 minutes.
+A persistent row of section labels at the top of each content slide: labels only, no bar fill and no underline, since decoration is out. Add to every content slide for talks > 15 minutes.
 
 ```javascript
 // Add to each slide after the title/divider set
@@ -410,30 +410,17 @@ const currentSection = "Results";  // Changes per slide
 const barY = 0.0;
 const barH = 0.28;
 
-// Background bar
-slide.addShape(pres.shapes.RECTANGLE, {
-  x: 0, y: barY, w: 10, h: barH,
-  fill: { color: "F0F4F8" }, line: { color: "F0F4F8" }
-});
-
-// Section labels
+// Section labels — the active one takes the accent colour and bold weight, nothing else
 const sectionW = 10 / sections.length;
 sections.forEach((section, i) => {
   const isActive = section === currentSection;
   slide.addText(section, {
     x: i * sectionW, y: barY, w: sectionW, h: barH,
-    fontSize: 10, fontFace: FONTS.face,
+    fontSize: FONTS.cite, fontFace: FONTS.face,
     color: isActive ? COLORS.accent : COLORS.muted,
     bold: isActive,
     align: "center", valign: "middle"
   });
-  // Active section underline
-  if (isActive) {
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: i * sectionW + sectionW * 0.1, y: barY + barH - 0.04, w: sectionW * 0.8, h: 0.04,
-      fill: { color: COLORS.accent }
-    });
-  }
 });
 
 // Shift all other content down by barH to avoid collision
@@ -451,7 +438,7 @@ slide.background = { color: COLORS.bg };
 
 slide.addText("References", {
   x: MARGIN, y: 0.2, w: 9.0, h: 0.5,
-  fontSize: 24, fontFace: FONTS.face, color: COLORS.primary, bold: true
+  fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
 
@@ -489,7 +476,7 @@ slide.addText("Appendix B — Robustness Checks", {
 // Action title (still required — appendix slides also use action titles)
 slide.addText("Earnings effect is stable across bandwidth choices and polynomial specifications", {
   x: MARGIN, y: 0.6, w: 9.0, h: 0.75,
-  fontSize: FONTS.title - 2, fontFace: FONTS.face, color: COLORS.primary, bold: true
+  fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
 // Content follows normal slide patterns
@@ -507,7 +494,7 @@ slide.addText("Earnings effect is stable across bandwidth choices and polynomial
 □ Every borrowed figure/data point: in-slide citation
 □ References slide: complete, consistently formatted
 □ Conclusions slide: last main slide, stays on screen during Q&A
-□ Contact info / QR code on conclusions or final slide
+□ Contact info / QR code on the conclusions slide
 □ Body text ≥ 20 pt throughout
 □ No slide has > ~40 words of body text
 □ Appendix slides labeled, with pre-built Q&A answers

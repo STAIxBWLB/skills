@@ -46,21 +46,21 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
 - **Word wrap and fonts**: pptxgenjs tags every run `en-US`, so PowerPoint splits Hangul mid-word, and it leaves the theme's Hangul font slots empty. After `writeFile()` (and the pptx skill's theme step), run:
 
   ```bash
-  python scripts/ko_fix.py deck.pptx --font "<the theme font>"
+  python3 scripts/ko_fix.py deck.pptx --font "<the theme font>"
   ```
 
-  It re-tags runs `ko-KR` (PowerPoint then wraps at word boundaries) and sets the theme's East Asian and Hangul fonts. Run it after every rebuild.
+  It re-tags runs `ko-KR` in slides and speaker notes (PowerPoint then wraps at word boundaries) and sets the theme's East Asian and Hangul fonts. Run it after every rebuild.
 
 ## Step 4: Build and QA
 
 1. Build per the pptx skill as a structured deck, then run `ko_fix.py` for Korean text.
 2. **File QA**: the pptx skill's `validate.py`. **Content QA**: its text extraction script; check order, typos and leftover placeholders.
-3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-*.png` (zero-padded numbers) through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
+3. **Visual QA**: `bash scripts/render_powerpoint.sh deck.pptx` writes `deck.pdf` and `deck-slide-*.png` (zero-padded numbers) through Microsoft PowerPoint for Mac. Look at every image, looking for: Korean words split across lines, titles over two lines, text overflow or clipping, chart data labels touching bars or each other, citations colliding with content, uneven gaps. Fix in the generator, rebuild, rerun `ko_fix.py`, re-render the deck and recheck the changed slides. Exit code 3 means no PowerPoint and exit code 4 means no `pdftoppm` on this host: report visual QA as unverified. LibreOffice is not a substitute renderer.
 4. **Academic QA**:
    - every content slide has an action title, and the ghost deck test passes
    - one exhibit per results slide, each with its "so what" marked on the exhibit
    - every borrowed figure or data point is cited on its slide
-   - the Conclusions slide is the last main slide (it stays up during Q&A), with contact details; References follows it as back matter (sources include tools, models and datasets used, not only papers), then any appendix
+   - the deck ends in the order `references/content_guidelines.md` §Deck Architecture states: Conclusions last among the main slides, carrying the contact details and staying up during Q&A, then References as back matter (sources include tools, models and datasets used, not only papers), then any appendix
    - body text ≥ 20 pt; no decorative elements; section dividers or a breadcrumb bar in decks over 15 slides
 
 ## Key principles
