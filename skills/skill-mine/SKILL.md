@@ -11,7 +11,7 @@ description: >
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as the `<vault>` argument of the `vmem` CLI command (or `vault` on `vmem_skills_mine`).
 >
-> Before that call, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `skill-mine needs vmem >= 0.7.0 (found <version, or "no vmem">)`: this bundle's vault contract needs 0.7.0.
+> Before that call, run `vmem --version`. If it fails or prints a version below 0.8.0, stop and report `skill-mine needs vmem >= 0.8.0 (found <version, or "no vmem">)`: this bundle's vault contract needs 0.8.0.
 
 ## 언제 사용
 

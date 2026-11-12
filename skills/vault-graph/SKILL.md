@@ -10,7 +10,7 @@ description: >
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 >
-> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.7.0, stop and report `vault-graph build needs vmem >= 0.7.0 (found <version, or "no vmem">)`: the deterministic Leiden communities, `--workspace` and the vmem-backed queries (`neighbors`, `orphans`, `backlinks`, `stale`) need it.
+> Before a vault or workspace build, run `vmem --version`. If it fails or prints a version below 0.8.0, stop and report `vault-graph build needs vmem >= 0.8.0 (found <version, or "no vmem">)`: the deterministic Leiden communities, `--workspace`, the vmem-backed queries (`neighbors`, `orphans`, `backlinks`, `stale`) and the shortest path between two notes (`path`, vmem 0.8.0) need it.
 
 Knowledge graph build, query, and report for vault notes and the workspace layer. No code graph and no graph MCP server.
 
@@ -39,6 +39,7 @@ Knowledge graph build, query, and report for vault notes and the workspace layer
   - `vault/reports/graph-report-YYMMDD.md` (audit report; 구 리포트는 보존되고 `graph-trend.md`에 빌드마다 행 1개가 추가된다)
 - **build --workspace**: Add the work operational layer → `vault/reports/workspace-graph.json` (vault-graph.json untouched; no report written). **On demand only**; the weekly ritual does not build it. See below.
 - **neighbors [note]**: 1-hop neighborhood + community of a note through `vmem_graph_neighbors` (no build, no report or `vault-graph.json` read).
+- **path [note-a] [note-b]**: shortest link path between two notes through `vmem_graph_path` (no build, no report or `vault-graph.json` read)
 - **report**: Read the latest graph report (if < 7 days old)
 - **communities**: List detected communities from latest build
 - **surprises**: List cross-community surprising connections
@@ -76,6 +77,20 @@ vmem graph neighbors <vault> <stem> --hops 1 --limit 50     # CLI
 - Backlinks, orphans and staleness come from vmem too: `vmem_links(path, direction: "in")`, `vmem_lint` L03, and `vmem_list` `mtime` — never a ripgrep pass over `notes/`.
 - expect: vmem refuses `hops` outside 1–2, a `limit` outside 1–500, an unknown `relation` and an unknown note.
 
+## Path Process (`/vault-graph path <note-a> <note-b>`)
+
+Shortest link path between two notes, read through `vmem_graph_path`, which builds the graph from the current index on each call (no report read, no `jq`, no rebuild).
+
+```text
+vmem_graph_path(from: "<stem-a>", to: "<stem-b>", maxHops: 6)                        # MCP
+vmem graph path <vault> <stem-a> <stem-b> [--max-hops 1..6] [--relation REL] [--via-hubs] [--json]   # CLI
+```
+
+- The walk is undirected BFS with neighbours visited in code-point order, so the same pair and options always return the same path. The result carries `found`, `length` in hops, the ordered `nodes` and the `edges` between them (each edge keeping its `relation`).
+- `maxHops` is 1–6 and defaults to 6: a pair farther apart than that comes back `found: false`, not as an error.
+- `viaHubs` is off by default, so `moc` and `bu` hubs are not intermediate steps; set it when the only route runs through a MOC. `relation` (`wiki_link` or one typed relation) narrows the edge set.
+- expect: vmem refuses `maxHops` outside 1–6, an unknown `relation` (`use wiki_link or supports, contradicts, extends, applies-to, context-for`), and an unknown `from` or `to` note. `from` equal to `to` returns `found: true, length: 0`; a pair with no route within `maxHops` returns `found: false` with `length: 0` and empty `nodes`/`edges`, a result and not a refusal.
+
 ## Report Process (`/vault-graph report [target]`)
 
 1. Resolve report directory: `<vault.path>/reports/graph-report-*.md`.
@@ -93,6 +108,7 @@ An ad-hoc graph question is a vmem read, never a pass over `graph.json`. Pick th
 | words that must appear in a note | `vmem_search` |
 | what surrounds one note | `vmem_graph_neighbors` (`hops: 2`, optional `relation`) |
 | what links to one note | `vmem_links` with `direction: "in"` |
+| how two notes are connected | `vmem_graph_path` (`from`/`to` stems; `maxHops` 1–6, `relation`, `viaHubs`) |
 | vault-wide shape (hubs, communities, cross-community links) | latest graph report, after `/vault-graph build` when it is stale |
 
 ## Integration
