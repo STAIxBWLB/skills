@@ -33,6 +33,14 @@ If any check fails:
 - **Do NOT synthesize empty values. Do NOT guess. Do NOT proceed to write.**
 - User must fix summary.md and re-run. `inbox-process` must re-emit summary with correct fields when the summary came from an inbox item.
 
+## Concurrent Extraction and Fact Fidelity
+
+When several agents or sessions extract from the same sources in one pass, these three rules decide how the pages divide:
+
+1. **One writer per entity page.** Assign each entity (person, organization, project, document, contract) to one writer. Every other writer links to that page from the notes it owns and writes only the pages it owns.
+2. **Key facts stay verbatim.** Quote numbers, dates, amounts, contract terms and named obligations exactly as the source states them, with the source path on the same line. Keep analysis in a separate `## Synthesis` section of the note.
+3. **Conflicts stay conflicts.** When two sources disagree on a value, record both values with their sources; `## Synthesis` may say which source is later or more authoritative, and both attributed values remain.
+
 ## Process
 
 1. Read the source document completely
