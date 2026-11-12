@@ -297,7 +297,7 @@ function verify(root = repoRoot) {
     if (!fm.has("description")) errors.push(`frontmatter description missing: ${skillMd}`);
     // A plain (unquoted) YAML scalar cannot contain ": "; hosts that parse frontmatter as YAML refuse the skill.
     for (const [key, value] of fm) {
-      if (!/^["'|>]/.test(value) && value.includes(": ")) errors.push(`frontmatter ${key} has an unquoted ": " (invalid YAML; quote the value): ${skillMd}`);
+      if (!/^["'|>[{]/.test(value) && value.includes(": ")) errors.push(`frontmatter ${key} has an unquoted ": " (invalid YAML; quote the value): ${skillMd}`);
     }
   }
 
