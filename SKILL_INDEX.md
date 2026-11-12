@@ -9,7 +9,7 @@ sync with it.
 - `envs/default/` — shared Python/Node runtime scaffold for document, graph, and workspace skills.
 - `lib/vault_adapter.md` — shared vault access policy for Obsidian MCP workflows.
 
-## Skills (37)
+## Skills
 
 - Document toolkits: `pptx-toolkit`, `xlsx-toolkit`, `md2docx`
 - Korean writing: `gaejosik`, `yunmun`
