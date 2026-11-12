@@ -3,6 +3,7 @@
 import os
 import shutil
 import subprocess
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -35,16 +36,29 @@ def _is_hwp_cli(binary: str) -> bool:
         return False
 
 
+ENGINE_MISSING_MESSAGE = (
+    "agent-hwp not found (tried $HWP_CLI, 'ahwp', 'hwp' on PATH). "
+    "Install agent-hwp (https://github.com/STAIxBWLB/agent-hwp/releases) "
+    "or set HWP_CLI to the ahwp binary path."
+)
+
+
+@lru_cache(maxsize=1)
+def _report_engine_missing() -> None:
+    """엔진 부재를 stderr에 한 번만 알린다. 호출부가 폴백을 위해 예외를 삼켜도
+    사용자는 설치 방법을 보게 된다."""
+    print(f"warning: {ENGINE_MISSING_MESSAGE} Falling back to built-in parsers.",
+          file=sys.stderr)
+
+
 def extract_via_hwp_cli(filepath: Path, fmt: str = "plain") -> str:
     """agent-hwp로 .hwp/.hwpx 텍스트 추출. stdout만 사용(경고는 stderr이므로 무시).
-    미설치·비정상 종료·빈 출력 시 예외를 던져 호출부의 폴백을 유도한다."""
+    미설치·비정상 종료·빈 출력 시 예외를 던져 호출부의 폴백을 유도한다.
+    미설치는 예외와 별도로 stderr에 한 번 보고한다."""
     binary = _find_hwp_cli()
     if not binary:
-        raise FileNotFoundError(
-            "agent-hwp not found (tried $HWP_CLI, 'ahwp', 'hwp' on PATH). "
-            "Install agent-hwp (https://github.com/STAIxBWLB/agent-hwp/releases) "
-            "or set HWP_CLI to the ahwp binary path."
-        )
+        _report_engine_missing()
+        raise FileNotFoundError(ENGINE_MISSING_MESSAGE)
     r = subprocess.run(
         [binary, "cat", str(filepath), "--format", fmt],
         capture_output=True, timeout=120,
