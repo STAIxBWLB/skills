@@ -70,6 +70,7 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 
 ## Output
 - List of connections made with reasoning
+- One-way links written into pages another writer owns, for the owner's back-link (`/vault-extract` §Extraction Fidelity and Concurrent Writers rule 3)
 - Cross-domain patterns noted (if any)
 - Updated MOCs (if any)
 - log append status
