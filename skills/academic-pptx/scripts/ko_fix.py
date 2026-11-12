@@ -60,13 +60,14 @@ def selftest():
     assert not TEXT_PARTS.match("ppt/notesSlides/_rels/notesSlide2.xml.rels")
 
     # A rewritten deck keeps the mode it arrived with instead of mkstemp's 0600.
+    # Compared against the source, not a literal: Windows os.chmod only toggles read-only.
     with tempfile.TemporaryDirectory() as d:
         src, dst = os.path.join(d, "src.pptx"), os.path.join(d, "dst.pptx")
         for p in (src, dst):
             open(p, "w").close()
         os.chmod(src, 0o640)
         copy_mode(src, dst)
-        assert stat.S_IMODE(os.stat(dst).st_mode) == 0o640
+        assert stat.S_IMODE(os.stat(dst).st_mode) == stat.S_IMODE(os.stat(src).st_mode)
 
 
 def main():

@@ -172,6 +172,7 @@ Required slides for a complete academic presentation, in order:
 
 ### References
 - Complete citations for all sources cited in the deck
+- The sources include the tools, models and datasets the work used, not only papers
 
 ### Appendix (clearly labeled)
 - Pre-built Q&A slides anticipating likely audience questions

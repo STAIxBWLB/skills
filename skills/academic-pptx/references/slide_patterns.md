@@ -231,10 +231,13 @@ slide.addChart(pres.charts.BAR, [{
   chartArea: { fill: { color: COLORS.bg } },
   catAxisLabelColor: COLORS.muted,
   valAxisLabelColor: COLORS.muted,
-  valGridLine: { color: COLORS.muted, size: 0.5 },
+  catAxisLabelFontSize: FONTS.label,
+  valAxisLabelFontSize: FONTS.label,
+  valGridLine: { style: "none" },
   catGridLine: { style: "none" },
   showValue: true,
   dataLabelColor: COLORS.body,
+  dataLabelFontSize: FONTS.label,
   showLegend: false,
   valAxisTitle: "Log earnings effect (%)",
   showValAxisTitle: true,
@@ -398,24 +401,24 @@ slide.addText("Empirical Strategy", {
 
 ---
 
-## 9. Breadcrumb Bar (optional, for long talks)
+## 9. Breadcrumb Row (optional, for long talks)
 
-A persistent row of section labels at the top of each content slide: labels only, no bar fill and no underline, since decoration is out. Add to every content slide for talks > 15 minutes.
+A persistent row of section labels at the top of each content slide: labels only, no fill and no underline, since decoration is out. Add to every content slide for talks > 15 minutes.
 
 ```javascript
 // Add to each slide after the title/divider set
 const sections = ["Motivation", "Data", "Strategy", "Results", "Discussion"];
 const currentSection = "Results";  // Changes per slide
 
-const barY = 0.0;
-const barH = 0.28;
+const rowY = 0.0;
+const rowH = 0.28;
 
 // Section labels — the active one takes the accent colour and bold weight, nothing else
 const sectionW = 10 / sections.length;
 sections.forEach((section, i) => {
   const isActive = section === currentSection;
   slide.addText(section, {
-    x: i * sectionW, y: barY, w: sectionW, h: barH,
+    x: i * sectionW, y: rowY, w: sectionW, h: rowH,
     fontSize: FONTS.cite, fontFace: FONTS.face,
     color: isActive ? COLORS.accent : COLORS.muted,
     bold: isActive,
@@ -423,8 +426,8 @@ sections.forEach((section, i) => {
   });
 });
 
-// Shift all other content down by barH to avoid collision
-// (adjust y coordinates in the rest of the slide by +barH)
+// Shift all other content down by rowH to avoid collision
+// (adjust y coordinates in the rest of the slide by +rowH)
 ```
 
 ---
@@ -455,7 +458,7 @@ const refItems = refs.flatMap((r, i) => [
 
 slide.addText(refItems, {
   x: MARGIN, y: 0.85, w: 9.0, h: 4.5,
-  fontSize: 13, fontFace: FONTS.face, color: COLORS.body,
+  fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 8
 });
 ```

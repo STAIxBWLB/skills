@@ -60,8 +60,8 @@ Each rule answers a failure seen when the upstream rules were applied to a Korea
    - every content slide has an action title, and the ghost deck test passes
    - one exhibit per results slide, each with its "so what" marked on the exhibit
    - every borrowed figure or data point is cited on its slide
-   - the deck ends in the order `references/content_guidelines.md` §Deck Architecture states: Conclusions last among the main slides, carrying the contact details and staying up during Q&A, then References as back matter (sources include tools, models and datasets used, not only papers), then any appendix
-   - body text ≥ 20 pt; no decorative elements; section dividers or a breadcrumb bar in decks over 15 slides
+   - the deck ends in the order `references/content_guidelines.md` §Deck Architecture states
+   - body text ≥ 20 pt; no decorative elements; section dividers or a breadcrumb row in decks over 15 slides
 
 ## Key principles
 
