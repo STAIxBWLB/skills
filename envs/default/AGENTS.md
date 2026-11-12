@@ -1,6 +1,6 @@
 # 문서 처리 프로젝트 (skills/env)
 
-HWP·PDF 파일 처리를 위한 skills repo-local runtime scaffold. Claude Code에서 자동으로 로드됨.
+HWP·PDF 파일 처리를 위한 skills repo-local runtime scaffold. 구조·env 해소·hook 정본: `REFERENCE.md`.
 
 ## 환경 설정
 

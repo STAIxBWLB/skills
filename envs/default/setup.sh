@@ -13,14 +13,14 @@ Usage: $0 [options]
 Options:
   --target PATH   Create runtime environment at PATH (default: this env directory)
   --dry-run       Show actions without changing the environment
-  --verify        Check venv/node/jre health at PATH and exit (no changes)
+  --verify        Check venv/node health at PATH and exit (no changes)
   -h, --help      Show help
 EOF
 }
 
-# Health check: venv importable + node docx + bundled jre (jdk.compiler).
-# The canonical setup target carries all three runtime surfaces:
-# .venv, node_modules, and jre.
+# Health check: venv importable + node docx.
+# The canonical setup target carries both runtime surfaces:
+# .venv and node_modules.
 verify_runtimes() {
     local target="$1" ok=0 py jre c
     echo "🔍 Maru 런타임 헬스체크: $target"

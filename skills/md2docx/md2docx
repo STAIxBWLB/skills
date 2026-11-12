@@ -10,7 +10,7 @@
 #   ./md2docx <file.md> --header "Running header"      (override) | --no-header
 #
 # Resolves the Maru env Node runtime + sets NODE_PATH so the bundled `docx`
-# package (~/.maru/env/node_modules) is importable. See skills/envs/default/REFERENCE.md.
+# package (~/.maru/env/node_modules) is importable. See envs/default/REFERENCE.md.
 
 set -e
 

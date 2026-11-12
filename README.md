@@ -24,16 +24,13 @@ Repo plumbing (`scripts/`, `.github/`, `Makefile`, `package.json`,
 
 ## Add or change a skill
 
-1. Edit `skills/<name>/SKILL.md`. Frontmatter `name` must equal the
-   directory name; `description` is required.
-2. A new skill also needs a `manifest.json` entry
-   (`{name, path: "skills/<name>", tier, tags}`) and a `SKILL_INDEX.md` line.
-3. `make skills-verify` — manifest/directory agreement, frontmatter,
-   tracked-inventory rules (NFC filenames, no symlinks, no runtime junk),
-   the vmem tool contract (`scripts/check-vmem-tools.mjs`: every `vmem_*`
-   name in the bundle must exist in the checked-in `vmem manifest --json`
-   snapshot `scripts/fixtures/vmem-manifest-<version>.json`),
-   plus warnings for workspace-private references in shipped text.
+1. Edit `skills/<name>/SKILL.md`. A new skill also needs a `manifest.json`
+   entry (`{name, path: "skills/<name>", tier, tags}`) and a
+   `SKILL_INDEX.md` line.
+2. Follow the authoring rules in [`AGENTS.md`](AGENTS.md) (frontmatter,
+   Skill authoring, public-safe and host-neutral text).
+3. Run `make skills-verify`; [`AGENTS.md`](AGENTS.md) (Verification) states
+   what it enforces and what a pass prints.
 4. PR to `main`. Merge triggers the publish workflow; there is nothing
    else to do.
 
@@ -87,9 +84,5 @@ this repo (a Claude Code skills catalog) is archived on the
 
 ## HWPX authoring migration
 
-Retired HWPX authoring content is unified in the released agent-hwp CLI's exported
-`hwp/` skill tree. The minimum supported release is `v1.2.0`; the binary is
-`ahwp` from `v1.6.0` and `hwp` on earlier releases. Select a
-versioned released binary rather than a checkout or unversioned PATH binary.
-See [the retirement migration guide](docs/hwpx-retirement.md) for the native
-command crosswalk, stale-install ownership checks, and rollback boundary.
+The retired `hwpx` skill moved to the released agent-hwp CLI's exported `hwp`
+skill; see [the retirement migration guide](docs/hwpx-retirement.md).

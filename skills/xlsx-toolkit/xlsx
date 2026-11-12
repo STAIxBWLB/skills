@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 # Resolve the Maru skills python interpreter, most-specific first.
 # Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV,
 # then the canonical ~/.maru/env, then a repo-local walk-up (dev-in-tree).
-# Canonical snippet — keep in sync with skills/envs/default/REFERENCE.md.
+# Canonical snippet — keep in sync with envs/default/REFERENCE.md.
 find_env_python() {
     local c dir
     if [ -n "${SKILL_PYTHON:-}" ] && [ -x "${SKILL_PYTHON}" ]; then
