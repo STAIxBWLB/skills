@@ -8,7 +8,7 @@ description: Refresh an outdated note with new context while preserving core ins
 
 > Before the first vmem call, read `lib/vault_adapter.md` §Runtime Discovery and bind the vmem vault id for the workspace `vault.path`; pass it as `vault` on every vmem tool call and as the `<vault>` argument of every `vmem` CLI command.
 
-Update a note with new information while preserving original meaning. This is the single-note leaf; batch discovery of notes that need updating is `/vault-sync` (its "update" proposals run this procedure).
+Update a note with new information while preserving original meaning. This is the single-note leaf; batch discovery of notes that need updating is `/vault-sync` (its "update" proposals run this procedure). Every update follows `/vault-extract` §Extraction Fidelity and Concurrent Writers, and step 3 applies its rules to a revision.
 
 ## Input
 - note: filename or path in `notes/`
@@ -19,7 +19,7 @@ Update a note with new information while preserving original meaning. This is th
 2. Identify what's changed (new context, superseded info, additional evidence)
 3. Draft the update:
    - preserve core insight
-   - add new content in an explicit section (e.g., `## Update YYYY-MM-DD`) OR inline-revise with preservation
+   - add new content in an explicit section (e.g., `## Update YYYY-MM-DD`) OR inline-revise with preservation: a revised value that came from a source keeps the earlier value and its source beside it, e.g. `amount 3,000,000 (source: work/<contract>.md); revised 4,000,000 (source: work/<minutes>.md)`
 4. Apply via vmem:
    - minor edit → `vmem_patch(path, oldString, newString, expectedSha)`
    - new section → `vmem_append(path, section: "Update YYYY-MM-DD", markdown)`
