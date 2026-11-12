@@ -85,7 +85,7 @@ this repo (a Claude Code skills catalog) is archived on the
 
 ## HWPX authoring migration
 
-Retired HWPX authoring content is unified in the released `hwp` CLI's exported
+Retired HWPX authoring content is unified in the released agent-hwp (`ahwp`) CLI's exported
 `hwp/` skill tree. The minimum supported release is `v1.2.0`; select a
 versioned released binary rather than a checkout or unversioned PATH binary.
 See [the retirement migration guide](docs/hwpx-retirement.md) for the native

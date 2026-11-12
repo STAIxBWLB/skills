@@ -1,7 +1,7 @@
 # PDF Print Path (Markdown -> HTML -> Chrome headless)
 
 Outgoing PDFs are produced by printing HTML with Chrome, not by rendering
-HWPX. Reason: the hwp-cli PDF renderer cannot continue a table across a page
+HWPX. Reason: the agent-hwp PDF renderer cannot continue a table across a page
 boundary; every row after the boundary is silently dropped (data loss, not
 just visual clipping). Chunking tables only shrinks the loss; it does not
 remove it. The browser print engine paginates tables correctly (rows stay

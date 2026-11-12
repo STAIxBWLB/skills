@@ -46,7 +46,8 @@ skill. The user may scope processing with `inbox-process <channel>`.
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
    - Prefer the native route when its tool is installed: `.hwp`/`.hwpx` via
-     `hwp cat --format markdown`, `.xlsx` via `xlsx-toolkit`, `.pptx` via
+     `ahwp cat --format markdown` (agent-hwp; `hwp` only on releases before
+     `ahwp` existed), `.xlsx` via `xlsx-toolkit`, `.pptx` via
      `pptx-toolkit`.
      `.docx`, `.txt`, `.md`, and `.csv` use the closest installed public
      toolkit or platform reader.

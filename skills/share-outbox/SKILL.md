@@ -79,7 +79,7 @@ Rules:
 - Report both the original source path and the staged output to the user; the
   receipt's `source` records the converted temp file.
 - Do not produce outgoing PDF from HWPX with a bare native renderer: the
-  hwp-cli renderer drops every table row after a page boundary (silent data
+  agent-hwp renderer drops every table row after a page boundary (silent data
   loss with exit 0). The default is the Chrome HTML print path. When no
   Chrome/Chromium is available, stop and ask the user how to proceed.
   Native rendering remains a last resort for table-free documents with

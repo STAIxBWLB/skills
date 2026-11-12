@@ -4,7 +4,7 @@ SKILL.md is the instruction source for this skill. This file is background for m
 
 ## Extraction route for HWP
 
-`.hwp`/`.hwpx` files go through `hwp cat --format markdown` because that output
+`.hwp`/`.hwpx` files go through `ahwp cat --format markdown` because that output
 keeps tables, merged cells and image positions, which plain-text extraction
 loses.
 

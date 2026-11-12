@@ -50,10 +50,10 @@ def extract_via_hwp_cli(filepath: Path, fmt: str = "plain") -> str:
         capture_output=True, timeout=120,
     )
     if r.returncode != 0:
-        raise RuntimeError(f"ahwp cat failed (rc={r.returncode})")
+        raise RuntimeError(f"{Path(binary).name} cat failed (rc={r.returncode})")
     text = r.stdout.decode("utf-8", errors="ignore")
     if not text.strip():
-        raise ValueError("ahwp cat produced empty output")
+        raise ValueError(f"{Path(binary).name} cat produced empty output")
     return text
 
 
