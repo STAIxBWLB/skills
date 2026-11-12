@@ -1,13 +1,15 @@
 #!/bin/bash
 # Render a .pptx through Microsoft PowerPoint for Mac: <deck>.pdf and <deck>-slide-N.png beside the deck.
 # Usage: bash render_powerpoint.sh deck.pptx [dpi]   (dpi default 110)
-# Exit 3: not macOS or PowerPoint missing (report visual QA as unverified).
+# Exit 2: no deck argument. Exit 3: not macOS or PowerPoint missing. Exit 4: pdftoppm missing.
+# Exit 3 and 4 both mean visual QA on this host is unverified.
 # Works inside PowerPoint's sandbox container, so no file-access prompt appears.
 set -euo pipefail
+[ $# -ge 1 ] || { echo "usage: bash render_powerpoint.sh deck.pptx [dpi]" >&2; exit 2; }
 deck=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
 dpi=${2:-110}
 [ "$(uname)" = Darwin ] && [ -d "/Applications/Microsoft PowerPoint.app" ] || { echo "render_powerpoint: needs macOS + Microsoft PowerPoint" >&2; exit 3; }
-command -v pdftoppm >/dev/null || { echo "render_powerpoint: needs pdftoppm (poppler)" >&2; exit 3; }
+command -v pdftoppm >/dev/null || { echo "render_powerpoint: needs pdftoppm (poppler); install poppler" >&2; exit 4; }
 
 box="$HOME/Library/Containers/com.microsoft.Powerpoint/Data/render-tmp"
 name="render-$$.pptx"   # fixed name: the deck name never enters the AppleScript

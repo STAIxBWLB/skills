@@ -164,18 +164,15 @@ Required slides for a complete academic presentation, in order:
 - Connect back to the research question from the opening
 - Address the main limitation(s) directly — pre-empt the audience's objection
 
-### Conclusions (1 slide)
+### Conclusions (1 slide, carrying the contact details)
 - 2–4 bullet points restating the key takeaways
-- **This slide stays on screen during Q&A. It is the last slide the audience sees.**
-- Do NOT follow it with "Thank You" or a blank slide
-
-### Contact / Next Steps (on conclusions slide or a final standalone slide)
-- Email address or affiliation URL
-- QR code or shortened URL linking to slides, preprint, or working paper
+- **This slide stays on screen during Q&A. It is the last slide the audience sees**, so the contact details go on it: email address or affiliation URL, and a QR code or shortened URL to the slides, preprint or working paper
 - "Work in progress — feedback welcome" if appropriate
+- Do NOT follow it with "Thank You", a blank slide, or a contact slide of its own
 
 ### References
 - Complete citations for all sources cited in the deck
+- The sources include the tools, models and datasets the work used, not only papers
 
 ### Appendix (clearly labeled)
 - Pre-built Q&A slides anticipating likely audience questions
