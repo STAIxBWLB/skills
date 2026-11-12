@@ -15,10 +15,11 @@ and v1.0.0's quick-xml 0.41 for RUSTSEC-2026-0194) and adds what Maru now relies
 fill that matched nothing.
 
 Use a versioned release asset and an absolute binary path. A checkout build or
-an unversioned PATH binary is not replacement evidence.
+an unversioned PATH binary is not replacement evidence. The binary is `ahwp`
+from v1.6.0 and `hwp` on earlier releases; 2.0.0 ships only `ahwp`.
 
 ```sh
-HWP_BIN=/absolute/path/to/hwp-v1.2.0/hwp
+HWP_BIN=/absolute/path/to/ahwp-v1.6.0/ahwp   # before v1.6.0: .../hwp-v1.2.0/hwp
 "$HWP_BIN" --version
 "$HWP_BIN" skill export --install claude-code
 "$HWP_BIN" skill export --install codex
@@ -57,7 +58,7 @@ supersedes eligible OTA content without manually editing release assets.
 
 ## Rollback
 
-If a post-retirement regression is found, keep the additive `hwp-cli` v0.12.1
+If a post-retirement regression is found, keep the additive agent-hwp v0.12.1
 release. Revert the skills retirement PR on `main` and let the normal release
 workflow publish a new signed OTA revision. Do not edit or delete immutable
 `skills-channel` assets in place.
