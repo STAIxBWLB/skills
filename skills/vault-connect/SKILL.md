@@ -33,7 +33,7 @@ Find relationships between a note and existing vault notes, create wiki links.
 3. For each discovered relationship:
    - Determine relationship type (supports, contradicts, extends, applies-to, context-for)
    - **Existing short path**: when the proposed link joins two notes that already sit close together, read `vmem_graph_path(from: "<x>", to: "<y>", maxHops: 3)` and show the hops beside the proposal (`x -[supports]-> m -[context-for]-> y`, 2 hops), in the same step and with no extra approval gate. `found: false` means no short route to show (raise `maxHops` to 6, or set `viaHubs` for a route through a MOC).
-   - `vmem_link(from, to, relation, context, log: {type: "CONNECT", project, source: "notes/<x>.md", dest: "notes/<y>.md", note: "linked [[y]] (<relation>)"})` adds the typed link to both notes (bidirectional by default) and skips a side that already links the target
+   - `vmem_link(from, to, relation, context, log: {type: "CONNECT", project, source: "notes/<x>.md", dest: "notes/<y>.md", note: "linked [[y]] (<relation>)"})` adds the typed link to both notes (bidirectional by default) and skips a side that already links the target; when the target is an entity page another writer owns, pass `bidirectional: false` and let its owner add the back-link, per `/vault-extract` §Extraction Fidelity and Concurrent Writers rule 3
    - expect: vmem refuses a relation outside `supports | contradicts | extends | applies-to | context-for` and an unknown or ambiguous note; an already-linked pair returns `unchanged: true`
 4. Update relevant MOCs if new connections span topics (`vmem_append` into the MOC's list section)
 5. **CONNECT events in vault/log** come from each `vmem_link` call (ingest chain audit trail)
@@ -64,7 +64,7 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 ## Quality Gates
 
 - Every connection must have stated reasoning
-- Bidirectional: if A links to B, B should link to A
+- Bidirectional: if A links to B, B should link to A, except on a page whose owner adds the back-link itself (step 3)
 - Don't force connections — quality over quantity
 - **CONNECT event appended to log for every run with ≥1 link created**
 
