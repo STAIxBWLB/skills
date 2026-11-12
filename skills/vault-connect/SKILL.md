@@ -64,7 +64,7 @@ YYYY-MM-DD HH:MM  CONNECT  <project>  <vault/notes/x.md>  — linked `[[a]]`
 ## Quality Gates
 
 - Every connection must have stated reasoning
-- Bidirectional: if A links to B, B should link to A, except a one-way link a non-owner wrote into a page another writer owns (step 3)
+- Bidirectional: if A links to B, B should link to A, except a link this run wrote with `bidirectional: false` (step 3)
 - Don't force connections — quality over quantity
 - **CONNECT event appended to log for every run with ≥1 link created**
 
