@@ -310,6 +310,15 @@
       ]
     },
     {
+      "name": "vmem-status",
+      "path": "skills/vmem-status",
+      "tier": "core",
+      "tags": [
+        "vault",
+        "vmem"
+      ]
+    },
+    {
       "name": "vault-sync",
       "path": "skills/vault-sync",
       "tier": "core",
