@@ -22,9 +22,9 @@ TEXT_PARTS = re.compile(r"ppt/(slides|slideLayouts|slideMasters|charts|notesSlid
 THEME_PART = re.compile(r"ppt/theme/theme\d+\.xml$")
 
 
-def copy_mode(src: str, dst: str) -> None:
-    """Give dst the mode src has: a rewritten deck keeps its permissions (0600 otherwise)."""
-    os.chmod(dst, stat.S_IMODE(os.stat(src).st_mode))
+def copy_mode(dst: str, mode: int) -> None:
+    """Give dst the mode the deck arrived with: a rewrite keeps its permissions, not mkstemp's 0600."""
+    os.chmod(dst, mode)
 
 
 def retag(xml: str) -> str:
@@ -60,13 +60,15 @@ def selftest():
     assert not TEXT_PARTS.match("ppt/notesSlides/_rels/notesSlide2.xml.rels")
 
     # A rewritten deck keeps the mode it arrived with instead of mkstemp's 0600.
-    # Compared against the source, not a literal: Windows os.chmod only toggles read-only.
+    # dst starts at 0600, so a copy_mode that does nothing fails whatever the umask;
+    # it is compared against the source, not a literal: Windows os.chmod only toggles read-only.
     with tempfile.TemporaryDirectory() as d:
         src, dst = os.path.join(d, "src.pptx"), os.path.join(d, "dst.pptx")
         for p in (src, dst):
             open(p, "w").close()
         os.chmod(src, 0o640)
-        copy_mode(src, dst)
+        os.chmod(dst, 0o600)
+        copy_mode(dst, stat.S_IMODE(os.stat(src).st_mode))
         assert stat.S_IMODE(os.stat(dst).st_mode) == stat.S_IMODE(os.stat(src).st_mode)
 
 
@@ -78,6 +80,8 @@ def main():
     ap.add_argument("-o", "--out")
     a = ap.parse_args()
     out = a.out or a.deck
+    # Read the mode before the rewrite: in place, a.deck itself becomes the new file.
+    mode = stat.S_IMODE(os.stat(a.deck).st_mode)
     fd, tmp = tempfile.mkstemp(suffix=".pptx", dir=os.path.dirname(os.path.abspath(out)))
     os.close(fd)
     runs = 0
@@ -92,11 +96,11 @@ def main():
                 elif a.font and THEME_PART.match(item.filename):
                     data = set_theme_font(data.decode("utf-8"), a.font).encode("utf-8")
                 zo.writestr(item, data)
-        copy_mode(a.deck, tmp)
         os.replace(tmp, out)
     except BaseException:
         os.remove(tmp)
         raise
+    copy_mode(out, mode)
     print(f"ko_fix: {runs} runs re-tagged ko-KR" + (f", theme Hangul font = {a.font}" if a.font else "") + f" -> {out}")
 
 
