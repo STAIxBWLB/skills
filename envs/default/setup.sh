@@ -22,7 +22,7 @@ EOF
 # The canonical setup target carries three runtime surfaces:
 # .venv, node/ and node_modules.
 verify_runtimes() {
-    local target="$1" ok=0 py c
+    local target="$1" ok=0 py
     echo "🔍 Maru 런타임 헬스체크: $target"
 
     py="$target/.venv/bin/python3"

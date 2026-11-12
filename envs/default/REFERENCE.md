@@ -31,8 +31,8 @@ envs/default/
 ```
 
 `pyproject.toml`, `uv.lock`, `package.json` and `pnpm-lock.yaml` are the
-dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`, `node_modules/`, `input/`, `output/`, `temp/` and
-`logs/`.
+dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`,
+`node_modules/`, `input/`, `output/`, `temp/` and `logs/`.
 
 ## Processing Strategy
 
