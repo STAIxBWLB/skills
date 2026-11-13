@@ -45,6 +45,7 @@ find_env_node() {
     done
     dir="$SCRIPT_DIR"
     while [ "$dir" != "/" ]; do
+        [ "$dir" -ef "$HOME/.maru" ] && break  # ~/.maru/env is the legacy env: never via the walk-up
         for c in \
             "$dir/env/node/bin/node" \
             "$dir/envs/default/node/bin/node" \

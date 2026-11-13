@@ -17,7 +17,9 @@ for w in "${WRAPPERS[@]}" "$HOOK"; do
     first="$body"
 done
 
-T="$(cd "$(mktemp -d)" && pwd -P)"  # physical: wrappers resolve env roots with pwd -P
+T="$(mktemp -d)" || exit 1
+T="$(cd "$T" && pwd -P)"  # physical: wrappers resolve env roots with pwd -P
+[[ -d "$T" && "$T" != "$PWD" ]] || { echo "FAIL: no temp dir" >&2; exit 1; }
 trap 'rm -rf "$T"' EXIT
 
 fake() {  # fake interpreter: prints the path it ran as and the NODE_PATH it got
@@ -109,6 +111,23 @@ hook no-venv "" "repair-env"
 fake "$T/w/envs/default/.venv/bin/python3"
 check_all no-venv-walkup "$T/w/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
 hook no-venv-walkup "$T/w/envs/default/.venv" "repair-env"
+rm -rf "${T:?}/w/envs/default/.venv"
+
+# 5d. installed layout (wrappers under ~/.maru/skills): the walk-up must not reach the legacy env
+rm -rf "${E:?}/$A/node"
+for w in "${WRAPPERS[@]}"; do
+    mkdir -p "$T/home/.maru/skills/_workspaces/x/$(dirname "$w")"
+    cp "$REPO/$w" "$T/home/.maru/skills/_workspaces/x/$w"
+done
+for w in "${WRAPPERS[@]}"; do
+    o="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" "$T/home/.maru/skills/_workspaces/x/$w" x 2>&1)"
+    [[ "$o" != *"$E/.venv"* && "$o" != *"$E/node/"* ]] || { echo "FAIL installed $w: used the legacy env: $o" >&2; exit 1; }
+done
+
+# 5e. active .venv present but without python3: the hook treats it as unusable and takes the walk-up
+reset_home; state "$A"; rm "$E/$A/.venv/bin/python3"
+fake "$T/w/envs/default/.venv/bin/python3"
+hook no-python "$T/w/envs/default/.venv" "repair-env"
 rm -rf "${T:?}/w/envs/default/.venv"
 
 # 5c. active env without bundled node: system node, NODE_PATH still from the active env

@@ -71,17 +71,23 @@ sync with it**:
    (`maru_active_env` in each wrapper)
 4. `$HOME/.maru/env/.venv/bin/python3`, the legacy location, only when there is
    no active hashed env
-5. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree)
+5. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree);
+   it stops at `~/.maru`, so it never reaches the legacy env
 6. system `python3` (warning)
 
 The md2docx wrapper resolves `node/bin/node` in the same order.
 
 The shell differs from Maru only in broken states, which need
-`maru skills update --apply --repair-env` either way: for a hash Maru rejects
-(reserved name, invalid characters, a symlinked directory), an unreadable or
-malformed state file, a recorded hash without its directory, or a `<hash>.prev`
-backup mid-rebuild, Maru refuses or recovers, while the wrappers use the legacy
-location.
+`maru skills update --apply --repair-env` either way:
+
+- a hash Maru rejects (reserved name, invalid characters, a symlinked
+  directory) or an unreadable, malformed or symlinked state file: Maru refuses,
+  the shell uses the legacy location;
+- a hashed-layout bundle whose hashed directory is missing: Maru returns that
+  missing root, the shell uses the legacy location;
+- a crashed rebuild that left a partial `<hash>` beside `<hash>.prev`: Maru
+  restores `.prev`, the shell uses the partial root (the system interpreter
+  with the repair hint when it has no python yet).
 
 Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
 venvs cannot shadow the Maru runtime. The Maru host injects `MARU_SKILLS_ENV`,
@@ -95,7 +101,6 @@ so bare CLI sessions match.
 active hashed env (or, without one, the legacy `~/.maru/env`), then a walk-up
 from the project directory; when the active env has no `.venv/bin/python3` it
 prints the repair command before the walk-up. When
-
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
 session use the shared runtime. Register it once as a SessionStart hook in the

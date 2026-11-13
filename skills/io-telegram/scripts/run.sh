@@ -45,6 +45,7 @@ find_env_python() {
   done
   dir="$SKILL_DIR"
   while [[ "$dir" != "/" ]]; do
+    [[ "$dir" -ef "$HOME/.maru" ]] && break  # ~/.maru/env is the legacy env: never via the walk-up
     for c in \
       "$dir/env/.venv/bin/python3" \
       "$dir/envs/default/.venv/bin/python3" \
