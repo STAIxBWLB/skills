@@ -17,10 +17,19 @@ for w in "${WRAPPERS[@]}" "$HOOK"; do
     first="$body"
 done
 
-T="$(mktemp -d /tmp/check_active_env.XXXXXX)" || exit 1  # fixed parent: no walk-up candidates above it
+T="$(mktemp -d)" || exit 1
 T="$(cd "$T" && pwd -P)"  # physical: wrappers resolve env roots with pwd -P
 [[ -d "$T" && "$T" != "$PWD" ]] || { echo "FAIL: no temp dir" >&2; exit 1; }
 trap 'rm -rf "$T"' EXIT
+# The wrappers' walk-up continues above $T: refuse to run if an ancestor holds a candidate
+d="$(dirname "$T")"
+while :; do
+    for c in env envs/default skills/envs/default; do
+        [[ ! -e "$d/$c/.venv" && ! -e "$d/$c/node" ]] || { echo "FAIL: walk-up candidate above the temp dir: $d/$c (remove it, then rerun)" >&2; exit 1; }
+    done
+    [[ "$d" != / ]] || break
+    d="$(dirname "$d")"
+done
 
 fake() {  # fake interpreter: prints the path it ran as and the NODE_PATH it got
     mkdir -p "$(dirname "$1")"
@@ -162,7 +171,7 @@ reset_home; state ccc333
 check_all no-dir "$E/.venv/bin/python3" "$E/node/bin/node"
 
 # 7. a hash Maru rejects (reserved name): legacy (Maru refuses; REFERENCE.md lists this)
-for r in node node_modules temp logs input output; do
+for r in node node_modules temp logs input output ABC a.b '../x'; do  # reserved names, then characters Maru rejects
     reset_home; state "$r"; mkdir -p "$E/$r/.venv/bin"; fake "$E/$r/.venv/bin/python3"
     check_all "reserved-$r" "$E/.venv/bin/python3" "$E/node/bin/node"
 done

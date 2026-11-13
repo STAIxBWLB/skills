@@ -21,7 +21,7 @@ try:
     from pptx import Presentation
     from pptx.slide import Slide
 except ImportError:
-    print(f"[pptx-toolkit] python-pptx 미설치: {sys.executable}. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)", file=sys.stderr)
+    print(f"[pptx-toolkit] python-pptx 미설치: {sys.executable}. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: ~/.maru/skills/_builtin 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)", file=sys.stderr)
     sys.exit(2)
 
 

@@ -93,7 +93,8 @@ either way (Bootstrap, or the state-file recovery Maru's error names):
   missing root, the shell uses the legacy location;
 - a crashed rebuild that left a partial `<hash>` beside `<hash>.prev`: Maru
   restores `.prev`, the shell uses the partial root (the system interpreter
-  with the repair hint when it has no python yet).
+  with the repair hint when it has no python yet); one that left only
+  `<hash>.prev`: Maru restores it, the shell uses the legacy location.
 
 Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
 venvs cannot shadow the Maru runtime. The Maru host injects `MARU_SKILLS_ENV`,
