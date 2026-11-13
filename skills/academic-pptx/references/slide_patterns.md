@@ -22,7 +22,7 @@ const COLORS = {
 
 const FONTS = {
   face: "Noto Sans KR",  // Single Hangul-capable typeface throughout (see SKILL.md)
-  title: 26,             // Action title: 26–28 pt; 0.4 in per rendered line, so two lines need h 0.9
+  title: 26,             // Action title: 26–28 pt; at 26 pt 0.4 in per rendered line, so two lines need h 0.9
   sectionHeader: 22,     // Within-slide section headers
   body: 20,              // Body bullets: 20 pt minimum
   label: 16,             // Chart annotations, inline labels
@@ -323,9 +323,9 @@ slide.addText("Main limitation", {
 
 slide.addText([
   { text: "External validity: ", options: { bullet: true, bold: true, breakLine: false } },
-  { text: "program was implemented in three U.S. counties; generalizability to other settings requires caution.", options: { breakLine: true } },
+  { text: "U.S. counties; generalizing needs caution.", options: { breakLine: true } },
   { text: "Partial identification: ", options: { bullet: true, bold: true, breakLine: false } },
-  { text: "earnings records unavailable for 11% of cohort (attrition analysis → Appendix D).", options: { breakLine: true } },
+  { text: "11% missing earnings (Appendix D).", options: { breakLine: true } },
 ], {
   x: MARGIN, y: 3.7, w: 9.0, h: 1.3,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
@@ -415,7 +415,7 @@ const rowY = MARGIN;
 const rowH = 0.28;
 
 // Section labels — the active one takes the accent colour and bold weight, nothing else.
-// The row spans the content width, not the canvas: no label may sit in a side margin.
+// The row spans the content width, not the canvas.
 const rowW = 10 - 2 * MARGIN;
 const sectionW = rowW / sections.length;
 sections.forEach((section, i) => {
@@ -429,11 +429,13 @@ sections.forEach((section, i) => {
   });
 });
 
-// The row costs its height at the bottom, not at the margins: add rowH to every y below
-// it, and keep the bottom band where it is. A single-line citation, pointer or contact
-// box keeps its y, and a block that the shift would push onto that line or past BOTTOM
-// loses rowH of height instead — pattern 5 exhibit 3.3 -> 3.0, pattern 6 limitation list
-// 1.3 -> 1.0, pattern 10 reference list 3.9 -> 3.6.
+// The row rides on content slides only: the title, divider and conclusions slides carry
+// none. It costs its height at the bottom, so add rowH to the y of every other box, the
+// title included, and leave the bottom band where it is — the citation, pointer or
+// contact line, and a corner square beside it such as the optional QR. A box that the
+// shift would push onto that band or past BOTTOM gives up rowH of height instead: an
+// exhibit shrinks (pattern 5 exhibit 3.3 -> 3.0), a text block only where it wraps shorter
+// than its box, and a block that fills its box loses words or splits the slide.
 ```
 
 ---
