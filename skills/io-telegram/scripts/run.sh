@@ -61,9 +61,9 @@ PYTHON="$(find_env_python || true)"
 if [[ -z "$PYTHON" || ! -x "$PYTHON" ]]; then
   if command -v python3 >/dev/null 2>&1; then
     PYTHON="$(command -v python3)"
-    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: Maru 설정 > Skills > Bootstrap, Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: Maru 설정 > Skills > Bootstrap, Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
   else
-    echo "ERROR: no python: Maru env도 system python3도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "ERROR: no python: Maru env도 system python3도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 1
   fi
 fi

@@ -60,7 +60,7 @@ find_env_node() {
 
 NODE_BIN="$(find_env_node || true)"
 if [ -z "$NODE_BIN" ] || [ ! -x "$NODE_BIN" ]; then
-    echo "[md2docx] node 없음: Maru env node도 system node도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "[md2docx] node 없음: Maru env node도 system node도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 1
 fi
 
@@ -74,7 +74,7 @@ case "$NODE_BIN" in
     *)
         _ENV_ROOT="${MARU_SKILLS_ENV:-$(maru_active_env || true)}"
         _ENV_ROOT="${_ENV_ROOT:-$HOME/.maru/env}"
-        echo "[md2docx] 번들 node 미발견, system node fallback: $NODE_BIN (번들 node 복구: Maru 설정 > Skills > Bootstrap, Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+        echo "[md2docx] 번들 node 미발견, system node fallback: $NODE_BIN (번들 node 복구: Maru 설정 > Skills > Bootstrap, Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
         ;;
 esac
 if [ -d "$_ENV_ROOT/node_modules" ]; then

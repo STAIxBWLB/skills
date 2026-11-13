@@ -95,7 +95,7 @@ A4 여백 2cm, 머리말=문서 제목(저시인성), 바닥글=현재/전체 �
 
 ## 런타임 점검
 
-번들 node가 없으면 wrapper가 system node fallback 경고를 낸다. Maru에서는 설정 > Skills > Bootstrap으로 활성 env(node, `docx` 포함)를 재빌드한다. Maru 없이 쓰는 경우 legacy 위치 `~/.maru/env`를 점검·재설치한다:
+번들 node가 없으면 wrapper가 system node fallback 경고를 내고, node는 있는데 `docx`가 없으면 변환기가 `Cannot find module 'docx'`로 실패한다. 둘 다 Maru 설정 > Skills > Bootstrap으로 활성 env(node, `docx` 포함)를 재빌드한다. Maru 없이 쓰는 경우 legacy 위치 `~/.maru/env`를 점검·재설치한다:
 ```bash
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env --verify
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env

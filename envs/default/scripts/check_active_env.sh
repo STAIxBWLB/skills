@@ -104,8 +104,10 @@ hook unfinished "$E/$A/.venv"
 
 # 5. active env without a venv: never the legacy one; system python with a repair hint
 reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"
-o="$(out skills/pptx-toolkit/pptx read x.pptx)"; expect no-venv "$T/bin/python3" "$o"
-[[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv: no repair hint: $o" >&2; exit 1; }
+for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh; do
+    o="$(out "$w" x)"; expect "no-venv $w" "$T/bin/python3" "$o"
+    [[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv $w: no repair hint: $o" >&2; exit 1; }
+done
 hook no-venv "" "Bootstrap"
 # 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
 fake "$T/w/envs/default/.venv/bin/python3"
@@ -140,7 +142,14 @@ err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CL
 # 5c. active env without bundled node: system node, NODE_PATH still from the active env
 reset_home; state "$A"; rm -rf "${E:?}/$A/node"
 o="$(out skills/md2docx/md2docx x.md)"; expect no-node "$T/bin/node" "$o"
-[[ "$o" == *"NODE_PATH:$E/$A/node_modules"* ]] || { echo "FAIL no-node NODE_PATH: $o" >&2; exit 1; }
+[[ "$o" == *"NODE_PATH:$E/$A/node_modules"* && "$o" == *"Bootstrap"* ]] || { echo "FAIL no-node NODE_PATH or hint: $o" >&2; exit 1; }
+
+# 5h. hook with no active hash: a legacy .venv without python3 and a nearer broken walk-up
+# candidate are both skipped for the next one that has python3
+reset_home; state -; rm "$E/.venv/bin/python3"
+mkdir -p "$T/w/env/.venv/bin"; fake "$T/w/envs/default/.venv/bin/python3"
+hook broken-legacy-walkup "$T/w/envs/default/.venv"
+rm -rf "${T:?}/w/env" "${T:?}/w/envs/default/.venv"
 
 # 5g. symlinked state file, which Maru rejects: legacy
 reset_home; state "$A"; mv "$T/home/.maru/skills/bundle-state.json" "$T/home/s.json"; ln -s "$T/home/s.json" "$T/home/.maru/skills/bundle-state.json"
