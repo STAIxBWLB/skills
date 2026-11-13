@@ -18,14 +18,12 @@ envs/default/
 ├── Makefile              # dev-in-tree commands (make help)
 ├── .claude/
 │   ├── hooks/init-env.sh         # SessionStart hook
-│   ├── templates/settings.json   # hook registration template
-│   └── settings.json
+│   └── settings.json             # registers the hook when envs/default is the project
 └── scripts/
     ├── extract_all.py            # HWP/HWPX/PDF text extraction
     ├── check_extract_engine_error.py  # self-check for the engine-missing path
     ├── extract_pdf.py
     ├── ocr_pipeline.py
-    ├── infuse-hooks.sh           # copy the hook into workspace submodules
     ├── setup-node.sh
     └── utils/file_detector.py
 ```
@@ -79,7 +77,8 @@ so bare CLI sessions match.
 `~/.maru/env`, then a walk-up from the project directory, and, when
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
-session use the shared runtime. Register it as a SessionStart hook in the
-host's settings, or copy the hook and its settings template into workspace
-submodules with `scripts/infuse-hooks.sh --all` or
-`scripts/infuse-hooks.sh <submodule>...` (`--dry-run` to preview).
+session use the shared runtime. Register it once as a SessionStart hook in the
+host's user settings, so every project gets it: from an installed bundle the
+command is `~/.maru/skills/_builtin/envs/default/.claude/hooks/init-env.sh`, and
+in a checkout of this repo it is `envs/default/.claude/hooks/init-env.sh` under
+the checkout.
