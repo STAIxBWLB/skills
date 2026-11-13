@@ -10,7 +10,7 @@
 #   3. repo-local env/.venv (dev-in-tree)
 #   4. python3 on PATH (경고 출력)
 #
-# venv 미설치 시: maru skills update --apply --repair-env
+# venv 미설치 시: Maru 설정 > Skills > Bootstrap
 
 set -euo pipefail
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -61,9 +61,9 @@ PYTHON="$(find_env_python || true)"
 if [[ -z "$PYTHON" || ! -x "$PYTHON" ]]; then
   if command -v python3 >/dev/null 2>&1; then
     PYTHON="$(command -v python3)"
-    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: maru skills update --apply --repair-env, Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: Maru 설정 > Skills > Bootstrap, Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
   else
-    echo "ERROR: no python: Maru env도 system python3도 찾지 못함. 'maru skills update --apply --repair-env' 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "ERROR: no python: Maru env도 system python3도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 1
   fi
 fi

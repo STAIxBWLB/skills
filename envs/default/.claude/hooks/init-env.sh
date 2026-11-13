@@ -30,8 +30,8 @@ resolve_env_root() {
     # cannot shadow the Maru runtime.
     if [[ -n "$ACTIVE" ]]; then
         [[ -x "$ACTIVE/.venv/bin/python3" ]] && printf '%s\n' "$ACTIVE" && return 0
-        echo "[init-env] 활성 Maru env에 python 없음: $ACTIVE (빌드 미완료 또는 삭제). legacy ~/.maru/env는 쓰지 않고 작업 트리 env를 찾음. 복구: maru skills update --apply --repair-env" >&2
-    elif [[ -d "$HOME/.maru/env/.venv" ]]; then
+        echo "[init-env] 활성 Maru env에 python 없음: $ACTIVE (빌드 미완료 또는 삭제). legacy ~/.maru/env는 쓰지 않고 작업 트리 env를 찾음. 복구: Maru 설정 > Skills > Bootstrap" >&2
+    elif [[ -x "$HOME/.maru/env/.venv/bin/python3" ]]; then
         printf '%s\n' "$HOME/.maru/env"; return 0
     fi
     # 3. 프로젝트 디렉토리에서 상위로 탐색 (dev-in-tree)
@@ -42,7 +42,7 @@ resolve_env_root() {
             "$dir/env" \
             "$dir/envs/default" \
             "$dir/skills/envs/default"; do
-            [[ -d "$candidate/.venv" ]] && printf '%s\n' "$candidate" && return 0
+            [[ -x "$candidate/.venv/bin/python3" ]] && printf '%s\n' "$candidate" && return 0
         done
         dir="$(dirname "$dir")"
     done
@@ -51,15 +51,11 @@ resolve_env_root() {
 
 ENV_ROOT="$(resolve_env_root)" || {
     [[ -n "$ACTIVE" ]] && exit 0  # resolve_env_root already printed the repair hint
-    echo "[init-env] Maru env 미발견 (MARU_SKILLS_ENV, 활성 해시 env, ~/.maru/env, 작업 트리 모두 .venv 없음). 스킵. 복구: maru skills update --apply --repair-env (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "[init-env] Maru env 미발견 (MARU_SKILLS_ENV, 활성 해시 env, ~/.maru/env, 작업 트리 모두 .venv 없음). 스킵. 복구: Maru 설정 > Skills > Bootstrap (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 0
 }
 
-VENV_BIN="$ENV_ROOT/.venv/bin"
-if [[ ! -x "$VENV_BIN/python3" ]]; then
-    echo "[init-env] venv에 python3 없음: $ENV_ROOT. 스킵. 복구: maru skills update --apply --repair-env" >&2
-    exit 0
-fi
+VENV_BIN="$ENV_ROOT/.venv/bin"  # resolve_env_root only returns roots with an executable python3
 
 if [[ -n "${CLAUDE_ENV_FILE:-}" ]]; then
     {

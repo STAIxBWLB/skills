@@ -105,12 +105,12 @@ hook unfinished "$E/$A/.venv"
 # 5. active env without a venv: never the legacy one; system python with a repair hint
 reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"
 o="$(out skills/pptx-toolkit/pptx read x.pptx)"; expect no-venv "$T/bin/python3" "$o"
-[[ "$o" == *"repair-env"* ]] || { echo "FAIL no-venv: no repair hint: $o" >&2; exit 1; }
-hook no-venv "" "repair-env"
+[[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv: no repair hint: $o" >&2; exit 1; }
+hook no-venv "" "Bootstrap"
 # 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
 fake "$T/w/envs/default/.venv/bin/python3"
 check_all no-venv-walkup "$T/w/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
-hook no-venv-walkup "$T/w/envs/default/.venv" "repair-env"
+hook no-venv-walkup "$T/w/envs/default/.venv" "Bootstrap"
 rm -rf "${T:?}/w/envs/default/.venv"
 
 # 5d. installed layout (wrappers under ~/.maru/skills): the walk-up must not reach the legacy env
@@ -128,14 +128,14 @@ done
 # 5e. active .venv present but without python3: the hook treats it as unusable and takes the walk-up
 reset_home; state "$A"; rm "$E/$A/.venv/bin/python3"
 fake "$T/w/envs/default/.venv/bin/python3"
-hook no-python "$T/w/envs/default/.venv" "repair-env"
+hook no-python "$T/w/envs/default/.venv" "Bootstrap"
 rm -rf "${T:?}/w/envs/default/.venv"
 
 # 5f. project under ~/.maru with a broken active env: the hook's walk-up stops at ~/.maru too
 reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"; mkdir -p "$T/home/.maru/x"
 f="$T/envfile"; : > "$f"
 err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/home/.maru/x" bash "$T/w/$HOOK" 2>&1 >/dev/null)"
-[[ ! -s "$f" && "$err" == *"repair-env"* ]] || { echo "FAIL hook under-maru: $(cat "$f") ($err)" >&2; exit 1; }
+[[ ! -s "$f" && "$err" == *"Bootstrap"* ]] || { echo "FAIL hook under-maru: $(cat "$f") ($err)" >&2; exit 1; }
 
 # 5c. active env without bundled node: system node, NODE_PATH still from the active env
 reset_home; state "$A"; rm -rf "${E:?}/$A/node"
@@ -162,6 +162,9 @@ check_all symlink "$E/.venv/bin/python3" "$E/node/bin/node"
 reset_home; state "$A"; EXTRA=(MARU_SKILLS_ENV="$E/$P")
 check_all injected "$E/$P/.venv/bin/python3" "$E/$P/node/bin/node"
 hook injected "$E/$P/.venv"
+# 8b. injected env whose .venv lacks python3: the hook falls through to the active env
+rm "$E/$P/.venv/bin/python3"
+hook injected-broken "$E/$A/.venv"
 EXTRA=()
 
 # 9. nothing installed, no state file: system interpreter, and no stray shell errors

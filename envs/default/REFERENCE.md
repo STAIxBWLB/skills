@@ -43,8 +43,9 @@ dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`,
 ## Provisioning and verification
 
 ```bash
-# With Maru: rebuild the active hashed env (venv, bundled node/, node_modules)
-maru skills update --apply --repair-env
+# With Maru: Settings > Skills > Bootstrap rebuilds the active hashed env
+# (venv, bundled node/, node_modules). The CLI builds it only while applying a
+# newer bundle (`maru skills update --apply --repair-env`).
 
 # Without Maru: provision or health-check the legacy location ~/.maru/env
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
@@ -79,7 +80,7 @@ sync with it**:
 The md2docx wrapper resolves `node/bin/node` in the same order.
 
 The shell differs from Maru only in broken states, which need
-`maru skills update --apply --repair-env` either way:
+Maru's Bootstrap either way:
 
 - a hash Maru rejects (reserved name, invalid characters, a symlinked
   directory), or a state file that is unreadable, a symlink, or malformed so the
@@ -100,8 +101,9 @@ so bare CLI sessions match.
 
 `.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then the
 active hashed env (or, without one, the legacy `~/.maru/env`), then a walk-up
-from the project directory; when the active env has no `.venv/bin/python3` it
-prints the repair command before the walk-up. When
+from the project directory that, like the wrappers', stops at `~/.maru`; when
+the active env has no `.venv/bin/python3` it prints the repair step before the
+walk-up, and with nothing found it writes nothing. When
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
 session use the shared runtime. Register it once as a SessionStart hook in the
