@@ -22,7 +22,7 @@ const COLORS = {
 
 const FONTS = {
   face: "Noto Sans KR",  // Single Hangul-capable typeface throughout (see SKILL.md)
-  title: 26,             // Action title: 26–28 pt
+  title: 26,             // Action title: 26–28 pt; at 26 pt 0.4 in per rendered line, so two lines need h 0.9
   sectionHeader: 22,     // Within-slide section headers
   body: 20,              // Body bullets: 20 pt minimum
   label: 16,             // Chart annotations, inline labels
@@ -30,6 +30,7 @@ const FONTS = {
 };
 
 const MARGIN = 0.5;      // Minimum margin from slide edge (inches)
+const BOTTOM = 5.625 - MARGIN;  // Lowest edge a box may reach on the 10 × 5.625 canvas
 ```
 
 ---
@@ -43,7 +44,7 @@ const MARGIN = 0.5;      // Minimum margin from slide edge (inches)
 slide.background = { color: COLORS.primary };
 
 // Main title — framed as a statement or question
-slide.addText("Treatment effect of early childhood interventions\npersists into adulthood across all income quartiles", {
+slide.addText("Treatment effect of early childhood interventions persists into adulthood across all income quartiles", {
   x: 0.7, y: 1.4, w: 8.6, h: 1.8,
   fontSize: 32, fontFace: FONTS.face, color: "FFFFFF",
   bold: true, align: "left", valign: "top"
@@ -78,7 +79,7 @@ Layout: Two-column (context left, gap/problem right) or single-column narrative.
 ```javascript
 // Action title
 slide.addText("Existing interventions show strong short-run effects but evidence on persistence is sparse", {
-  x: MARGIN, y: MARGIN, w: 9.0, h: 0.8,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true, valign: "top"
 });
 
@@ -92,14 +93,14 @@ slide.addText([
   { text: "Mechanism is unresolved: ", options: { bullet: true, bold: true, breakLine: false } },
   { text: "cognitive vs. non-cognitive channels remain debated (see Appendix A).", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 1.4, w: 9.0, h: 3.2,
+  x: MARGIN, y: 1.45, w: 9.0, h: 3.0,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 12
 });
 
 // In-slide citation
 slide.addText("Heckman et al. (2013), Science; Cunha & Heckman (2007), AER", {
-  x: MARGIN, y: 5.1, w: 9.0, h: 0.35,
+  x: MARGIN, y: 4.8, w: 9.0, h: 0.3,
   fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.muted, align: "left"
 });
 ```
@@ -150,7 +151,7 @@ Target: 1–2 slides. Move all detail the audience doesn't need to Appendix.
 
 ```javascript
 // Action title
-slide.addText("Regression discontinuity exploits a sharp household income threshold\nfor program eligibility — treatment is as-good-as-random near the cutoff", {
+slide.addText("Regression discontinuity exploits a sharp income threshold: treatment is as-good-as-random near the cutoff", {
   x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
@@ -197,7 +198,7 @@ slide.addText([
 
 // Appendix pointer
 slide.addText("Full identification assumptions and robustness checks → Appendix B", {
-  x: MARGIN, y: 5.1, w: 9.0, h: 0.35,
+  x: MARGIN, y: 4.8, w: 9.0, h: 0.3,
   fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.muted, align: "left"
 });
 ```
@@ -213,7 +214,7 @@ Layout: Figure left (~5.5"), interpretive text right (~3.5"). Action title state
 ```javascript
 // Action title — MUST state the finding, not just the topic
 slide.addText("Treated children earn 18% more at age 35 — effect is largest in the bottom income quartile", {
-  x: MARGIN, y: MARGIN, w: 9.0, h: 0.85,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
@@ -225,7 +226,7 @@ slide.addChart(pres.charts.BAR, [{
   labels: ["Q1 (lowest)", "Q2", "Q3", "Q4 (highest)"],
   values: [28, 22, 15, 8]
 }], {
-  x: MARGIN, y: 1.45, w: 5.4, h: 3.6,
+  x: MARGIN, y: 1.45, w: 5.4, h: 3.3,
   barDir: "col",
   chartColors: [COLORS.accent],
   chartArea: { fill: { color: COLORS.bg } },
@@ -274,7 +275,7 @@ slide.addText([
 
 // In-slide citation
 slide.addText("Administrative earnings records, Social Security Administration (accessed 2024)", {
-  x: MARGIN, y: 5.15, w: 9.0, h: 0.3,
+  x: MARGIN, y: 4.8, w: 9.0, h: 0.3,
   fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.muted
 });
 ```
@@ -293,7 +294,7 @@ slide.addText("Administrative earnings records, Social Security Administration (
 
 ```javascript
 // Action title
-slide.addText("Results support a skill-formation pathway: the earnings effect is fully mediated\nby cognitive scores at age 8, not by schooling attainment", {
+slide.addText("Earnings effects are fully mediated by age-8 cognitive scores, not by schooling attainment", {
   x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
@@ -322,9 +323,9 @@ slide.addText("Main limitation", {
 
 slide.addText([
   { text: "External validity: ", options: { bullet: true, bold: true, breakLine: false } },
-  { text: "program was implemented in three U.S. counties; generalizability to other settings requires caution.", options: { breakLine: true } },
+  { text: "U.S. counties; generalizing needs caution.", options: { breakLine: true } },
   { text: "Partial identification: ", options: { bullet: true, bold: true, breakLine: false } },
-  { text: "earnings records unavailable for 11% of cohort (attrition analysis → Appendix D).", options: { breakLine: true } },
+  { text: "11% missing earnings (Appendix D).", options: { breakLine: true } },
 ], {
   x: MARGIN, y: 3.7, w: 9.0, h: 1.3,
   fontSize: FONTS.body, fontFace: FONTS.face, color: COLORS.body,
@@ -346,7 +347,7 @@ slide.background = { color: COLORS.primary };
 
 // Action title stating the overall conclusion (not a bare "Conclusions" label)
 slide.addText("Early intervention raises adult earnings most for the poorest children", {
-  x: MARGIN, y: MARGIN, w: 9.0, h: 0.5,
+  x: MARGIN, y: MARGIN, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: "FFFFFF", bold: true, align: "left"
 });
 
@@ -360,19 +361,19 @@ slide.addText([
   { text: "3. The pathway is cognitive, not schooling-mediated: ", options: { bold: true, breakLine: false } },
   { text: "consistent with skill complementarity models.", options: { breakLine: true } },
 ], {
-  x: MARGIN, y: 1.1, w: 9.0, h: 3.5,
+  x: MARGIN, y: 1.45, w: 9.0, h: 2.8,
   fontSize: FONTS.body + 1, fontFace: FONTS.face, color: "FFFFFF",
   paraSpaceAfter: 20
 });
 
 // Contact + link (this slide stays up during Q&A, so the contact is read here, not on a slide after it)
 slide.addText("<author email>  |  Working paper: <short link>", {
-  x: MARGIN, y: 4.8, w: 7.0, h: 0.4,
+  x: MARGIN, y: 4.7, w: 7.0, h: 0.4,
   fontSize: 14, fontFace: FONTS.face, color: "FFFFFF", align: "left"
 });
 
-// Optional QR code (add as image)
-// slide.addImage({ path: "qr_preprint.png", x: 8.5, y: 4.7, w: 0.9, h: 0.9 });
+// Optional QR code (add as image, square, in the corner beside the contact line)
+// slide.addImage({ path: "qr_preprint.png", x: 8.5, y: 4.3, w: 0.8, h: 0.8 });
 ```
 
 ---
@@ -413,12 +414,14 @@ const currentSection = "Results";  // Changes per slide
 const rowY = MARGIN;
 const rowH = 0.28;
 
-// Section labels — the active one takes the accent colour and bold weight, nothing else
-const sectionW = 10 / sections.length;
+// Section labels — the active one takes the accent colour and bold weight, nothing else.
+// The row spans the content width, not the canvas.
+const rowW = 10 - 2 * MARGIN;
+const sectionW = rowW / sections.length;
 sections.forEach((section, i) => {
   const isActive = section === currentSection;
   slide.addText(section, {
-    x: i * sectionW, y: rowY, w: sectionW, h: rowH,
+    x: MARGIN + i * sectionW, y: rowY, w: sectionW, h: rowH,
     fontSize: FONTS.cite, fontFace: FONTS.face,
     color: isActive ? COLORS.accent : COLORS.muted,
     bold: isActive,
@@ -426,8 +429,13 @@ sections.forEach((section, i) => {
   });
 });
 
-// Shift all other content down by rowH to clear the row
-// (adjust y coordinates in the rest of the slide by +rowH)
+// The row rides on content slides only: the title, divider and conclusions slides carry
+// none. It costs its height at the bottom, so add rowH to the y of every other box, the
+// title included, and leave the bottom band where it is — the citation, pointer or
+// contact line, and a corner square beside it such as the optional QR. A box that the
+// shift would push onto that band or past BOTTOM gives up rowH of height instead: an
+// exhibit shrinks (pattern 5 exhibit 3.3 -> 3.0), a text block only where it wraps shorter
+// than its box, and a block that fills its box loses words or splits the slide.
 ```
 
 ---
@@ -457,7 +465,7 @@ const refItems = refs.flatMap((r, i) => [
 ]);
 
 slide.addText(refItems, {
-  x: MARGIN, y: 1.15, w: 9.0, h: 4.2,
+  x: MARGIN, y: 1.15, w: 9.0, h: 3.9,
   fontSize: FONTS.cite, fontFace: FONTS.face, color: COLORS.body,
   paraSpaceAfter: 8
 });
@@ -478,7 +486,7 @@ slide.addText("Appendix B — Robustness Checks", {
 
 // Action title (still required — appendix slides also use action titles)
 slide.addText("Earnings effect is stable across bandwidth choices and polynomial specifications", {
-  x: MARGIN, y: 1.0, w: 9.0, h: 0.75,
+  x: MARGIN, y: 1.0, w: 9.0, h: 0.9,
   fontSize: FONTS.title, fontFace: FONTS.face, color: COLORS.primary, bold: true
 });
 
