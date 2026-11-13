@@ -13,15 +13,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Resolve the Maru skills python interpreter, most-specific first.
 # Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV, then Maru's active
-# hashed env, then the legacy ~/.maru/env, then a repo-local walk-up (dev-in-tree).
+# hashed env (or, when there is none, the legacy ~/.maru/env), then a repo-local
+# walk-up (dev-in-tree).
 # Canonical snippet — keep in sync with envs/default/REFERENCE.md.
-# Maru's active hashed env: ~/.maru/env/<active.envHash> from bundle-state.json,
-# once its build completed. Prints nothing when there is none.
+# Maru's active hashed env, as Maru's env_root() picks it: ~/.maru/env/<active.envHash>
+# from bundle-state.json when that directory exists, built or not. Prints nothing
+# (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
-    local h
-    h="$(tr -d '\n' < "$HOME/.maru/skills/bundle-state.json" 2>/dev/null \
+    local f="$HOME/.maru/skills/bundle-state.json" h
+    [ -f "$f" ] || return 1
+    h="$(tr -d '\n' < "$f" \
         | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
-    [ -n "$h" ] && [ -f "$HOME/.maru/env/$h/.maru-env-complete" ] && printf '%s\n' "$HOME/.maru/env/$h"
+    case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac
+    [ -d "$HOME/.maru/env/$h" ] && [ ! -L "$HOME/.maru/env/$h" ] && printf '%s\n' "$HOME/.maru/env/$h"
 }
 
 find_env_python() {
@@ -32,8 +36,7 @@ find_env_python() {
     fi
     for c in \
         "${MARU_SKILLS_ENV:+$MARU_SKILLS_ENV/.venv/bin/python3}" \
-        "${active:+$active/.venv/bin/python3}" \
-        "$HOME/.maru/env/.venv/bin/python3"; do
+        "${active:-$HOME/.maru/env}/.venv/bin/python3"; do
         [ -n "$c" ] && [ -x "$c" ] && printf '%s\n' "$c" && return 0
     done
     dir="$SCRIPT_DIR"

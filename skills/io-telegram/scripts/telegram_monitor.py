@@ -116,7 +116,7 @@ async def scan(args: argparse.Namespace) -> list[dict[str, Any]]:
     try:
         from telethon import TelegramClient
     except ImportError as exc:
-        raise SystemExit("telethon is not installed in ~/.maru/env") from exc
+        raise SystemExit("telethon is not installed in the python scripts/run.sh selected; repair the Maru env with `maru skills update --apply --repair-env`") from exc
 
     session_file = require_runtime(args)
     session_file.parent.mkdir(parents=True, exist_ok=True)

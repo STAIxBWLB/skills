@@ -7,7 +7,7 @@ MVP scope (read-only):
 - notes:   speaker notes only
 - to-md:   markdown aggregator (same as read --output)
 
-Uses python-pptx 1.0.2 from ~/.maru/env/.venv.
+Uses python-pptx 1.0.2 from the Maru env venv.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ try:
     from pptx import Presentation
     from pptx.slide import Slide
 except ImportError:
-    print("[pptx-toolkit] python-pptx 미설치. ~/.maru/env/.venv 확인", file=sys.stderr)
+    print("[pptx-toolkit] python-pptx 미설치: wrapper가 고른 python에 패키지가 없음. 복구: maru skills update --apply --repair-env", file=sys.stderr)
     sys.exit(2)
 
 

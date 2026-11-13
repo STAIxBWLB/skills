@@ -27,10 +27,10 @@ Provide Telegram primitives and normalized inbox export.
 
 ## Maru Runtime
 
-These scripts import `telethon`, which is installed only in the Maru venv
-(`~/.maru/env/.venv`). Always launch them through `scripts/run.sh`, which
-resolves that interpreter (honoring `$MARU_SKILLS_ENV`, then canonical
-`~/.maru/env/.venv`). Do not invoke the `.py` files directly.
+These scripts import `telethon`, which is installed only in the Maru env's
+venv. Always launch them through `scripts/run.sh`, which resolves that
+interpreter (order: `envs/default/REFERENCE.md`). Do not invoke the `.py`
+files directly.
 
 - `scripts/run.sh scripts/telegram_monitor.py --output-json --once --session-file <absolute>`
   prints normalized recent messages to stdout and does not write to the inbox.

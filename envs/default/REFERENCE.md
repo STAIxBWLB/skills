@@ -1,8 +1,8 @@
 # Document Runtime Reference
 
 `envs/default/` is the source scaffold for the shared Python/Node runtime used
-by document and graph skills. `setup.sh --target ~/.maru/env` provisions it
-into the canonical runtime `~/.maru/env`. This file is the source of truth for
+by document and graph skills. Maru builds it into `~/.maru/env/<envHash>`;
+without Maru, `setup.sh --target ~/.maru/env` provisions the legacy location. This file is the source of truth for
 the layout, env resolution, provisioning and session hook; other files point
 here.
 
@@ -66,9 +66,11 @@ sync with it**:
 1. `$SKILL_PYTHON` (caller override)
 2. `$MARU_SKILLS_ENV/.venv/bin/python3` (host-injected)
 3. `$HOME/.maru/env/<hash>/.venv/bin/python3`, the active hashed env: `<hash>` is
-   `active.envHash` in `~/.maru/skills/bundle-state.json`, used once
-   `.maru-env-complete` exists there (`maru_active_env` in each wrapper)
-4. `$HOME/.maru/env/.venv/bin/python3` (legacy fixed location)
+   `active.envHash` in `~/.maru/skills/bundle-state.json`, used whenever that
+   directory exists, built or not, as Maru's `env_root()` does
+   (`maru_active_env` in each wrapper)
+4. `$HOME/.maru/env/.venv/bin/python3`, the legacy location, only when there is
+   no active hashed env
 5. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree)
 6. system `python3` (warning)
 
@@ -83,8 +85,8 @@ so bare CLI sessions match.
 ## Session hook
 
 `.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then the
-active hashed env, then the legacy `~/.maru/env`, then a walk-up from the
-project directory, and, when
+active hashed env (or, without one, the legacy `~/.maru/env`), then a walk-up
+from the project directory, and, when
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
 session use the shared runtime. Register it once as a SessionStart hook in the

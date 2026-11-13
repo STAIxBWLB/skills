@@ -21,8 +21,8 @@ description: >
 
 **markdown이 SSOT, docx는 산출물** — 수정은 `.md`에서 하고 재변환한다.
 
-런타임: Maru env(`~/.maru/env`)에 번들된 Node + `docx` 패키지. wrapper가 env Node를
-해소하고 `NODE_PATH=~/.maru/env/node_modules`를 export하여 변환기가
+런타임: Maru env에 번들된 Node + `docx` 패키지. wrapper가 env Node를
+해소하고 `NODE_PATH=<env>/node_modules`를 export하여 변환기가
 `createRequire("docx")`로 패키지를 로드한다(ESM 정적 import는 bare specifier에 NODE_PATH를
 적용하지 않으므로 createRequire 사용).
 
