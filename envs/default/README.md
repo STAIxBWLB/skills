@@ -1,8 +1,8 @@
-# 문서 처리 환경 (envs/default → ~/.maru/env)
+# 문서 처리 환경 (envs/default → Maru env)
 
 HWP/HWPX/PDF 파일 처리를 위한 공유 Python 가상환경 + 번들 Node 런타임.
-이 디렉토리(`envs/default`)는 source scaffold 이며, `setup.sh --target ~/.maru/env`
-로 정규 런타임 `~/.maru/env`(`.venv` + `node` + `node_modules`)에 프로비저닝된다.
+이 디렉토리(`envs/default`)는 source scaffold 이며, Maru가 활성 해시 env
+`~/.maru/env/<envHash>`(`.venv` + `node` + `node_modules`)로 빌드한다(Maru 없이는 legacy `~/.maru/env`, 해소 순서는 `REFERENCE.md`).
 번들 Node(`node/`)는 md2docx(docx-js) 변환기를 시스템 node 의존 없이 실행한다.
 SessionStart hook(`init-env.sh`)을 등록하면 세션에서 이 환경이 활성화된다(등록: `REFERENCE.md` "Session hook").
 

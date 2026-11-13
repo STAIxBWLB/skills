@@ -47,9 +47,12 @@ dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`,
 # (venv, bundled node/, node_modules). The CLI builds it only while applying a
 # newer bundle (`maru skills update --apply --repair-env`).
 
-# Without Maru: provision or health-check the legacy location ~/.maru/env
-bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
-bash ~/.maru/skills/_builtin/envs/default/setup.sh --verify --target ~/.maru/env
+# Without the Maru app, and only when no active hashed env is recorded (the
+# wrappers never use the legacy location while one is): provision or
+# health-check ~/.maru/env with setup.sh from the bundle
+# (~/.maru/skills/_builtin/envs/default/) or a checkout (envs/default/)
+bash envs/default/setup.sh --target ~/.maru/env
+bash envs/default/setup.sh --verify --target ~/.maru/env
 
 # dev-in-tree: provision this directory, check system dependencies
 make setup
@@ -77,7 +80,7 @@ sync with it**:
    it stops at `~/.maru`, so it never reaches the legacy env
 6. system `python3` (warning)
 
-The md2docx wrapper resolves `node/bin/node` in the same order.
+The md2docx wrapper resolves `node/bin/node` in the same order, with `$SKILL_NODE` as the override; when it falls back to system node it still sets `NODE_PATH` from `$MARU_SKILLS_ENV`, the active hashed env, or the legacy location.
 
 The shell differs from Maru only in broken states, which need
 Maru's Bootstrap either way:

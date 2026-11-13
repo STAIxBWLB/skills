@@ -72,7 +72,7 @@ async def login(args: argparse.Namespace) -> None:
     try:
         from telethon import TelegramClient
     except ImportError as exc:
-        raise SystemExit(f"telethon is not installed for {sys.executable}. Repair the Maru env with Settings > Skills > Bootstrap in Maru, or without the Maru app run `envs/default/setup.sh --target ~/.maru/env` from the bundle or a checkout.") from exc
+        raise SystemExit(f"telethon is not installed for {sys.executable}. Repair the Maru env with Settings > Skills > Bootstrap in Maru, or, only with no Maru app and no active hashed env, run `envs/default/setup.sh --target ~/.maru/env` from the bundle or a checkout.") from exc
     session_file = Path(args.session_file).expanduser()
     if not session_file.is_absolute():
         raise SystemExit("session-file must be absolute")

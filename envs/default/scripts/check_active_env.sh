@@ -109,6 +109,8 @@ for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/sc
     [[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv $w: no repair hint: $o" >&2; exit 1; }
 done
 hook no-venv "" "Bootstrap"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$T/envfile" CLAUDE_PROJECT_DIR="$T/w" bash "$T/w/$HOOK" 2>&1 >/dev/null)"
+[[ "$err" != *"setup.sh"* ]] || { echo "FAIL hook no-venv: legacy setup step offered: $err" >&2; exit 1; }
 # 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
 fake "$T/w/envs/default/.venv/bin/python3"
 check_all no-venv-walkup "$T/w/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
@@ -160,8 +162,10 @@ reset_home; state ccc333
 check_all no-dir "$E/.venv/bin/python3" "$E/node/bin/node"
 
 # 7. a hash Maru rejects (reserved name): legacy (Maru refuses; REFERENCE.md lists this)
-reset_home; state node
-check_all reserved "$E/.venv/bin/python3" "$E/node/bin/node"
+for r in node node_modules temp logs input output; do
+    reset_home; state "$r"; mkdir -p "$E/$r/.venv/bin"; fake "$E/$r/.venv/bin/python3"
+    check_all "reserved-$r" "$E/.venv/bin/python3" "$E/node/bin/node"
+done
 
 # 7b. a symlinked hash directory, which Maru also rejects: legacy
 reset_home; ln -s "$E/$A" "$E/lnk"; state lnk
@@ -179,6 +183,15 @@ EXTRA=()
 # 9. nothing installed, no state file: system interpreter, and no stray shell errors
 rm -rf "${T:?}/home"; mkdir -p "$T/home"
 check_all none "$T/bin/python3" "$T/bin/node"
+hook none "" "Bootstrap"
+
+# 9b. no interpreter anywhere: every wrapper exits non-zero with the repair hint
+mkdir -p "$T/minbin"
+for c in bash dirname tr sed head cat; do ln -sf "$(command -v "$c")" "$T/minbin/$c"; done
+for w in "${WRAPPERS[@]}"; do
+    rc=0; o="$(env -i HOME="$T/home" PATH="$T/minbin" "$T/w/$w" x 2>&1)" || rc=$?
+    [[ $rc -ne 0 && "$o" == *"Bootstrap"* && "$o" != *"RAN:"* ]] || { echo "FAIL no-interpreter $w (rc=$rc): $o" >&2; exit 1; }
+done
 for w in "${WRAPPERS[@]}"; do
     o="$(out "$w" x)"
     [[ "$o" != *"No such file"* ]] || { echo "FAIL none $w: stray error: $o" >&2; exit 1; }

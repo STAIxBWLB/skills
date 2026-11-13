@@ -57,9 +57,9 @@ VENV_PY="$(find_env_python || true)"
 if [ -z "$VENV_PY" ] || [ ! -x "$VENV_PY" ]; then
     if command -v python3 >/dev/null 2>&1; then
         VENV_PY="$(command -v python3)"
-        echo "[pptx-toolkit] Maru env python 미발견, system python3 fallback: $VENV_PY (복구: Maru 설정 > Skills > Bootstrap, Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
+        echo "[pptx-toolkit] Maru env python 미발견, system python3 fallback: $VENV_PY (복구: Maru 설정 > Skills > Bootstrap, Maru 앱도 활성 해시 env도 없을 때만: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
     else
-        echo "[pptx-toolkit] python 없음: Maru env도 system python3도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
+        echo "[pptx-toolkit] python 없음: Maru env도 system python3도 찾지 못함. Maru 설정 > Skills > Bootstrap 실행 (Maru 앱도 활성 해시 env도 없을 때만: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
         exit 1
     fi
 fi

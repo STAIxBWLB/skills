@@ -51,7 +51,7 @@ resolve_env_root() {
 
 ENV_ROOT="$(resolve_env_root)" || {
     [[ -n "$ACTIVE" ]] && exit 0  # resolve_env_root already printed the repair hint
-    echo "[init-env] Maru env 미발견 (MARU_SKILLS_ENV, 활성 해시 env, ~/.maru/env, 작업 트리 모두 .venv/bin/python3 없음). 스킵. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱 없이: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
+    echo "[init-env] Maru env 미발견 (MARU_SKILLS_ENV, 활성 해시 env, ~/.maru/env, 작업 트리 모두 .venv/bin/python3 없음). 스킵. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: 번들 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 0
 }
 
