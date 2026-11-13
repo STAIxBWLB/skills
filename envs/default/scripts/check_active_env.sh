@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-WRAPPERS=(skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh skills/md2docx/md2docx)
+WRAPPERS=(skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh skills/share-outbox/scripts/run.sh skills/md2docx/md2docx)
 HOOK=envs/default/.claude/hooks/init-env.sh
 
 # Every copy of maru_active_env is the same function (indentation aside).
@@ -80,6 +80,7 @@ check_all() {  # check_all <label> <python> <node>
     expect "$1 pptx" "$2" "$(out skills/pptx-toolkit/pptx read x.pptx)"
     expect "$1 xlsx" "$2" "$(out skills/xlsx-toolkit/xlsx read x.xlsx)"
     expect "$1 run.sh" "$2" "$(out skills/io-telegram/scripts/run.sh x.py)"
+    expect "$1 share-outbox run.sh" "$2" "$(out skills/share-outbox/scripts/run.sh x.py)"
     expect "$1 md2docx" "$3" "$(out skills/md2docx/md2docx x.md)"
 }
 hook() {  # hook <label> <wanted VIRTUAL_ENV or ""> [stderr substring]
@@ -115,7 +116,7 @@ hook unfinished "$E/$A/.venv"
 
 # 5. active env without a venv: never the legacy one; system python with a repair hint
 reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"
-for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh; do
+for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh skills/share-outbox/scripts/run.sh; do
     o="$(out "$w" x)"; expect "no-venv $w" "$T/bin/python3" "$o"
     [[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv $w: no repair hint: $o" >&2; exit 1; }
 done
