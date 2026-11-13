@@ -10,10 +10,11 @@ whole, header rows repeat per page).
 ## Pipeline
 
 Use the bundled script (markdown-it-py based; `scripts/run.sh` runs it on
-the Maru env, no extra packages; paths relative to the skill directory):
+the Maru env, no extra packages; `<skill>` is the share-outbox skill
+directory):
 
 ```bash
-scripts/run.sh scripts/md_to_pdf_chrome.py \
+<skill>/scripts/run.sh <skill>/scripts/md_to_pdf_chrome.py \
   <src.md> -o <tmp>/<stem>.pdf [--title "문서 제목"]
 ```
 
