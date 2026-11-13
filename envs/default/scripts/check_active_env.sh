@@ -59,7 +59,7 @@ state() {  # state <active hash or "-"> : pretty JSON shaped like Maru's bundle-
 
 EXTRA=()
 out() {  # out <wrapper> <args...>: stdout and stderr of a wrapper copy
-    env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" ${EXTRA[@]+"${EXTRA[@]}"} "$T/w/$1" "${@:2}" 2>&1
+    env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" ${EXTRA[@]+"${EXTRA[@]}"} "$T/w/$1" "${@:2}" 2>&1 || echo "EXIT:$?"
 }
 expect() {  # expect <label> <wanted interpreter> <output>
     local got; got="$(printf '%s\n' "$3" | sed -n 's/^RAN://p' | head -n1)"
@@ -120,8 +120,9 @@ for w in "${WRAPPERS[@]}"; do
     cp "$REPO/$w" "$T/home/.maru/skills/_workspaces/x/$w"
 done
 for w in "${WRAPPERS[@]}"; do
-    o="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" "$T/home/.maru/skills/_workspaces/x/$w" x 2>&1)"
-    [[ "$o" != *"$E/.venv"* && "$o" != *"$E/node/"* ]] || { echo "FAIL installed $w: used the legacy env: $o" >&2; exit 1; }
+    o="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" "$T/home/.maru/skills/_workspaces/x/$w" x 2>&1 || echo "EXIT:$?")"
+    [[ "$w" == *md2docx ]] && want="$T/bin/node" || want="$T/bin/python3"
+    expect "installed $w" "$want" "$o"
 done
 
 # 5e. active .venv present but without python3: the hook treats it as unusable and takes the walk-up
@@ -130,10 +131,20 @@ fake "$T/w/envs/default/.venv/bin/python3"
 hook no-python "$T/w/envs/default/.venv" "repair-env"
 rm -rf "${T:?}/w/envs/default/.venv"
 
+# 5f. project under ~/.maru with a broken active env: the hook's walk-up stops at ~/.maru too
+reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"; mkdir -p "$T/home/.maru/x"
+f="$T/envfile"; : > "$f"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/home/.maru/x" bash "$T/w/$HOOK" 2>&1 >/dev/null)"
+[[ ! -s "$f" && "$err" == *"repair-env"* ]] || { echo "FAIL hook under-maru: $(cat "$f") ($err)" >&2; exit 1; }
+
 # 5c. active env without bundled node: system node, NODE_PATH still from the active env
 reset_home; state "$A"; rm -rf "${E:?}/$A/node"
 o="$(out skills/md2docx/md2docx x.md)"; expect no-node "$T/bin/node" "$o"
 [[ "$o" == *"NODE_PATH:$E/$A/node_modules"* ]] || { echo "FAIL no-node NODE_PATH: $o" >&2; exit 1; }
+
+# 5g. symlinked state file, which Maru rejects: legacy
+reset_home; state "$A"; mv "$T/home/.maru/skills/bundle-state.json" "$T/home/s.json"; ln -s "$T/home/s.json" "$T/home/.maru/skills/bundle-state.json"
+check_all state-symlink "$E/.venv/bin/python3" "$E/node/bin/node"
 
 # 6. recorded hash without a directory (a pre-hash app): legacy
 reset_home; state ccc333

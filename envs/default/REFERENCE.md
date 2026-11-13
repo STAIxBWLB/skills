@@ -43,10 +43,11 @@ dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`,
 ## Provisioning and verification
 
 ```bash
-# Provision or repair the canonical runtime (venv, bundled node/, node_modules)
-bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
+# With Maru: rebuild the active hashed env (venv, bundled node/, node_modules)
+maru skills update --apply --repair-env
 
-# Health-check it (no changes)
+# Without Maru: provision or health-check the legacy location ~/.maru/env
+bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
 bash ~/.maru/skills/_builtin/envs/default/setup.sh --verify --target ~/.maru/env
 
 # dev-in-tree: provision this directory, check system dependencies
@@ -81,8 +82,8 @@ The shell differs from Maru only in broken states, which need
 `maru skills update --apply --repair-env` either way:
 
 - a hash Maru rejects (reserved name, invalid characters, a symlinked
-  directory) or an unreadable, malformed or symlinked state file: Maru refuses,
-  the shell uses the legacy location;
+  directory), or a state file that is unreadable, a symlink, or malformed so the
+  hash no longer parses: Maru refuses, the shell uses the legacy location;
 - a hashed-layout bundle whose hashed directory is missing: Maru returns that
   missing root, the shell uses the legacy location;
 - a crashed rebuild that left a partial `<hash>` beside `<hash>.prev`: Maru

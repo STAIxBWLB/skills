@@ -11,7 +11,7 @@ set -euo pipefail
 # (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
     local f="$HOME/.maru/skills/bundle-state.json" h
-    [ -f "$f" ] && [ -r "$f" ] || return 1
+    [ -f "$f" ] && [ -r "$f" ] && [ ! -L "$f" ] || return 1
     h="$(tr -d '\n' < "$f" \
         | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
     case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac
@@ -22,7 +22,7 @@ ACTIVE="$(maru_active_env || true)"
 
 resolve_env_root() {
     # 1. 명시적 호스트 주입 변수
-    if [[ -n "${MARU_SKILLS_ENV:-}" && -d "$MARU_SKILLS_ENV/.venv" ]]; then
+    if [[ -n "${MARU_SKILLS_ENV:-}" && -x "$MARU_SKILLS_ENV/.venv/bin/python3" ]]; then
         printf '%s\n' "$MARU_SKILLS_ENV"; return 0
     fi
     # 2. Maru가 기록한 활성 해시 env가 있으면 그것, 없을 때만 legacy 고정 위치.
@@ -37,6 +37,7 @@ resolve_env_root() {
     # 3. 프로젝트 디렉토리에서 상위로 탐색 (dev-in-tree)
     local dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
     while [[ "$dir" != "/" ]]; do
+        [[ "$dir" -ef "$HOME/.maru" ]] && break  # ~/.maru/env is the legacy env: never via the walk-up
         for candidate in \
             "$dir/env" \
             "$dir/envs/default" \

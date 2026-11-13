@@ -25,7 +25,7 @@ SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
   local f="$HOME/.maru/skills/bundle-state.json" h
-  [ -f "$f" ] && [ -r "$f" ] || return 1
+  [ -f "$f" ] && [ -r "$f" ] && [ ! -L "$f" ] || return 1
   h="$(tr -d '\n' < "$f" \
       | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
   case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac
@@ -61,7 +61,7 @@ PYTHON="$(find_env_python || true)"
 if [[ -z "$PYTHON" || ! -x "$PYTHON" ]]; then
   if command -v python3 >/dev/null 2>&1; then
     PYTHON="$(command -v python3)"
-    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: maru skills update --apply --repair-env)" >&2
+    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: maru skills update --apply --repair-env, Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
   else
     echo "ERROR: no python: Maru env도 system python3도 찾지 못함. 'maru skills update --apply --repair-env' 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 1
