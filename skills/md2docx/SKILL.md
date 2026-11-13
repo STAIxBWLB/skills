@@ -21,8 +21,8 @@ description: >
 
 **markdown이 SSOT, docx는 산출물** — 수정은 `.md`에서 하고 재변환한다.
 
-런타임: Maru env(`~/.maru/env`)에 번들된 Node + `docx` 패키지. wrapper가 env Node를
-해소하고 `NODE_PATH=~/.maru/env/node_modules`를 export하여 변환기가
+런타임: Maru env에 번들된 Node + `docx` 패키지. wrapper가 env Node를
+해소하고 `NODE_PATH=<env>/node_modules`를 export하여 변환기가
 `createRequire("docx")`로 패키지를 로드한다(ESM 정적 import는 bare specifier에 NODE_PATH를
 적용하지 않으므로 createRequire 사용).
 
@@ -95,16 +95,11 @@ A4 여백 2cm, 머리말=문서 제목(저시인성), 바닥글=현재/전체 �
 
 ## 런타임 점검
 
+번들 node가 없으면 wrapper가 system node fallback 경고를 내고, node는 있는데 `docx`가 없으면 변환기가 `Cannot find module 'docx'`로 실패한다. 둘 다 Maru 설정 > Skills > Bootstrap으로 활성 env(node, `docx` 포함)를 재빌드한다. Maru 앱도 활성 해시 env(`~/.maru/env/<active.envHash>` 디렉토리)도 없을 때만 legacy 위치 `~/.maru/env`를 점검·재설치한다(이 스킬 디렉토리 기준 경로, 번들과 checkout 공통):
 ```bash
-bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env --verify
-# → venv / node: docx 존재 / node-runtime: vNN + docx require OK
+bash ../../envs/default/setup.sh --target ~/.maru/env --verify
+bash ../../envs/default/setup.sh --target ~/.maru/env
 ```
-
-Node 또는 docx 패키지가 없으면:
-```bash
-bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
-```
-가 번들 Node 설치 + `docx` 재설치를 수행한다.
 
 ## 참고
 

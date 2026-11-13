@@ -7,7 +7,7 @@ MVP scope (read-only):
 - to-csv:  CSV output (stdout or file)
 - to-md:   markdown table output
 
-Uses openpyxl 3.1.5 from ~/.maru/env/.venv.
+Uses openpyxl 3.1.5 from the Maru env venv.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ try:
     import openpyxl
     from openpyxl.worksheet.worksheet import Worksheet
 except ImportError:
-    print("[xlsx-toolkit] openpyxl 미설치. ~/.maru/env/.venv 확인", file=sys.stderr)
+    print(f"[xlsx-toolkit] openpyxl 미설치: {sys.executable}. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: ~/.maru/skills/_builtin 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)", file=sys.stderr)
     sys.exit(2)
 
 

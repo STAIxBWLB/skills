@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# Self-check for the env resolution order (envs/default/REFERENCE.md):
+# runs the real skill wrappers and the SessionStart hook against a fake home
+# and asserts which interpreter each one picks. Prints "ok" on success.
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+WRAPPERS=(skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh skills/md2docx/md2docx)
+HOOK=envs/default/.claude/hooks/init-env.sh
+
+# Every copy of maru_active_env is the same function (indentation aside).
+first=""
+for w in "${WRAPPERS[@]}" "$HOOK"; do
+    body="$(sed -n '/^maru_active_env() {/,/^}/p' "$REPO/$w" | sed 's/^[[:space:]]*//')"
+    [[ -n "$body" ]] || { echo "FAIL: no maru_active_env in $w" >&2; exit 1; }
+    [[ -z "$first" || "$body" == "$first" ]] || { echo "FAIL: maru_active_env in $w differs from ${WRAPPERS[0]}" >&2; exit 1; }
+    first="$body"
+done
+
+T="$(mktemp -d)" || exit 1
+T="$(cd "$T" && pwd -P)"  # physical: wrappers resolve env roots with pwd -P
+[[ -d "$T" && "$T" != "$PWD" ]] || { echo "FAIL: no temp dir" >&2; exit 1; }
+trap 'rm -rf "$T"' EXIT
+# The wrappers' walk-up continues above $T: refuse to run if an ancestor holds a candidate
+d="$(dirname "$T")"
+while :; do
+    for c in env envs/default skills/envs/default; do
+        [[ ! -e "$d/$c/.venv" && ! -e "$d/$c/node" ]] || { echo "FAIL: walk-up candidate above the temp dir: $d/$c (remove it, then rerun)" >&2; exit 1; }
+    done
+    [[ "$d" != / ]] || break
+    d="$(dirname "$d")"
+done
+
+fake() {  # fake interpreter: prints the path it ran as and the NODE_PATH it got
+    mkdir -p "$(dirname "$1")"
+    printf '#!/bin/sh\necho "RAN:$0"\necho "NODE_PATH:${NODE_PATH:-}"\n' > "$1"
+    chmod +x "$1"
+}
+
+# The wrappers run from copies under the fake ~/.maru, so every walk-up ends at
+# the wrappers' own ~/.maru stop inside $T and never reaches a shared parent.
+W="$T/home/.maru/w"
+for w in "${WRAPPERS[@]}" "$HOOK"; do
+    mkdir -p "$W/$(dirname "$w")"
+    cp "$REPO/$w" "$W/$w"
+done
+fake "$T/bin/python3"
+fake "$T/bin/node"
+
+A=aaa111 P=bbb222
+E="$T/home/.maru/env"
+reset_home() {
+    rm -rf "${T:?}/home/.maru/env" "${T:?}/home/.maru/skills"
+    mkdir -p "$T/home/.maru/skills"
+    for h in "$A" "$P"; do
+        fake "$E/$h/.venv/bin/python3"
+        fake "$E/$h/node/bin/node"
+        mkdir -p "$E/$h/node_modules"
+        touch "$E/$h/.maru-env-complete"
+    done
+    fake "$E/.venv/bin/python3"
+    fake "$E/node/bin/node"
+    mkdir -p "$E/node_modules"
+}
+state() {  # state <active hash or "-"> : pretty JSON shaped like Maru's bundle-state.json
+    local active=""
+    [[ "$1" == "-" ]] || active="$(printf '  "active": {\n    "bundleId": "r2",\n    "revision": 2,\n    "source": "remote",\n    "envHash": "%s",\n    "appliedAt": "x"\n  },\n' "$1")"
+    printf '{\n  "schema": 1,\n%s  "previous": {\n    "bundleId": "r1",\n    "envHash": "%s",\n    "appliedAt": "x"\n  }\n}\n' "$active" "$P" > "$T/home/.maru/skills/bundle-state.json"
+}
+
+EXTRA=()
+out() {  # out <wrapper> <args...>: stdout and stderr of a wrapper copy
+    env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" ${EXTRA[@]+"${EXTRA[@]}"} "$W/$1" "${@:2}" 2>&1 || echo "EXIT:$?"
+}
+expect() {  # expect <label> <wanted interpreter> <output>
+    local got; got="$(printf '%s\n' "$3" | sed -n 's/^RAN://p' | head -n1)"
+    [[ "$got" == "$2" ]] || { echo "FAIL $1: wanted $2, got '${got:-nothing}'" >&2; printf '%s\n' "$3" >&2; exit 1; }
+}
+check_all() {  # check_all <label> <python> <node>
+    expect "$1 pptx" "$2" "$(out skills/pptx-toolkit/pptx read x.pptx)"
+    expect "$1 xlsx" "$2" "$(out skills/xlsx-toolkit/xlsx read x.xlsx)"
+    expect "$1 run.sh" "$2" "$(out skills/io-telegram/scripts/run.sh x.py)"
+    expect "$1 md2docx" "$3" "$(out skills/md2docx/md2docx x.md)"
+}
+hook() {  # hook <label> <wanted VIRTUAL_ENV or ""> [stderr substring]
+    local f="$T/envfile" err got; : > "$f"
+    err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$W" \
+        ${EXTRA[@]+"${EXTRA[@]}"} bash "$W/$HOOK" 2>&1 >/dev/null)"
+    got="$(sed -n 's/^export VIRTUAL_ENV="\(.*\)"$/\1/p' "$f")"
+    [[ "$got" == "$2" ]] || { echo "FAIL hook $1: wanted '$2', got '$got' ($err)" >&2; exit 1; }
+    [[ -z "${3:-}" || "$err" == *"$3"* ]] || { echo "FAIL hook $1: stderr lacks '$3': $err" >&2; exit 1; }
+}
+
+# 1. Maru-shaped state: the active hash wins over previous and legacy; NODE_PATH follows it
+reset_home; state "$A"
+check_all pretty "$E/$A/.venv/bin/python3" "$E/$A/node/bin/node"
+[[ "$(out skills/md2docx/md2docx x.md)" == *"NODE_PATH:$E/$A/node_modules"* ]] || { echo "FAIL pretty md2docx NODE_PATH" >&2; exit 1; }
+hook pretty "$E/$A/.venv"
+
+# 2. compact state on one line: still the active hash, not previous
+reset_home
+printf '{"schema":1,"active":{"bundleId":"r2","envHash":"%s"},"previous":{"bundleId":"r1","envHash":"%s"}}' "$A" "$P" > "$T/home/.maru/skills/bundle-state.json"
+check_all compact "$E/$A/.venv/bin/python3" "$E/$A/node/bin/node"
+
+# 3. no active entry: legacy, never previous
+reset_home; state -
+check_all no-active "$E/.venv/bin/python3" "$E/node/bin/node"
+[[ "$(out skills/md2docx/md2docx x.md)" == *"NODE_PATH:$E/node_modules"* ]] || { echo "FAIL no-active md2docx NODE_PATH" >&2; exit 1; }
+hook no-active "$E/.venv"
+
+# 4. active build not finished (no marker): still the active env, as Maru's env_root() picks it
+reset_home; state "$A"; rm "$E/$A/.maru-env-complete"
+check_all unfinished "$E/$A/.venv/bin/python3" "$E/$A/node/bin/node"
+hook unfinished "$E/$A/.venv"
+
+# 5. active env without a venv: never the legacy one; system python with a repair hint
+reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"
+for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/scripts/run.sh; do
+    o="$(out "$w" x)"; expect "no-venv $w" "$T/bin/python3" "$o"
+    [[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv $w: no repair hint: $o" >&2; exit 1; }
+done
+hook no-venv "" "Bootstrap"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$T/envfile" CLAUDE_PROJECT_DIR="$W" bash "$W/$HOOK" 2>&1 >/dev/null)"
+[[ "$err" != *"setup.sh"* ]] || { echo "FAIL hook no-venv: legacy setup step offered: $err" >&2; exit 1; }
+# 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
+fake "$W/envs/default/.venv/bin/python3"
+check_all no-venv-walkup "$W/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
+hook no-venv-walkup "$W/envs/default/.venv" "Bootstrap"
+rm -rf "${W:?}/envs/default/.venv"
+
+# 5d. installed layout (wrappers under ~/.maru/skills): the walk-up must not reach the legacy env
+rm -rf "${E:?}/$A/node"
+for w in "${WRAPPERS[@]}"; do
+    mkdir -p "$T/home/.maru/skills/_workspaces/x/$(dirname "$w")"
+    cp "$REPO/$w" "$T/home/.maru/skills/_workspaces/x/$w"
+done
+for w in "${WRAPPERS[@]}"; do
+    o="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" "$T/home/.maru/skills/_workspaces/x/$w" x 2>&1 || echo "EXIT:$?")"
+    [[ "$w" == *md2docx ]] && want="$T/bin/node" || want="$T/bin/python3"
+    expect "installed $w" "$want" "$o"
+done
+
+# 5e. active .venv present but without python3: the hook treats it as unusable and takes the walk-up
+reset_home; state "$A"; rm "$E/$A/.venv/bin/python3"
+fake "$W/envs/default/.venv/bin/python3"
+hook no-python "$W/envs/default/.venv" "Bootstrap"
+rm -rf "${W:?}/envs/default/.venv"
+
+# 5f. project under ~/.maru with a broken active env: the hook's walk-up stops at ~/.maru too
+reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"; mkdir -p "$T/home/.maru/x"
+f="$T/envfile"; : > "$f"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/home/.maru/x" bash "$W/$HOOK" 2>&1 >/dev/null)"
+[[ ! -s "$f" && "$err" == *"Bootstrap"* ]] || { echo "FAIL hook under-maru: $(cat "$f") ($err)" >&2; exit 1; }
+
+# 5c. active env without bundled node: system node, NODE_PATH still from the active env
+reset_home; state "$A"; rm -rf "${E:?}/$A/node"
+o="$(out skills/md2docx/md2docx x.md)"; expect no-node "$T/bin/node" "$o"
+[[ "$o" == *"NODE_PATH:$E/$A/node_modules"* && "$o" == *"Bootstrap"* ]] || { echo "FAIL no-node NODE_PATH or hint: $o" >&2; exit 1; }
+
+# 5h. hook with no active hash: a legacy .venv without python3 and a nearer broken walk-up
+# candidate are both skipped for the next one that has python3
+reset_home; state -; rm "$E/.venv/bin/python3"
+mkdir -p "$W/env/.venv/bin"; fake "$W/envs/default/.venv/bin/python3"
+hook broken-legacy-walkup "$W/envs/default/.venv"
+rm -rf "${W:?}/env" "${W:?}/envs/default/.venv"
+
+# 5g. symlinked state file, which Maru rejects: legacy
+reset_home; state "$A"; mv "$T/home/.maru/skills/bundle-state.json" "$T/home/s.json"; ln -s "$T/home/s.json" "$T/home/.maru/skills/bundle-state.json"
+check_all state-symlink "$E/.venv/bin/python3" "$E/node/bin/node"
+
+# 6. recorded hash without a directory (a pre-hash app): legacy
+reset_home; state ccc333
+check_all no-dir "$E/.venv/bin/python3" "$E/node/bin/node"
+
+# 7. a hash Maru rejects (reserved name): legacy (Maru refuses; REFERENCE.md lists this)
+for r in node node_modules temp logs input output ABC a.b '../x'; do  # reserved names, then characters Maru rejects
+    reset_home; state "$r"; mkdir -p "$E/$r/.venv/bin"; fake "$E/$r/.venv/bin/python3"
+    check_all "reserved-$r" "$E/.venv/bin/python3" "$E/node/bin/node"
+done
+
+# 7b. a symlinked hash directory, which Maru also rejects: legacy
+reset_home; ln -s "$E/$A" "$E/lnk"; state lnk
+check_all symlink "$E/.venv/bin/python3" "$E/node/bin/node"
+
+# 8. host-injected MARU_SKILLS_ENV outranks the state file
+reset_home; state "$A"; EXTRA=(MARU_SKILLS_ENV="$E/$P")
+check_all injected "$E/$P/.venv/bin/python3" "$E/$P/node/bin/node"
+hook injected "$E/$P/.venv"
+# 8b. injected env whose .venv lacks python3: the hook falls through to the active env
+rm "$E/$P/.venv/bin/python3"
+hook injected-broken "$E/$A/.venv"
+EXTRA=()
+
+# 9. nothing installed, no state file: system interpreter, and no stray shell errors
+rm -rf "${T:?}/home/.maru/env" "${T:?}/home/.maru/skills"
+check_all none "$T/bin/python3" "$T/bin/node"
+hook none "" "Bootstrap"
+
+# 9b. no interpreter anywhere: every wrapper exits non-zero with the repair hint
+mkdir -p "$T/minbin"
+for c in bash dirname tr sed head cat; do ln -sf "$(command -v "$c")" "$T/minbin/$c"; done
+[[ ! -x /bin/bash ]] || ln -sf /bin/bash "$T/minbin/bash"  # run.sh finds bash via env: keep it the system bash
+for w in "${WRAPPERS[@]}"; do
+    rc=0; o="$(env -i HOME="$T/home" PATH="$T/minbin" "$W/$w" x 2>&1)" || rc=$?
+    [[ $rc -eq 1 && "$o" == *"Bootstrap"* && "$o" != *"RAN:"* && "$o" != *"not found"* ]] || { echo "FAIL no-interpreter $w (rc=$rc): $o" >&2; exit 1; }
+done
+for w in "${WRAPPERS[@]}"; do
+    o="$(out "$w" x)"
+    [[ "$o" != *"No such file"* ]] || { echo "FAIL none $w: stray error: $o" >&2; exit 1; }
+done
+
+# 10. unreadable state file: legacy, and no stray shell errors
+reset_home; state "$A"; chmod 000 "$T/home/.maru/skills/bundle-state.json"
+if [[ ! -r "$T/home/.maru/skills/bundle-state.json" ]]; then  # root reads anyway; skip there
+    check_all unreadable "$E/.venv/bin/python3" "$E/node/bin/node"
+    o="$(out skills/pptx-toolkit/pptx read x.pptx)"
+    [[ "$o" != *"Permission denied"* ]] || { echo "FAIL unreadable: stray error: $o" >&2; exit 1; }
+fi
+chmod 644 "$T/home/.maru/skills/bundle-state.json"
+
+echo ok

@@ -1,6 +1,6 @@
 # python-pptx Quick Reference
 
-> python-pptx 1.0.2 (`~/.maru/env/.venv`)
+> python-pptx 1.0.2 (Maru 공유 env)
 > 공식 문서: https://python-pptx.readthedocs.io/en/latest/
 
 ## 로드

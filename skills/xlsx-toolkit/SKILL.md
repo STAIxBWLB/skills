@@ -1,7 +1,7 @@
 ---
 name: xlsx-toolkit
 description: >
-  Excel(.xlsx) 파일 읽기·요약·변환 스킬. openpyxl 기반(~/.maru/env/.venv 기설치).
+  Excel(.xlsx) 파일 읽기·요약·변환 스킬. openpyxl 기반(Maru 공유 env 기설치).
   MVP는 read-only — 셀 값 추출, 시트 요약, markdown/CSV 변환.
   inbox-process 추출 도구로 사용되며, 스프레드시트 자료 처리에 재사용.
   트리거: xlsx, 엑셀, excel, 스프레드시트, .xlsx 읽기, 시트 요약, xlsx 변환,
@@ -12,7 +12,7 @@ description: >
 
 ## Overview
 
-Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 스킬. `~/.maru/env/.venv`에 이미 설치된 openpyxl 3.1.5를 사용한다. `inbox-process` 내용 추출 도구로 호출될 수 있다.
+Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 스킬. Maru 공유 env에 이미 설치된 openpyxl 3.1.5를 사용한다. `inbox-process` 내용 추출 도구로 호출될 수 있다.
 
 ## MVP scope
 
