@@ -6,7 +6,7 @@
 #
 # 우선순위:
 #   1. $SKILL_PYTHON (caller override)
-#   2. $MARU_SKILLS_ENV (host 주입) → Maru 활성 해시 env → ~/.maru/env/.venv (legacy)
+#   2. $MARU_SKILLS_ENV (host 주입) → Maru 활성 해시 env (없을 때만 ~/.maru/env/.venv legacy)
 #   3. repo-local env/.venv (dev-in-tree)
 #   4. python3 on PATH (경고 출력)
 #
@@ -25,7 +25,7 @@ SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
   local f="$HOME/.maru/skills/bundle-state.json" h
-  [ -f "$f" ] || return 1
+  [ -f "$f" ] && [ -r "$f" ] || return 1
   h="$(tr -d '\n' < "$f" \
       | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
   case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac

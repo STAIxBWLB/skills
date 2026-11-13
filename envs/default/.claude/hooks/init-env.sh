@@ -11,7 +11,7 @@ set -euo pipefail
 # (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
     local f="$HOME/.maru/skills/bundle-state.json" h
-    [ -f "$f" ] || return 1
+    [ -f "$f" ] && [ -r "$f" ] || return 1
     h="$(tr -d '\n' < "$f" \
         | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
     case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac
@@ -29,7 +29,8 @@ resolve_env_root() {
     # Ambient VIRTUAL_ENV is intentionally ignored so an unrelated shell venv
     # cannot shadow the Maru runtime.
     if [[ -n "$ACTIVE" ]]; then
-        [[ -d "$ACTIVE/.venv" ]] && printf '%s\n' "$ACTIVE" && return 0
+        [[ -x "$ACTIVE/.venv/bin/python3" ]] && printf '%s\n' "$ACTIVE" && return 0
+        echo "[init-env] 활성 Maru env에 python 없음: $ACTIVE (빌드 미완료 또는 삭제). legacy ~/.maru/env는 쓰지 않고 작업 트리 env를 찾음. 복구: maru skills update --apply --repair-env" >&2
     elif [[ -d "$HOME/.maru/env/.venv" ]]; then
         printf '%s\n' "$HOME/.maru/env"; return 0
     fi
@@ -48,17 +49,14 @@ resolve_env_root() {
 }
 
 ENV_ROOT="$(resolve_env_root)" || {
-    if [[ -n "$ACTIVE" ]]; then
-        echo "[init-env] 활성 Maru env에 .venv 없음: $ACTIVE (빌드 미완료 또는 삭제). 스킵. 복구: maru skills update --apply --repair-env" >&2
-        exit 0
-    fi
+    [[ -n "$ACTIVE" ]] && exit 0  # resolve_env_root already printed the repair hint
     echo "[init-env] Maru env 미발견 (MARU_SKILLS_ENV, 활성 해시 env, ~/.maru/env, 작업 트리 모두 .venv 없음). 스킵. 복구: maru skills update --apply --repair-env (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 0
 }
 
 VENV_BIN="$ENV_ROOT/.venv/bin"
 if [[ ! -x "$VENV_BIN/python3" ]]; then
-    echo "[init-env] venv 미설치: $ENV_ROOT" >&2
+    echo "[init-env] venv에 python3 없음: $ENV_ROOT. 스킵. 복구: maru skills update --apply --repair-env" >&2
     exit 0
 fi
 

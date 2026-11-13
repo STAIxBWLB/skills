@@ -47,6 +47,7 @@ reset_home() {
     done
     fake "$E/.venv/bin/python3"
     fake "$E/node/bin/node"
+    mkdir -p "$E/node_modules"
 }
 state() {  # state <active hash or "-"> : pretty JSON shaped like Maru's bundle-state.json
     local active=""
@@ -91,6 +92,7 @@ check_all compact "$E/$A/.venv/bin/python3" "$E/$A/node/bin/node"
 # 3. no active entry: legacy, never previous
 reset_home; state -
 check_all no-active "$E/.venv/bin/python3" "$E/node/bin/node"
+[[ "$(out skills/md2docx/md2docx x.md)" == *"NODE_PATH:$E/node_modules"* ]] || { echo "FAIL no-active md2docx NODE_PATH" >&2; exit 1; }
 hook no-active "$E/.venv"
 
 # 4. active build not finished (no marker): still the active env, as Maru's env_root() picks it
@@ -103,14 +105,28 @@ reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"
 o="$(out skills/pptx-toolkit/pptx read x.pptx)"; expect no-venv "$T/bin/python3" "$o"
 [[ "$o" == *"repair-env"* ]] || { echo "FAIL no-venv: no repair hint: $o" >&2; exit 1; }
 hook no-venv "" "repair-env"
+# 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
+fake "$T/w/envs/default/.venv/bin/python3"
+check_all no-venv-walkup "$T/w/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
+hook no-venv-walkup "$T/w/envs/default/.venv" "repair-env"
+rm -rf "${T:?}/w/envs/default/.venv"
+
+# 5c. active env without bundled node: system node, NODE_PATH still from the active env
+reset_home; state "$A"; rm -rf "${E:?}/$A/node"
+o="$(out skills/md2docx/md2docx x.md)"; expect no-node "$T/bin/node" "$o"
+[[ "$o" == *"NODE_PATH:$E/$A/node_modules"* ]] || { echo "FAIL no-node NODE_PATH: $o" >&2; exit 1; }
 
 # 6. recorded hash without a directory (a pre-hash app): legacy
 reset_home; state ccc333
 check_all no-dir "$E/.venv/bin/python3" "$E/node/bin/node"
 
-# 7. a hash Maru rejects (reserved name): legacy
+# 7. a hash Maru rejects (reserved name): legacy (Maru refuses; REFERENCE.md lists this)
 reset_home; state node
 check_all reserved "$E/.venv/bin/python3" "$E/node/bin/node"
+
+# 7b. a symlinked hash directory, which Maru also rejects: legacy
+reset_home; ln -s "$E/$A" "$E/lnk"; state lnk
+check_all symlink "$E/.venv/bin/python3" "$E/node/bin/node"
 
 # 8. host-injected MARU_SKILLS_ENV outranks the state file
 reset_home; state "$A"; EXTRA=(MARU_SKILLS_ENV="$E/$P")
@@ -125,5 +141,14 @@ for w in "${WRAPPERS[@]}"; do
     o="$(out "$w" x)"
     [[ "$o" != *"No such file"* ]] || { echo "FAIL none $w: stray error: $o" >&2; exit 1; }
 done
+
+# 10. unreadable state file: legacy, and no stray shell errors
+reset_home; state "$A"; chmod 000 "$T/home/.maru/skills/bundle-state.json"
+if [[ ! -r "$T/home/.maru/skills/bundle-state.json" ]]; then  # root reads anyway; skip there
+    check_all unreadable "$E/.venv/bin/python3" "$E/node/bin/node"
+    o="$(out skills/pptx-toolkit/pptx read x.pptx)"
+    [[ "$o" != *"Permission denied"* ]] || { echo "FAIL unreadable: stray error: $o" >&2; exit 1; }
+fi
+chmod 644 "$T/home/.maru/skills/bundle-state.json"
 
 echo ok

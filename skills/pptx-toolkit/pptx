@@ -21,7 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 # (no state file, no active hash, a name Maru rejects, no directory) to fall through.
 maru_active_env() {
     local f="$HOME/.maru/skills/bundle-state.json" h
-    [ -f "$f" ] || return 1
+    [ -f "$f" ] && [ -r "$f" ] || return 1
     h="$(tr -d '\n' < "$f" \
         | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
     case "$h" in ''|node|node_modules|temp|logs|input|output) return 1 ;; esac

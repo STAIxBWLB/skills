@@ -2,7 +2,7 @@
 // md2docx.mjs — convert markdown docs to refined .docx using docx-js (docx@9.6.x).
 // Self-contained parser tuned to a pragmatic markdown subset (no external md parser).
 // Managed by the Maru `md2docx` skill — invoke via the `md2docx` wrapper, which
-// resolves the bundled Node runtime + NODE_PATH=~/.maru/env/node_modules.
+// resolves the bundled Node runtime + NODE_PATH=<env>/node_modules.
 //
 // Usage (via wrapper):
 //   md2docx <file1.md> [file2.md ...]
@@ -19,7 +19,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { createRequire } from "node:module";
-// docx resolves from the Maru env (NODE_PATH=~/.maru/env/node_modules) via CJS
+// docx resolves from the Maru env (NODE_PATH=<env>/node_modules) via CJS
 // require — ESM static `import` does NOT honor NODE_PATH for bare specifiers.
 const require = createRequire(import.meta.url);
 const {

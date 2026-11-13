@@ -21,7 +21,7 @@ try:
     from pptx import Presentation
     from pptx.slide import Slide
 except ImportError:
-    print("[pptx-toolkit] python-pptx 미설치: wrapper가 고른 python에 패키지가 없음. 복구: maru skills update --apply --repair-env", file=sys.stderr)
+    print(f"[pptx-toolkit] python-pptx 미설치: {sys.executable}. 복구: maru skills update --apply --repair-env (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)", file=sys.stderr)
     sys.exit(2)
 
 

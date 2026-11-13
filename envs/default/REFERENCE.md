@@ -76,6 +76,13 @@ sync with it**:
 
 The md2docx wrapper resolves `node/bin/node` in the same order.
 
+The shell differs from Maru only in broken states, which need
+`maru skills update --apply --repair-env` either way: for a hash Maru rejects
+(reserved name, invalid characters, a symlinked directory), an unreadable or
+malformed state file, a recorded hash without its directory, or a `<hash>.prev`
+backup mid-rebuild, Maru refuses or recovers, while the wrappers use the legacy
+location.
+
 Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
 venvs cannot shadow the Maru runtime. The Maru host injects `MARU_SKILLS_ENV`,
 `VIRTUAL_ENV`, `PATH` (`+.venv/bin`), and `NODE_PATH` (`+node_modules`) for
@@ -86,7 +93,9 @@ so bare CLI sessions match.
 
 `.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then the
 active hashed env (or, without one, the legacy `~/.maru/env`), then a walk-up
-from the project directory, and, when
+from the project directory; when the active env has no `.venv/bin/python3` it
+prints the repair command before the walk-up. When
+
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
 session use the shared runtime. Register it once as a SessionStart hook in the
