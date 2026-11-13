@@ -47,12 +47,13 @@ dependency source of truth. Runtime outputs are ignored: `.venv/`, `node/`,
 # (venv, bundled node/, node_modules). The CLI builds it only while applying a
 # newer bundle (`maru skills update --apply --repair-env`).
 
-# Without the Maru app, and only when no active hashed env is recorded (the
-# wrappers never use the legacy location while one is): provision or
-# health-check ~/.maru/env with setup.sh from the bundle
-# (~/.maru/skills/_builtin/envs/default/) or a checkout (envs/default/)
-bash envs/default/setup.sh --target ~/.maru/env
-bash envs/default/setup.sh --verify --target ~/.maru/env
+# Without the Maru app, and only when there is no active hashed env (no
+# recorded active.envHash whose directory exists under ~/.maru/env; while that
+# directory exists the wrappers never use the legacy location): provision or
+# health-check ~/.maru/env, from the bundle (~/.maru/skills/_builtin/envs/default/)
+# or this directory in a checkout
+bash setup.sh --target ~/.maru/env
+bash setup.sh --verify --target ~/.maru/env
 
 # dev-in-tree: provision this directory, check system dependencies
 make setup
@@ -82,8 +83,8 @@ sync with it**:
 
 The md2docx wrapper resolves `node/bin/node` in the same order, with `$SKILL_NODE` as the override; when it falls back to system node it still sets `NODE_PATH` from `$MARU_SKILLS_ENV`, the active hashed env, or the legacy location.
 
-The shell differs from Maru only in broken states, which need
-Maru's Bootstrap either way:
+The shell differs from Maru only in broken states, which need Maru-side repair
+either way (Bootstrap, or the state-file recovery Maru's error names):
 
 - a hash Maru rejects (reserved name, invalid characters, a symlinked
   directory), or a state file that is unreadable, a symlink, or malformed so the

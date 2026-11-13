@@ -17,7 +17,7 @@ for w in "${WRAPPERS[@]}" "$HOOK"; do
     first="$body"
 done
 
-T="$(mktemp -d)" || exit 1
+T="$(mktemp -d /tmp/check_active_env.XXXXXX)" || exit 1  # fixed parent: no walk-up candidates above it
 T="$(cd "$T" && pwd -P)"  # physical: wrappers resolve env roots with pwd -P
 [[ -d "$T" && "$T" != "$PWD" ]] || { echo "FAIL: no temp dir" >&2; exit 1; }
 trap 'rm -rf "$T"' EXIT
@@ -190,7 +190,7 @@ mkdir -p "$T/minbin"
 for c in bash dirname tr sed head cat; do ln -sf "$(command -v "$c")" "$T/minbin/$c"; done
 for w in "${WRAPPERS[@]}"; do
     rc=0; o="$(env -i HOME="$T/home" PATH="$T/minbin" "$T/w/$w" x 2>&1)" || rc=$?
-    [[ $rc -ne 0 && "$o" == *"Bootstrap"* && "$o" != *"RAN:"* ]] || { echo "FAIL no-interpreter $w (rc=$rc): $o" >&2; exit 1; }
+    [[ $rc -eq 1 && "$o" == *"Bootstrap"* && "$o" != *"RAN:"* && "$o" != *"not found"* ]] || { echo "FAIL no-interpreter $w (rc=$rc): $o" >&2; exit 1; }
 done
 for w in "${WRAPPERS[@]}"; do
     o="$(out "$w" x)"
