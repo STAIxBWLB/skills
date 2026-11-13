@@ -37,10 +37,12 @@ fake() {  # fake interpreter: prints the path it ran as and the NODE_PATH it got
     chmod +x "$1"
 }
 
-# The wrappers run from copies under $T; their dev-in-tree walk-up starts there.
+# The wrappers run from copies under the fake ~/.maru, so every walk-up ends at
+# the wrappers' own ~/.maru stop inside $T and never reaches a shared parent.
+W="$T/home/.maru/w"
 for w in "${WRAPPERS[@]}" "$HOOK"; do
-    mkdir -p "$T/w/$(dirname "$w")"
-    cp "$REPO/$w" "$T/w/$w"
+    mkdir -p "$W/$(dirname "$w")"
+    cp "$REPO/$w" "$W/$w"
 done
 fake "$T/bin/python3"
 fake "$T/bin/node"
@@ -48,7 +50,7 @@ fake "$T/bin/node"
 A=aaa111 P=bbb222
 E="$T/home/.maru/env"
 reset_home() {
-    rm -rf "${T:?}/home"
+    rm -rf "${T:?}/home/.maru/env" "${T:?}/home/.maru/skills"
     mkdir -p "$T/home/.maru/skills"
     for h in "$A" "$P"; do
         fake "$E/$h/.venv/bin/python3"
@@ -68,7 +70,7 @@ state() {  # state <active hash or "-"> : pretty JSON shaped like Maru's bundle-
 
 EXTRA=()
 out() {  # out <wrapper> <args...>: stdout and stderr of a wrapper copy
-    env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" ${EXTRA[@]+"${EXTRA[@]}"} "$T/w/$1" "${@:2}" 2>&1 || echo "EXIT:$?"
+    env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" ${EXTRA[@]+"${EXTRA[@]}"} "$W/$1" "${@:2}" 2>&1 || echo "EXIT:$?"
 }
 expect() {  # expect <label> <wanted interpreter> <output>
     local got; got="$(printf '%s\n' "$3" | sed -n 's/^RAN://p' | head -n1)"
@@ -82,8 +84,8 @@ check_all() {  # check_all <label> <python> <node>
 }
 hook() {  # hook <label> <wanted VIRTUAL_ENV or ""> [stderr substring]
     local f="$T/envfile" err got; : > "$f"
-    err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/w" \
-        ${EXTRA[@]+"${EXTRA[@]}"} bash "$T/w/$HOOK" 2>&1 >/dev/null)"
+    err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$W" \
+        ${EXTRA[@]+"${EXTRA[@]}"} bash "$W/$HOOK" 2>&1 >/dev/null)"
     got="$(sed -n 's/^export VIRTUAL_ENV="\(.*\)"$/\1/p' "$f")"
     [[ "$got" == "$2" ]] || { echo "FAIL hook $1: wanted '$2', got '$got' ($err)" >&2; exit 1; }
     [[ -z "${3:-}" || "$err" == *"$3"* ]] || { echo "FAIL hook $1: stderr lacks '$3': $err" >&2; exit 1; }
@@ -118,13 +120,13 @@ for w in skills/pptx-toolkit/pptx skills/xlsx-toolkit/xlsx skills/io-telegram/sc
     [[ "$o" == *"Bootstrap"* ]] || { echo "FAIL no-venv $w: no repair hint: $o" >&2; exit 1; }
 done
 hook no-venv "" "Bootstrap"
-err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$T/envfile" CLAUDE_PROJECT_DIR="$T/w" bash "$T/w/$HOOK" 2>&1 >/dev/null)"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$T/envfile" CLAUDE_PROJECT_DIR="$W" bash "$W/$HOOK" 2>&1 >/dev/null)"
 [[ "$err" != *"setup.sh"* ]] || { echo "FAIL hook no-venv: legacy setup step offered: $err" >&2; exit 1; }
 # 5b. ... and with a walk-up env present: wrappers and hook take it, the hook still warns
-fake "$T/w/envs/default/.venv/bin/python3"
-check_all no-venv-walkup "$T/w/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
-hook no-venv-walkup "$T/w/envs/default/.venv" "Bootstrap"
-rm -rf "${T:?}/w/envs/default/.venv"
+fake "$W/envs/default/.venv/bin/python3"
+check_all no-venv-walkup "$W/envs/default/.venv/bin/python3" "$E/$A/node/bin/node"
+hook no-venv-walkup "$W/envs/default/.venv" "Bootstrap"
+rm -rf "${W:?}/envs/default/.venv"
 
 # 5d. installed layout (wrappers under ~/.maru/skills): the walk-up must not reach the legacy env
 rm -rf "${E:?}/$A/node"
@@ -140,14 +142,14 @@ done
 
 # 5e. active .venv present but without python3: the hook treats it as unusable and takes the walk-up
 reset_home; state "$A"; rm "$E/$A/.venv/bin/python3"
-fake "$T/w/envs/default/.venv/bin/python3"
-hook no-python "$T/w/envs/default/.venv" "Bootstrap"
-rm -rf "${T:?}/w/envs/default/.venv"
+fake "$W/envs/default/.venv/bin/python3"
+hook no-python "$W/envs/default/.venv" "Bootstrap"
+rm -rf "${W:?}/envs/default/.venv"
 
 # 5f. project under ~/.maru with a broken active env: the hook's walk-up stops at ~/.maru too
 reset_home; state "$A"; rm -rf "${E:?}/$A/.venv"; mkdir -p "$T/home/.maru/x"
 f="$T/envfile"; : > "$f"
-err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/home/.maru/x" bash "$T/w/$HOOK" 2>&1 >/dev/null)"
+err="$(env -i HOME="$T/home" PATH="$T/bin:/usr/bin:/bin" CLAUDE_ENV_FILE="$f" CLAUDE_PROJECT_DIR="$T/home/.maru/x" bash "$W/$HOOK" 2>&1 >/dev/null)"
 [[ ! -s "$f" && "$err" == *"Bootstrap"* ]] || { echo "FAIL hook under-maru: $(cat "$f") ($err)" >&2; exit 1; }
 
 # 5c. active env without bundled node: system node, NODE_PATH still from the active env
@@ -158,9 +160,9 @@ o="$(out skills/md2docx/md2docx x.md)"; expect no-node "$T/bin/node" "$o"
 # 5h. hook with no active hash: a legacy .venv without python3 and a nearer broken walk-up
 # candidate are both skipped for the next one that has python3
 reset_home; state -; rm "$E/.venv/bin/python3"
-mkdir -p "$T/w/env/.venv/bin"; fake "$T/w/envs/default/.venv/bin/python3"
-hook broken-legacy-walkup "$T/w/envs/default/.venv"
-rm -rf "${T:?}/w/env" "${T:?}/w/envs/default/.venv"
+mkdir -p "$W/env/.venv/bin"; fake "$W/envs/default/.venv/bin/python3"
+hook broken-legacy-walkup "$W/envs/default/.venv"
+rm -rf "${W:?}/env" "${W:?}/envs/default/.venv"
 
 # 5g. symlinked state file, which Maru rejects: legacy
 reset_home; state "$A"; mv "$T/home/.maru/skills/bundle-state.json" "$T/home/s.json"; ln -s "$T/home/s.json" "$T/home/.maru/skills/bundle-state.json"
@@ -190,15 +192,16 @@ hook injected-broken "$E/$A/.venv"
 EXTRA=()
 
 # 9. nothing installed, no state file: system interpreter, and no stray shell errors
-rm -rf "${T:?}/home"; mkdir -p "$T/home"
+rm -rf "${T:?}/home/.maru/env" "${T:?}/home/.maru/skills"
 check_all none "$T/bin/python3" "$T/bin/node"
 hook none "" "Bootstrap"
 
 # 9b. no interpreter anywhere: every wrapper exits non-zero with the repair hint
 mkdir -p "$T/minbin"
 for c in bash dirname tr sed head cat; do ln -sf "$(command -v "$c")" "$T/minbin/$c"; done
+[[ ! -x /bin/bash ]] || ln -sf /bin/bash "$T/minbin/bash"  # run.sh finds bash via env: keep it the system bash
 for w in "${WRAPPERS[@]}"; do
-    rc=0; o="$(env -i HOME="$T/home" PATH="$T/minbin" "$T/w/$w" x 2>&1)" || rc=$?
+    rc=0; o="$(env -i HOME="$T/home" PATH="$T/minbin" "$W/$w" x 2>&1)" || rc=$?
     [[ $rc -eq 1 && "$o" == *"Bootstrap"* && "$o" != *"RAN:"* && "$o" != *"not found"* ]] || { echo "FAIL no-interpreter $w (rc=$rc): $o" >&2; exit 1; }
 done
 for w in "${WRAPPERS[@]}"; do
