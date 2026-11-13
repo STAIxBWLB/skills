@@ -64,7 +64,7 @@ The user selects the target format by naming just the extension (e.g. "hwpx로",
 |--------|------------|
 | (none) / `docx` | `~/.maru/skills/md2docx/md2docx <src.md> -o <tmp>/<stem>.docx` |
 | `hwpx` | Use the released agent-hwp binary `ahwp` (minimum `v1.2.0`; releases before `v1.6.0` ship it only as `hwp`): `"$HWP_CLI" new --from <src.md> --preset report -o <tmp>/<stem>.hwpx`; if the source deliberately contains `{{slots}}`, follow with `"$HWP_CLI" fill <tmp>/<stem>.hwpx -o <tmp>/<stem>-filled.hwpx --set "name=value"`; always finish with `"$HWP_CLI" validate <output>.hwpx`. Set `HWP_CLI` to an absolute released binary path whose `--version` reports the supported tag, never a checkout or unversioned PATH fallback. See `hwp/references/editing-recipes.md`. |
-| `pdf` | `~/.maru/env/.venv/bin/python ~/.maru/skills/share-outbox/scripts/md_to_pdf_chrome.py <src.md> -o <tmp>/<stem>.pdf` (HTML print path; details in `references/pdf-print-path.md`) |
+| `pdf` | `<skill>/scripts/run.sh <skill>/scripts/md_to_pdf_chrome.py <src.md> -o <tmp>/<stem>.pdf` (HTML print path; details in `references/pdf-print-path.md`) |
 | `md` | stage the original without conversion (explicit instruction only) |
 | other (e.g. `pptx`) | use the matching workspace conversion skill if one exists; otherwise tell the user the target is unsupported (never silently fall back) |
 
@@ -87,17 +87,20 @@ Rules:
 
 ## Script
 
-Use `scripts/prepare_share_file.py` with the workspace Python runtime for
-deterministic filename generation, copying, duplicate protection, and receipt
-writing.
+Use `scripts/prepare_share_file.py` for deterministic filename generation,
+copying, duplicate protection, and receipt writing. Run both scripts through
+`scripts/run.sh`, which finds the Maru env that has their packages (PyYAML,
+markdown-it-py). Run them from the workspace root: the script finds
+`workspace.config.yaml` from the current directory, and a relative
+`--inbox-item` resolves against it. `<skill>` is this skill's directory.
 
 Typical usage:
 
 ```bash
-~/.maru/env/.venv/bin/python ~/.maru/skills/share-outbox/scripts/prepare_share_file.py /path/to/source.ext --title "한글 제목"
-~/.maru/env/.venv/bin/python ~/.maru/skills/share-outbox/scripts/prepare_share_file.py /path/to/source.ext --title "English Title" --allow-english
-~/.maru/env/.venv/bin/python ~/.maru/skills/share-outbox/scripts/prepare_share_file.py /path/to/source.ext --inbox-item inbox/items/done/item-id
-~/.maru/env/.venv/bin/python ~/.maru/skills/share-outbox/scripts/prepare_share_file.py /path/to/source.ext --dry-run
+<skill>/scripts/run.sh <skill>/scripts/prepare_share_file.py /path/to/source.ext --title "한글 제목"
+<skill>/scripts/run.sh <skill>/scripts/prepare_share_file.py /path/to/source.ext --title "English Title" --allow-english
+<skill>/scripts/run.sh <skill>/scripts/prepare_share_file.py /path/to/source.ext --inbox-item inbox/items/done/item-id
+<skill>/scripts/run.sh <skill>/scripts/prepare_share_file.py /path/to/source.ext --dry-run
 ```
 
 Rules:
