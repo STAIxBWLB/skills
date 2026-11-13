@@ -1,31 +1,42 @@
 #!/usr/bin/env bash
 # run.sh — Maru skills python interpreter wrapper (io-telegram)
 #
-# telethon 은 ~/.maru/env/.venv 에만 설치되므로 auth.py/telegram_monitor.py
+# telethon 은 Maru env(.venv)에만 설치되므로 auth.py/telegram_monitor.py
 # 는 반드시 이 wrapper 를 통해 실행한다.
 #
 # 우선순위:
 #   1. $SKILL_PYTHON (caller override)
-#   2. $MARU_SKILLS_ENV (host 주입) → ~/.maru/env/.venv (정규)
+#   2. $MARU_SKILLS_ENV (host 주입) → Maru 활성 해시 env → ~/.maru/env/.venv (legacy)
 #   3. repo-local env/.venv (dev-in-tree)
 #   4. python3 on PATH (경고 출력)
 #
-# venv 미설치 시: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env
+# venv 미설치 시: maru skills update --apply --repair-env
 
 set -euo pipefail
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Resolve the Maru skills python interpreter, most-specific first.
-# Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV,
-# then the canonical ~/.maru/env, then a repo-local walk-up (dev-in-tree).
+# Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV, then Maru's active
+# hashed env, then the legacy ~/.maru/env, then a repo-local walk-up (dev-in-tree).
 # Canonical snippet — keep in sync with envs/default/REFERENCE.md.
+# Maru's active hashed env: ~/.maru/env/<active.envHash> from bundle-state.json,
+# once its build completed. Prints nothing when there is none.
+maru_active_env() {
+  local h
+  h="$(tr -d '\n' < "$HOME/.maru/skills/bundle-state.json" 2>/dev/null \
+      | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
+  [ -n "$h" ] && [ -f "$HOME/.maru/env/$h/.maru-env-complete" ] && printf '%s\n' "$HOME/.maru/env/$h"
+}
+
 find_env_python() {
-  local c dir
+  local c dir active
+  active="$(maru_active_env || true)"
   if [[ -n "${SKILL_PYTHON:-}" && -x "${SKILL_PYTHON}" ]]; then
     printf '%s\n' "$SKILL_PYTHON"; return 0
   fi
   for c in \
     "${MARU_SKILLS_ENV:+$MARU_SKILLS_ENV/.venv/bin/python3}" \
+    "${active:+$active/.venv/bin/python3}" \
     "$HOME/.maru/env/.venv/bin/python3"; do
     [[ -n "$c" && -x "$c" ]] && printf '%s\n' "$c" && return 0
   done
@@ -46,9 +57,9 @@ PYTHON="$(find_env_python || true)"
 if [[ -z "$PYTHON" || ! -x "$PYTHON" ]]; then
   if command -v python3 >/dev/null 2>&1; then
     PYTHON="$(command -v python3)"
-    echo "WARN: ~/.maru/env/.venv 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능)" >&2
+    echo "WARN: Maru env python 미발견, system python3 fallback: $PYTHON (telethon 미설치 가능; 복구: maru skills update --apply --repair-env)" >&2
   else
-    echo "ERROR: no python. 'bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env' 실행" >&2
+    echo "ERROR: no python: Maru env도 system python3도 찾지 못함. 'maru skills update --apply --repair-env' 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
     exit 1
   fi
 fi

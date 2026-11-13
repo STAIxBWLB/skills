@@ -22,6 +22,7 @@ envs/default/
 └── scripts/
     ├── extract_all.py            # HWP/HWPX/PDF text extraction
     ├── check_extract_engine_error.py  # self-check for the engine-missing path
+    ├── check_active_env.sh       # self-check for the env resolution order
     ├── extract_pdf.py
     ├── ocr_pipeline.py
     ├── setup-node.sh
@@ -51,6 +52,9 @@ bash ~/.maru/skills/_builtin/envs/default/setup.sh --verify --target ~/.maru/env
 # dev-in-tree: provision this directory, check system dependencies
 make setup
 make verify
+
+# resolution self-check: runs the wrappers and the hook against a fake home
+bash scripts/check_active_env.sh
 ```
 
 ## Env resolution (canonical)
@@ -61,9 +65,14 @@ sync with it**:
 
 1. `$SKILL_PYTHON` (caller override)
 2. `$MARU_SKILLS_ENV/.venv/bin/python3` (host-injected)
-3. `$HOME/.maru/env/.venv/bin/python3` (canonical fixed location)
-4. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree)
-5. system `python3` (warning)
+3. `$HOME/.maru/env/<hash>/.venv/bin/python3`, the active hashed env: `<hash>` is
+   `active.envHash` in `~/.maru/skills/bundle-state.json`, used once
+   `.maru-env-complete` exists there (`maru_active_env` in each wrapper)
+4. `$HOME/.maru/env/.venv/bin/python3` (legacy fixed location)
+5. repo-local walk-up: `env/.venv`, `envs/default/.venv`, `skills/envs/default/.venv` (dev-in-tree)
+6. system `python3` (warning)
+
+The md2docx wrapper resolves `node/bin/node` in the same order.
 
 Ambient `$VIRTUAL_ENV` is intentionally ignored as an input so unrelated shell
 venvs cannot shadow the Maru runtime. The Maru host injects `MARU_SKILLS_ENV`,
@@ -73,8 +82,9 @@ so bare CLI sessions match.
 
 ## Session hook
 
-`.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then
-`~/.maru/env`, then a walk-up from the project directory, and, when
+`.claude/hooks/init-env.sh` resolves the env from `$MARU_SKILLS_ENV`, then the
+active hashed env, then the legacy `~/.maru/env`, then a walk-up from the
+project directory, and, when
 `CLAUDE_ENV_FILE` is set, writes `MARU_SKILLS_ENV`, `VIRTUAL_ENV`, `PATH` and
 (when `node_modules` exists) `NODE_PATH` into it, so later tool calls in the
 session use the shared runtime. Register it once as a SessionStart hook in the

@@ -12,16 +12,27 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Resolve the Maru skills python interpreter, most-specific first.
-# Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV,
-# then the canonical ~/.maru/env, then a repo-local walk-up (dev-in-tree).
+# Honors $SKILL_PYTHON, then host-injected $MARU_SKILLS_ENV, then Maru's active
+# hashed env, then the legacy ~/.maru/env, then a repo-local walk-up (dev-in-tree).
 # Canonical snippet — keep in sync with envs/default/REFERENCE.md.
+# Maru's active hashed env: ~/.maru/env/<active.envHash> from bundle-state.json,
+# once its build completed. Prints nothing when there is none.
+maru_active_env() {
+    local h
+    h="$(tr -d '\n' < "$HOME/.maru/skills/bundle-state.json" 2>/dev/null \
+        | sed -n 's/.*"active"[[:space:]]*:[[:space:]]*{[^}]*"envHash"[[:space:]]*:[[:space:]]*"\([a-z0-9_-]*\)".*/\1/p')"
+    [ -n "$h" ] && [ -f "$HOME/.maru/env/$h/.maru-env-complete" ] && printf '%s\n' "$HOME/.maru/env/$h"
+}
+
 find_env_python() {
-    local c dir
+    local c dir active
+    active="$(maru_active_env || true)"
     if [ -n "${SKILL_PYTHON:-}" ] && [ -x "${SKILL_PYTHON}" ]; then
         printf '%s\n' "$SKILL_PYTHON"; return 0
     fi
     for c in \
         "${MARU_SKILLS_ENV:+$MARU_SKILLS_ENV/.venv/bin/python3}" \
+        "${active:+$active/.venv/bin/python3}" \
         "$HOME/.maru/env/.venv/bin/python3"; do
         [ -n "$c" ] && [ -x "$c" ] && printf '%s\n' "$c" && return 0
     done
@@ -42,9 +53,9 @@ VENV_PY="$(find_env_python || true)"
 if [ -z "$VENV_PY" ] || [ ! -x "$VENV_PY" ]; then
     if command -v python3 >/dev/null 2>&1; then
         VENV_PY="$(command -v python3)"
-        echo "[xlsx-toolkit] ~/.maru/env/.venv 미발견, system python3 fallback: $VENV_PY" >&2
+        echo "[xlsx-toolkit] Maru env python 미발견, system python3 fallback: $VENV_PY (복구: maru skills update --apply --repair-env)" >&2
     else
-        echo "[xlsx-toolkit] python 없음. 'bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env' 실행" >&2
+        echo "[xlsx-toolkit] python 없음: Maru env도 system python3도 찾지 못함. 'maru skills update --apply --repair-env' 실행 (Maru 없이: bash ~/.maru/skills/_builtin/envs/default/setup.sh --target ~/.maru/env)" >&2
         exit 1
     fi
 fi
