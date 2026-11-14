@@ -12,11 +12,13 @@ and v1.0.0's quick-xml 0.41 for RUSTSEC-2026-0194) and adds what Maru now relies
 `hwp slots --forms`, which lists label cells and inline labels beside the slots;
 `hwp fill --forms`, which also fills blanks and checkboxes; `hwp fill` matching padded
 `{{ name }}` slots the way `hwp slots` lists them; and `--allow-partial` publishing a
-fill that matched nothing.
+fill that matched nothing. These are v1.2.0 command names; v2.0.0 accepts only
+`ahwp slots` and `ahwp fill`.
 
 Use a versioned release asset and an absolute binary path. A checkout build or
 an unversioned PATH binary is not replacement evidence. The binary is `ahwp`
-from v1.6.0 and `hwp` on earlier releases; 2.0.0 is planned to ship only `ahwp`.
+from v1.6.0 and `hwp` on earlier releases;
+[v2.0.0](https://github.com/STAIxBWLB/agent-hwp/releases/tag/v2.0.0) ships only `ahwp`.
 
 ```sh
 HWP_BIN=/absolute/path/to/ahwp-v1.6.0/ahwp   # before v1.6.0: .../hwp-v1.2.0/hwp
