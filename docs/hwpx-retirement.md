@@ -16,7 +16,8 @@ fill that matched nothing.
 
 Use a versioned release asset and an absolute binary path. A checkout build or
 an unversioned PATH binary is not replacement evidence. The binary is `ahwp`
-from v1.6.0 and `hwp` on earlier releases; 2.0.0 is planned to ship only `ahwp`.
+from v1.6.0 and `hwp` on earlier releases;
+[v2.0.0](https://github.com/STAIxBWLB/agent-hwp/releases/tag/v2.0.0) ships only `ahwp`.
 
 ```sh
 HWP_BIN=/absolute/path/to/ahwp-v1.6.0/ahwp   # before v1.6.0: .../hwp-v1.2.0/hwp
