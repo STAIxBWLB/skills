@@ -50,6 +50,10 @@ stepwise status:
   ],
   "enrichment": {
     "project": "[[vault-note]]",
+    "description": "Outcome or purpose beyond the meeting title",
+    "domain": "projects",
+    "topics": ["[[projects]]"],
+    "entities": ["Canonical person", "Canonical organization"],
     "relatedMeetings": ["[[meeting-note]]"],
     "relatedTasks": ["[[task-note]]"],
     "calendarLink": { "calendarId": "id-or-null", "calendarEventId": "id-or-null" },
@@ -67,6 +71,27 @@ stepwise status:
       "due": "YYYY-MM-DD or null",
       "meetingSourcePath": "meetings/YYYY/YYYY-MM/<file>.md",
       "selected": false
+    },
+    {
+      "skill": "vault-extract",
+      "title": "Extract meeting decisions",
+      "prompt": "Read the approved meetingSourcePath and re-run vault-extract preconditions. Include the actual vault fields, workspace origins, sibling hint and candidates here, per vault-handoff.md.",
+      "reason": "Preserve a source-supported decision",
+      "meetingSourcePath": "meetings/YYYY/YYYY-MM/<file>.md",
+      "vault": {
+        "description": "Outcome or purpose beyond the meeting title",
+        "domain": "projects",
+        "topics": ["[[projects]]"],
+        "entities": ["Canonical person", "Canonical organization"]
+      },
+      "workspaceOrigins": [
+        {"field": "relatedMeetings", "link": "[[meeting-note]]", "path": "meetings/YYYY/YYYY-MM/meeting-note.md"}
+      ],
+      "siblingMeetingHint": null,
+      "candidates": [
+        {"title": "Source-supported decision", "type": "decision", "evidence": "Decision passage in the meeting note"}
+      ],
+      "selected": false
     }
   ]
 }
@@ -77,3 +102,11 @@ The `enrichment` object, the `corrections` array, and the
 populate them only from resolved enrichment (context-enrichment §3/§4) and
 verified corrections (workflow step 5), and omit or null them otherwise.
 Parsers ignore unknown fields.
+
+During normalize, apply `vault-handoff.md` before populating the vault fields in
+`enrichment`. They are reviewable proposals, not proof of a successful vault
+write. Keep rejected topic candidates in `uncertainties` with their cause and
+remedy, never in `enrichment.topics` or the note's frontmatter. When extraction
+is blocked, state why in `summary` and omit its follow-up. For ready extraction
+proposals, use `vault-handoff.md` §Extraction proposal for the structured fields
+and self-contained prompt. Unknown fields in existing records are preserved.

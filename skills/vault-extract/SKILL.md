@@ -15,11 +15,11 @@ Extract insights, decisions, observations from a source document and create vaul
 
 ## Preconditions (MANDATORY — enforce before any vault write)
 
-Before writing ANY vault note, verify the source summary.md frontmatter has **all three required fields with non-empty values**:
+Before writing ANY vault note, verify the source frontmatter (summary or canonical meeting note) has **all three required fields with non-empty values**:
 
 1. **`description`** — string, ≥10 chars, not equal to title
 2. **`domain`** — ∈ `{research | projects | teaching | operations | people | ai-practice}`
-3. **`topics`** — array containing ≥1 `[[wiki-link]]` **AND every `[[target]]` must exist as a real note in `vault/notes/<target>.md`** (MOC enforcement — topics carry hub navigation only, not keyword tags)
+3. **`topics`** — array containing ≥1 `[[wiki-link]]` **AND every `[[target]]` must be an existing MOC in the bound vault** (MOC enforcement — topics carry hub navigation only, not keyword tags)
    - vmem checks this at write time; `vmem_mocs` lists the existing MOCs when you need to choose one. expect: vmem refuses (V02) a `topics` entry that is not an existing MOC
    - If any `[[target]]` is missing: **ABORT** (do NOT auto-create the MOC) — the caller (or user) must either fix the summary's topics or create the MOC note first
    - Concept/keyword tags (e.g., `credit-recognition`, `partnership-mapping`) belong in body text, NOT in `topics`. Schema is "topics = MOC only" per `vault/AGENTS.md §Schema`.
@@ -57,13 +57,15 @@ These rules govern every extraction:
    - Filename: prose-as-title (lowercase, hyphens, .md)
    - YAML frontmatter with required fields (`description`, `type`, `domain`, `topics`)
    - **Copy source-derived fields verbatim**: `description`, `domain`, `topics` are copied directly from summary.md frontmatter (verified in preconditions above). See `lib/vault_adapter.md` §Summary To Vault Fields.
-   - **type remapping**: summary `type` (regulation|report|plan|...) maps to vault `type` (insight|decision|observation|person|project|method|moc|reference) based on semantic intent. Common mappings: report→observation, plan→decision, memo→insight, proposal→decision, regulation→observation.
-   - If registry matched in step 2, add `vault_note` wiki link to topics array
+   - **type remapping**: summary `type` (regulation|report|plan|...) maps to vault `type` (insight|decision|observation|person|project|method|moc|reference) based on semantic intent. Common mappings: report→observation, plan→decision, memo→insight, proposal→decision, regulation→observation, meeting→decision for actual decisions or observation for other meeting insights; `meeting_kind` is descriptive metadata, not a vault type.
+   - If registry matched in step 2, follow `lib/vault_adapter.md` §Project Registry Pattern for MOC validation; an ordinary `vault_note` never becomes a topic.
    - Set source field to the work/ relative path. If the source carries backref
      frontmatter (`source_doc`, `meetingSourcePath`, `relatedMeetings`,
-     `relatedTasks`), preserve those origins in the
-     note's source / Relevant Notes; emit a `[[wiki-link]]` only for targets that
-     resolve (consistent with the MOC dead-link gate above)
+     `relatedTasks`), read `skills/meeting-notes/references/vault-handoff.md`
+     §Link namespaces before composing the vault note. Preserve workspace
+     origins as plain paths, including body links; retain vault links only
+     after resolving them in the bound vault. The same stem in both namespaces
+     does not make a workspace link a vault link.
    - Body: the insight with context, with quoted facts and `## Synthesis` placed per §Extraction Fidelity and Concurrent Writers
    - Relevant Notes section with wiki links
    - Topics section with MOC wiki links
