@@ -27,3 +27,11 @@ added later as optional fields; because parsers ignore unknown fields, existing
 Material needed only in one mode lives in `references/`: the verification
 procedure (`verification.md`, used when the verification hook is set) and the
 review-mode output (`maru-review.md`).
+
+## Change history
+
+- 2026-11-15: Issue #150 aligned meeting frontmatter and extraction handoffs.
+  The template lacked extraction-required fields, registry project notes were
+  mistaken for MOC topics, and workspace links could be treated as vault links.
+  The updated contract separates those namespaces and exposes unresolved
+  metadata during review before an extraction proposal is offered.

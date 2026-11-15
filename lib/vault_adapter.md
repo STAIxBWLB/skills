@@ -129,7 +129,7 @@ If required fields are missing, fail before writing. Do not synthesize blank or 
 1. Load `ssot.project_registry` from `workspace.config.yaml`.
 2. Consider `status: active` entries only. Extract signals from the source (people, acronyms, keywords, orgs, tags).
 3. Score with the workspace weights; the default is people +3, acronyms +2, keywords +2, orgs +1, tags +1, with a match threshold of 3. A workspace scoring rule under `ssot.registry_scoring` overrides these defaults.
-4. A single top score at or above the threshold is the match: use its `vault_note` for `topics` and its `path` to validate the source.
+4. A single top score at or above the threshold is the match: use its `path` to validate the source. Resolve its `vault_note` in the bound vault. Add it to `topics` only if `vmem_mocs` confirms it is a MOC; for an ordinary note, keep it as a project/body link and use its validated MOC topics or a relevant existing domain MOC. Apply §Summary To Vault Fields before writing; a missing MOC is unresolved, never auto-created.
 5. Tie or ambiguity: use the registry disambiguation fields, then ask the user.
 6. Below the threshold (registry fallback): fall back to content-based domain analysis; if still ambiguous, ask the user, or record the source as unclassified (`project: -`) when the calling workflow allows it.
 

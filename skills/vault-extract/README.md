@@ -10,3 +10,11 @@ SKILL.md is the instruction source for this skill. This file is background for m
 ## Sibling meeting merge rule
 
 The merge-or-split rule for sibling meetings was added after two complementary meeting sources on one initiative were extracted as fragmented notes.
+
+## Change history
+
+- 2026-11-15: Issue #150 aligned meeting frontmatter and extraction handoffs.
+  The template lacked extraction-required fields, registry project notes were
+  mistaken for MOC topics, and workspace links could be treated as vault links.
+  The updated contract separates those namespaces and exposes unresolved
+  metadata during review before an extraction proposal is offered.

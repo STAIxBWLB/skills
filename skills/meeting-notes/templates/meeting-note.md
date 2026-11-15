@@ -1,13 +1,18 @@
 ---
 title: {title}
 date: {date}
-type: {type}
+type: meeting
+meeting_kind: "{meeting_kind}"
+description: "{description}"
+domain: {domain}
+topics: []            # populate with validated, existing vault MOC links
+entities: []          # resolved canonical people/org names, including non-attendees
 topic: {topic}
 tags: []
 attendees: []          # resolved [[person]] links when enrichment is on
-project:               # [[vault_note]] when resolved (context-enrichment §4)
-relatedMeetings: []    # [[meeting-note]] links
-relatedTasks: []       # [[task-note]] links
+project:               # resolved vault note; need not be a MOC
+relatedMeetings: []    # workspace meeting links, not vault targets
+relatedTasks: []       # workspace task links, not vault targets
 source_doc:            # origin path (transcript / inbox item)
 ---
 # {title}

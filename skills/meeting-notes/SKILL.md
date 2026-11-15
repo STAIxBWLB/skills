@@ -51,20 +51,21 @@ skill is provider-neutral and does not require inbox staging.
    tasks, and — targeted only — matching calendar events) and use it to
    cross-check facts and enrich the draft. Surface unresolved entities as
    uncertainties; never invent a canonical name or a wiki-link. Without the
-   hook, fall back to normalizing against the local guides only.
+   hook, fall back to normalizing against the local guides only. Read
+   `references/vault-handoff.md` during this phase to prepare and validate
+   vault fields and separate vault targets from workspace links.
 5. **Content verification & supplementation (`[phase:verify]`).** When
    `meeting_notes.hooks.verification` is set (e.g. `internal-external`), read
    `references/verification.md` before drafting and verify and supplement as it
    says; without the hook, skip this step.
-6. Draft the note using `templates/meeting-note.md`. Fill the frontmatter
-   `title` with a human-readable meeting title; Maru reads `title`, `date`,
-   `type`, `topic`, `tags`, and `attendees` from frontmatter. Keep the
-   configured filename policy. When enrichment resolved them, also set the
-   additive cross-link fields per the context-enrichment §4 contract: `project: [[vault_note]]`, `attendees` as
-   resolved `[[person]]` links, `relatedMeetings`, `relatedTasks`, and
-   `source_doc`. Emit a wiki-link only for entities §2 actually resolved (never
-   a guessed link). Structure action items as `{assignee, task, due}` rather
-   than bare checkboxes.
+6. Draft the note using `templates/meeting-note.md`. Set `type: meeting` and
+   keep the localized kind in `meeting_kind`. Fill `title`, `date`, `topic`,
+   `tags`, `attendees`, and the vault fields prepared in step 4, following
+   `references/vault-handoff.md`. Keep the configured filename policy.
+   Preserve unknown fields when updating an existing note. Populate resolved
+   cross-links (`project`, `relatedMeetings`, `relatedTasks`, `source_doc`)
+   according to that reference's namespaces. Structure action items as
+   `{assignee, task, due}` rather than bare checkboxes.
 7. Propose filing it under the configured meeting root, usually
    `YYYY/YYYY-MM/`; Maru applies the write only after user approval. The
    meeting root holds the **canonical** note. When a partner/project also needs a
@@ -76,7 +77,9 @@ skill is provider-neutral and does not require inbox staging.
    candidate from the structured action items (`title`, `assignee`, `due`) and
    add a `meetingSourcePath` backref to this meeting note so the task links back
    to its origin (context-enrichment §4). Do not write vault notes directly;
-   follow-ups are proposals only.
+   follow-ups are proposals only. For a vault extraction proposal, read
+   `references/vault-handoff.md` §Extraction proposal and carry its inputs
+   into both the structured follow-up and its self-contained `prompt`.
 
 ## Maru Run Contract
 
@@ -112,7 +115,8 @@ Allowed follow-up skills are `vault-extract`, `vault-connect`, and
   has already produced text.
 - Keep filename policy configurable; default to
   `YYMMDD-meeting-<slug>.md` (English lowercase kebab-case slug, no spaces/Hangul).
-  The 회의유형/한글 제목 are preserved in frontmatter `type`/`title`, not the filename.
+  The localized meeting kind and title are preserved in frontmatter
+  `meeting_kind`/`title`, not the filename.
 - If date, participants, or topic cannot be recovered from the input, leave a
   visible placeholder and state what is missing.
 - Legal/accounting evidence meeting records are out of scope unless the user
@@ -123,6 +127,7 @@ Allowed follow-up skills are `vault-extract`, `vault-connect`, and
 - `references/workspace-config.md` - runtime config keys
 - `references/verification.md` - workflow step 5 verification procedure
 - `references/maru-review.md` - review-mode phase markers and review object
+- `references/vault-handoff.md` - normalize-time vault fields and extraction inputs
 - `templates/meeting-note.md` - neutral meeting note template
 - `_meta/rules/naming-and-placement.md` §C - destination subfolder for project/partner
   copies of the meeting note (`*-meetings/`); the canonical note stays in the
