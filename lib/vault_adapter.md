@@ -46,12 +46,6 @@ Read the whole receipt, never one field. `ok: true` with `applied: true` saved i
 
 Skills link to this section (§Write results) instead of restating the rule.
 
-Declared exceptions (machine I/O, not agent writes):
-
-| Path | Writer / reader | Why |
-|---|---|---|
-| `ops/sessions/last-sync-timestamp` | fs read/write by vault-sync | plain file, not a note |
-
 Typical mappings:
 
 | Operation | vmem tool |

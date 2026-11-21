@@ -1,5 +1,7 @@
 # Maru Integration Contract
 
+The `vault-extract` and `vault-connect` skills are installed by `vmem setup <host> --apply`.
+
 Maru can treat the configured task root as a local-first data source.
 
 ## Directories

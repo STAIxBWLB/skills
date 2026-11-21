@@ -1,5 +1,7 @@
 # Vault handoff
 
+The `vault-extract` and `vault-connect` skills are installed by `vmem setup <host> --apply`.
+
 Read during workflow step 4 (`[phase:normalize]`) before drafting vault fields,
 and again when preparing an extraction follow-up.
 

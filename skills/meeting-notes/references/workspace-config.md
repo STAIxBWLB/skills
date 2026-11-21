@@ -1,5 +1,7 @@
 # Workspace Config
 
+The `vault-extract` and `vault-connect` skills are installed by `vmem setup <host> --apply`.
+
 ```yaml
 meeting_notes:
   root: ~/workspace/work/meetings

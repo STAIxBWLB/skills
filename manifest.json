@@ -222,129 +222,12 @@
       ]
     },
     {
-      "name": "skill-mine",
-      "path": "skills/skill-mine",
-      "tier": "core",
-      "tags": [
-        "skills",
-        "analysis"
-      ]
-    },
-    {
       "name": "task-management",
       "path": "skills/task-management",
       "tier": "core",
       "tags": [
         "task",
         "workflow"
-      ]
-    },
-    {
-      "name": "vault-connect",
-      "path": "skills/vault-connect",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "obsidian"
-      ]
-    },
-    {
-      "name": "vault-extract",
-      "path": "skills/vault-extract",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "extract"
-      ]
-    },
-    {
-      "name": "vault-graph",
-      "path": "skills/vault-graph",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "graph"
-      ]
-    },
-    {
-      "name": "vault-learn",
-      "path": "skills/vault-learn",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "learning"
-      ]
-    },
-    {
-      "name": "vault-lint",
-      "path": "skills/vault-lint",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "lint"
-      ]
-    },
-    {
-      "name": "vault-refactor",
-      "path": "skills/vault-refactor",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "refactor"
-      ]
-    },
-    {
-      "name": "vault-remember",
-      "path": "skills/vault-remember",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "memory"
-      ]
-    },
-    {
-      "name": "vault-rethink",
-      "path": "skills/vault-rethink",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "review"
-      ]
-    },
-    {
-      "name": "vault-stats",
-      "path": "skills/vault-stats",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "stats"
-      ]
-    },
-    {
-      "name": "vault-sync",
-      "path": "skills/vault-sync",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "sync"
-      ]
-    },
-    {
-      "name": "vault-update",
-      "path": "skills/vault-update",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "update"
-      ]
-    },
-    {
-      "name": "vmem-status",
-      "path": "skills/vmem-status",
-      "tier": "core",
-      "tags": [
-        "vault",
-        "vmem"
       ]
     },
     {
