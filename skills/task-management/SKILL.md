@@ -73,6 +73,8 @@ starting; it defines the phase markers and the `maru_task_review_v1` shape.
      add create-only backref fields in a sync proposal.
 3. Return exactly one `maru_task_review_v1` JSON object for user confirmation.
 
+Install `vault-extract`, `vault-connect`, and `vault-sync` with `vmem setup <host> --apply`.
+
 Allowed follow-up skills are `vault-extract`, `vault-connect`, and
 `meeting-notes` (never `task-management` itself). Follow-ups must be proposals
 for the user to review.

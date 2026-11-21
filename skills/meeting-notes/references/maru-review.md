@@ -1,5 +1,7 @@
 # Maru review-mode output
 
+The `vault-extract` and `vault-connect` skills are installed by `vmem setup <host> --apply`.
+
 Progress markers and the review object for a background/review-mode run. The
 write and follow-up limits stay in SKILL.md *Maru Run Contract*.
 

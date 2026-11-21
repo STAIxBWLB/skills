@@ -1,5 +1,7 @@
 # Workspace Config
 
+The `vault-extract` and `vault-connect` skills are installed by `vmem setup <host> --apply`.
+
 `inbox-process` expects the same `inbox` section used by `inbox-intake`, plus
 optional hooks:
 

@@ -93,6 +93,8 @@ the `maru_meeting_review_v1` shape.
    write proposal.
 4. Return one `maru_meeting_review_v1` JSON object for user confirmation.
 
+Install `vault-extract` and `vault-connect` with `vmem setup <host> --apply`.
+
 Allowed follow-up skills are `vault-extract`, `vault-connect`, and
 `task-management`. Follow-ups must be proposals for the user to review.
 
