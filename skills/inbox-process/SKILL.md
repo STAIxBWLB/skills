@@ -137,14 +137,13 @@ restating it in the prompt.
    read-only and report non-zero unlinked file counts per channel using
    `inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
-   schemas once per batch rather than once per item. When
-   `inbox.hooks.route_validator` is configured, optionally run its command on
-   the batch's route files and include its output in the proposal as advisory.
-   This read-only check is not a follow-up skill.
+   schemas once per batch rather than once per item.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
-   `manifest.yaml`. Nothing else.
+   `manifest.yaml`. When `inbox.hooks.route_validator` is configured, optionally
+   run its command after writing the batch's route files and include its output
+   in the proposal as advisory. This read-only check is not a follow-up skill.
 3. Move nothing. The item stays in `pending/`, `_state/index.jsonl` gets no
    receipt, and no raw original is filed into a project folder. A person or the
    applying tool performs the move after confirmation.
