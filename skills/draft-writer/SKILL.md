@@ -51,6 +51,7 @@ Path: `<drafts>/<YYMMDD>-<type>-<slug>.md`.
 
 `<drafts>` is `<paths.scratchpad>/<scratchpad.drafts_subdir>`, resolved per
 `../../lib/scratchpad_adapter.md` (default `scratchpad/drafts`).
+Resolve `../..` from the skill directory's real path, with symlinks resolved (for example `cd -P <skill-dir>/../.. && pwd`).
 When that adapter file cannot be read, read `paths.scratchpad` and
 `scratchpad.drafts_subdir` from the nearest `workspace.config.yaml` at or above
 the working directory, use `scratchpad` and `drafts` for an absent key, resolve

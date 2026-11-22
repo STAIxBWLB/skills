@@ -9,7 +9,7 @@ description: |
 `gpt-images-deck`은 `<skills-bundle>/docs/slide-decks/`의 스타일 카탈로그를 디자인 권위로 삼아, 사용자 콘텐츠를 ChatGPT Images 2.0용 슬라이드 이미지 덱으로 변환한다.
 
 - 스타일 카탈로그: `<skills-bundle>/docs/slide-decks/`
-- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
+- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 스킬 디렉토리의 실제 경로에서 심볼릭 링크를 해제한 뒤 `../..`를 해석한다 (예: `cd -P <skill-dir>/../.. && pwd`). 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
 - 스타일 선택 보조: `../notebooklm-deck/references/style-decision-tree.md`
 - 긴 산출물 스키마: [`references/output-schemas.md`](references/output-schemas.md)
 - 최종 산출물: `DESIGN.md`, `slide_plan.json`, `slide_prompts.json`, `page_1.png` ... `page_N.png`

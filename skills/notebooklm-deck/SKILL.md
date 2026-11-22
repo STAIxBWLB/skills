@@ -10,7 +10,7 @@ description: |
 NotebookLM Studio의 Slide Deck / Visual Overview 생성 시 일관된 디자인 시스템을 강제하기 위한 14종 마스터 프롬프트 카탈로그를 쉽게 선택·조립한다.
 
 - 카탈로그 위치: `<skills-bundle>/docs/slide-decks/`
-- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
+- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 스킬 디렉토리의 실제 경로에서 심볼릭 링크를 해제한 뒤 `../..`를 해석한다 (예: `cd -P <skill-dir>/../.. && pwd`). 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
 - 단일 진입점: 본 스킬 (`notebooklm-deck`)
 - 출력: NotebookLM에 통째로 붙여넣을 수 있는 완성된 프롬프트 블록 1개
 

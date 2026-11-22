@@ -10,7 +10,7 @@ description: |
 Canva의 AI 프레젠테이션 도구(Magic Design for Presentations / AI 프레젠테이션 / Docs to Decks)에 입력할 디자인 시스템 프롬프트를 14종 카탈로그에서 압축·조립한다.
 
 - 카탈로그 위치: `<skills-bundle>/docs/slide-decks/` (NotebookLM·Canva 공유 단일 소스)
-- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
+- `<skills-bundle>`: 이 스킬에서 `../..`로 접근하는 스킬 번들 루트. 스킬 디렉토리의 실제 경로에서 심볼릭 링크를 해제한 뒤 `../..`를 해석한다 (예: `cd -P <skill-dir>/../.. && pwd`). 개발 중에는 skills repo 루트이며 워크스페이스 루트가 아니다.
 - 단일 진입점: 본 스킬 (`canva-deck`)
 - 출력: Canva의 짧은 프롬프트 입력에 맞춘 1-2문단 + 템플릿 검색 키워드 + 폰트·컬러 명세
 

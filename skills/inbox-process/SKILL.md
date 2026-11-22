@@ -70,7 +70,8 @@ skill. The user may scope processing with `inbox-process <channel>`.
    the raw original to the memos collection and the distilled one-idea-per-file
    seeds to `seeds/` under the ideation collection. Resolve both through
    `../../lib/scratchpad_adapter.md` (`paths.scratchpad` plus `memos_subdir` /
-   `ideation_subdir`); do not join a literal `scratchpad/` segment. Do not write
+   `ideation_subdir`). Resolve `../..` from the skill directory's real path, with symlinks resolved (for example `cd -P <skill-dir>/../.. && pwd`).
+   Do not join a literal `scratchpad/` segment. Do not write
    the seeds yourself; a person confirms and the split follows the three-way
    triage in the ideation collection's `README.md` §인테이크, which separates
    idea from already-committed task from scope decision.
