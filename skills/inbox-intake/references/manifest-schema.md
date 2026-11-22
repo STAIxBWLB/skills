@@ -89,10 +89,13 @@ still link referenced attachments into a message or bundle item in this run.
 
 ## Drop Residuals
 
-Count as residuals attachment and file drop files under a channel's configured
-`drop_paths` recursively (files only), whose `source_kinds` subfolder maps to
-`attachment` or `file`, plus channel-root files with no such mapping, and whose
-SHA-256 matches no `files[].sha256` in an existing item manifest. Message records
-are not counted; the collector owns them. Ignore OS noise and placeholder files
-such as `.DS_Store` and `.gitkeep`. A copied source can remain in the drop
+A drop residual is a file under a channel's configured `drop_paths`, searched
+recursively and counting files only, that meets all of these:
+
+- It is not a message record, meaning it is not in a subfolder whose
+  `source_kinds` maps to `message`.
+- It is not OS noise or a placeholder (`.DS_Store`, `.gitkeep`).
+- Its SHA-256 matches no `files[].sha256` in an existing item manifest.
+
+The collector owns message records. A copied source can remain in the drop
 directory after it is carried.

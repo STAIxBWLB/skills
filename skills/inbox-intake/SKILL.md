@@ -42,7 +42,8 @@ skill does not summarize, route, extract tasks, or write to a vault.
    item under the root channel only for a drop file that is unlinked per
    `references/manifest-schema.md` §Drop Residuals and is not referenced by a
    message or bundle item in this run. Skip linked files for standalone staging;
-   still link referenced attachments into a message or bundle item in this run.
+   this is the dedupe for drop files, so they never reach `items/duplicate/`.
+   Still link referenced attachments into a message or bundle item in this run.
 3. If the source path is under a provider-specific subfolder such as
    `drop/mso/mail/`, store that folder name as `metadata.source_kind`; do not
    change the manifest `channel` away from the root channel.
