@@ -39,8 +39,8 @@ skill. The user may scope processing with `inbox-process <channel>`.
      same guidance as trailing `<channel> [context...]`; treat its text
      identically. When an item's manifest already has
      `metadata.processing_context`, honor it as guidance on (re)processing.
-2. If a channel is provided, stage its unnormalized files through `inbox-intake`
-   before processing. In every run mode, inspect each channel's configured
+2. If a channel is provided, stage its unnormalized files under `drop_paths`
+   through `inbox-intake` before processing. In every run mode, inspect each channel's configured
    `drop_paths` read-only and report each channel with a non-zero count of
    unlinked files, using `inbox-intake/references/manifest-schema.md`
    §Drop Residuals. Check the requested channel after staging.

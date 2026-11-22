@@ -31,6 +31,7 @@ inbox:
       skill: io-kakao
       kind: bundle
       drop_paths: [drop/kakao]
+      drop_ignore: ["_index.json"]
       source_kinds:
         messages: message
         files: attachment
@@ -51,6 +52,9 @@ inbox:
         sharepoint: document
       dedupe: provider-native
 ```
+
+`drop_ignore` is an optional list of glob patterns, relative to each drop path,
+for collector state files that are not inbox content.
 
 Provider runtime values live under `io.providers`.
 

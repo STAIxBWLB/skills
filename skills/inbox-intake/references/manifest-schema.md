@@ -94,7 +94,8 @@ recursively and counting files only, that meets all of these:
 
 - It is not a message record, meaning it is not in a subfolder whose
   `source_kinds` maps to `message`.
-- It is not OS noise or a placeholder (`.DS_Store`, `.gitkeep`).
+- It is not OS noise or a placeholder (`.DS_Store`, `.gitkeep`), and it does
+  not match the channel's `drop_ignore` globs.
 - Its SHA-256 matches no `files[].sha256` in an existing item manifest.
 
 The collector owns message records. A copied source can remain in the drop
