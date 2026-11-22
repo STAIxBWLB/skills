@@ -19,7 +19,9 @@ Guidance for AI agents working in this repository.
 - Releases are automatic on push to `main` (see README.md). Never hand-edit
   the `skills-channel` prerelease or its assets; the release workflow
   prunes all but the newest 10 revisions.
-- Bump `bundleVersion` through `make release-prepare`; fix a missing or invalid value by hand in a reviewed PR. Push tags only on explicit instruction.
+- Change `bundleVersion` only through `make release-prepare`, except that a
+  missing or invalid value is fixed by hand in a reviewed PR. Push tags only on
+  explicit instruction.
 - `minAppVersion` in `manifest.json` changes only when a bundle needs newer
   app code, and is coordinated with a Maru app release.
 - Commit messages: Conventional Commits, English (e.g.
@@ -78,8 +80,9 @@ Run `make skills-verify` from the repository root. A successful run prints
 `skills-verify ok: <N> skills, <M> tracked files`, then
 `check-vmem-tools: ok (vmem <version>, <N> tools, <M> bundle files)`, then
 `bundle-version self-test ok`, `release-prepare self-test ok`, and
-`release-tag-check self-test ok`, and exits zero; private-reference and host-compat warnings print to stderr and do
-not change the exit code; a rule promoted to `fail` does.
+`release-tag-check self-test ok`, and exits zero; private-reference and
+host-compat warnings print to stderr and do not change the exit code; a rule
+promoted to `fail` does.
 A `vmem_*` name that the snapshot does not list is a failure: fix the skill
 text, or, when vmem really gained or renamed the tool, capture
 `vmem manifest --json` into `scripts/fixtures/vmem-manifest-<version>.json`

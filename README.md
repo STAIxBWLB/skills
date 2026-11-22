@@ -78,9 +78,8 @@ Add reviewed notes under `Unreleased`, run `make release-prepare VERSION=X.Y.Z`,
 and submit the manifest and changelog changes through a PR. Only push the
 corresponding `vX.Y.Z` tag on explicit instruction. The tag workflow checks
 that its commit is on `main`, the tag matches the manifest, and the changelog
-has the version section; it publishes a separate signed, durable release. It
+has a non-empty version section; it publishes a separate signed, durable release. It
 does not alter the rolling channel.
-
 
 ## Client behavior (Maru app)
 
