@@ -16,7 +16,7 @@ function check(tag, version, changelog, onMain) {
   }
   return section[1].trim() + "\n";
 }
-function onMain(run = () => execFileSync("git", ["merge-base", "--is-ancestor", "HEAD", "refs/remotes/origin/main"], { stdio: "ignore" })) {
+function onMain(run = () => execFileSync("git", ["merge-base", "--is-ancestor", "HEAD", "refs/remotes/origin/main"], { stdio: ["ignore", "ignore", "inherit"] })) {
   try { run(); return true; } catch (error) {
     if (error.status === 1) return false;
     throw new Error("git ancestry check failed; check that the checkout has origin/main and retry");
