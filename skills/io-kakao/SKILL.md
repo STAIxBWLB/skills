@@ -51,7 +51,7 @@ python3 scripts/kakao_send.py --work <workRoot> \
 ## Rules
 
 - Store chat room names and local monitor settings only in workspace config or
-  `.maru/secrets` (with `.secrets` kept only as a legacy compatibility symlink).
+  the configured `secrets.root` (with `.secrets` kept only as a legacy compatibility symlink).
 - Group related messages into one inbox item when they form one topic.
 - Do not classify messages or create tasks directly; use `inbox-process`.
 - Use file hashes when source-native message IDs are unavailable.

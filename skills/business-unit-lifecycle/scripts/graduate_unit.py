@@ -3,7 +3,7 @@
 
 This script NEVER moves files. It scans the unit's root stage directories,
 maps them to Tree B destinations (DR-025 §5 / DR-026), and writes a manifest
-JSON compatible with the workspace tool `_meta/scripts/migrate_tree.py`,
+JSON compatible with the workspace tool `migrate_tree.py` in the workspace scripts directory adjacent to `ssot.rules` (see `ssot.naming_and_placement` §B7),
 which owns the actual moves, reference rewriting, and path-map updates.
 
 Usage:
@@ -71,7 +71,7 @@ def main() -> int:
         "manual_pre_steps": [
             "review the stage->destination mapping below before running",
             "after migrate_tree.py: update registry (remove 'profile: cycle' pin)",
-            "same commit: python3 _meta/scripts/gen_structure.py --project <id>",
+            "same commit: python3 gen_structure.py --project <id>  # workspace tool; see ssot.naming_and_placement §B5",
         ],
     }
     payload = json.dumps(manifest, ensure_ascii=False, indent=2)
@@ -81,7 +81,7 @@ def main() -> int:
     else:
         print(payload)
     print("\nRun (dry-run first):", file=sys.stderr)
-    print(f"  python3 _meta/scripts/migrate_tree.py <manifest> --dry-run", file=sys.stderr)
+    print(f"  python3 migrate_tree.py <manifest> --dry-run  # workspace scripts directory adjacent to ssot.rules; see ssot.naming_and_placement §B7", file=sys.stderr)
     return 0
 
 

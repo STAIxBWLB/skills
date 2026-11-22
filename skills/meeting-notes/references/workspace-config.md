@@ -4,7 +4,7 @@ The `vault-extract` and `vault-connect` skills are installed by `vmem setup <hos
 
 ```yaml
 meeting_notes:
-  root: ~/workspace/work/meetings
+  root: <workspace>/meetings
   filename_template: "YYMMDD-meeting-{slug}.md"
   guides:
     quick_start: _guides/QUICK_START.md
@@ -21,7 +21,7 @@ meeting_notes:
 When `hooks.enrichment` is set, the skill also reads `ssot.context_enrichment`
 and the `context.*` lookup paths (people/glossary fast caches plus the canonical
 vault MOCs) to resolve entities and assemble the project context bundle before
-drafting. See `_meta/rules/context-enrichment.md`.
+drafting. See `ssot.context_enrichment`.
 
 When `hooks.verification` is set, the skill runs the content verification &
 supplementation step (workflow step 5) before drafting: high-risk claims are

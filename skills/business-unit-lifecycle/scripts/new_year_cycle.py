@@ -83,7 +83,7 @@ def main() -> int:
     print("  lifecycle_stage: implementing")
     print(f"  current_year: {args.year}")
     print("Then regenerate the structure index (same commit):")
-    print("  python3 _meta/scripts/gen_structure.py --project <id>")
+    print("  python3 gen_structure.py --project <id>  # workspace tool; see ssot.naming_and_placement §B5")
     return 0
 
 

@@ -5,7 +5,7 @@ directory. Public skill files must not store real account values.
 
 ```yaml
 inbox:
-  root: ~/workspace/work/inbox
+  root: <workspace>/inbox
   schema_version: 1
   paths:
     drop: drop

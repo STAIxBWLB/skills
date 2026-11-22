@@ -2,7 +2,7 @@
 
 Single source for the year-partition leaves and cycle-stage vocabulary.
 Tree C grammar and canonical vocabulary: workspace
-`_meta/rules/naming-and-placement.md` (§B, §E) and DR-026.
+`ssot.naming_and_placement` (§B, §E) and DR-026.
 """
 
 from __future__ import annotations

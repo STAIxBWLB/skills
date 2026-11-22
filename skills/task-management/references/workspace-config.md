@@ -7,7 +7,7 @@ directory. The public skill package never stores real owner or service IDs.
 
 ```yaml
 task_management:
-  root: ~/workspace/work/tasks
+  root: <workspace>/tasks
   timezone: Region/City
   gws_binary: /path/to/gws
   google:
