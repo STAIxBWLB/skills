@@ -43,7 +43,8 @@ skill. The user may scope processing with `inbox-process <channel>`.
    through `inbox-intake` before processing. In every run mode, inspect each channel's configured
    `drop_paths` read-only and report each channel with a non-zero count of
    unlinked files, using `../inbox-intake/references/manifest-schema.md`
-   §Drop Residuals. Check the requested channel after staging.
+   §Drop Residuals and the `residual_counter` hook in §Hooks. Check the
+   requested channel after staging.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
@@ -136,16 +137,15 @@ restating it in the prompt.
 
 1. Process only the named items. Inspect each channel's configured `drop_paths`
    read-only and report non-zero unlinked file counts per channel in the proposal
-   output using `../inbox-intake/references/manifest-schema.md` §Drop Residuals;
+   output using `../inbox-intake/references/manifest-schema.md` §Drop Residuals
+   and the `residual_counter` hook in §Hooks;
    never move or stage drop files. Read static configuration, registry, and
    schemas once per batch rather than once per item.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
-   `manifest.yaml`. Write nothing else. When `inbox.hooks.route_validator` is configured, optionally
-   run its command after writing the batch's route files, passing file paths as
-   separate arguments, never through a shell string. Include its output in the
-   proposal as advisory. This read-only check is not a follow-up skill.
+   `manifest.yaml`. Write nothing else. After writing the batch's route files,
+   optionally run `route_validator` per §Hooks and include its advisory output.
 3. Move nothing. The item stays in `pending/`, `_state/index.jsonl` gets no
    receipt, and no raw original is filed into a project folder. A person or the
    applying tool performs the move after confirmation.
@@ -170,7 +170,7 @@ never write, move, or delete files in any mode (review mode included), and do
 not run follow-up skills. Inspect each channel's configured `drop_paths`
 read-only and report non-zero unlinked file counts per channel using
 `../inbox-intake/references/manifest-schema.md`
-§Drop Residuals. Put the residual report outside the `maru_task_candidates_v1`
+§Drop Residuals and the `residual_counter` hook in §Hooks. Put the residual report outside the `maru_task_candidates_v1`
 block. Read `references/extract-tasks.md` before collecting inputs; it defines
 the sources and the `maru_task_candidates_v1` output.
 
@@ -191,10 +191,16 @@ source-kind hints only. Do not require users to call fine-grained channel names.
 
 Hooks are optional and config-driven:
 
-- `route_validator`: optional command to check the batch's route files; pass
-  file paths as separate arguments, never through a shell string. It may read
-  and report only, never write or move files. Include its output as advisory in
-  the proposal.
+- `residual_counter`: optional trusted read-only argv list. When configured,
+  invoke it without a shell and report its per-channel residual counts instead
+  of hashing in prose, using the same §Drop Residuals contract. Its stdout is a
+  JSON object mapping every configured channel to a non-negative integer count.
+  On failure, malformed output, or a missing channel, report the check as
+  unavailable, name the missing capability, and give the next step; do not
+  infer zero. This read-only check is not a follow-up skill.
+- `route_validator`: optional trusted read-only argv list. Append the batch's
+  route file paths as separate trailing arguments and invoke without a shell.
+  Include its output as advisory in the proposal; this is not a follow-up skill.
 - `task_skill`: create local task candidates or call `task-management` when the
   user asks for task registration.
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit

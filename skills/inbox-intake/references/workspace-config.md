@@ -53,8 +53,9 @@ inbox:
       dedupe: provider-native
 ```
 
-`drop_ignore` is an optional list of glob patterns, relative to each drop path,
-for collector state files that are not inbox content.
+`drop_ignore` is an optional list of glob patterns for collector state files
+that are not inbox content. Match paths relative to each drop root; `**` is
+allowed and a bare filename pattern matches at any depth.
 
 Provider runtime values live under `io.providers`.
 
