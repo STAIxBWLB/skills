@@ -39,9 +39,11 @@ skill. The user may scope processing with `inbox-process <channel>`.
      same guidance as trailing `<channel> [context...]`; treat its text
      identically. When an item's manifest already has
      `metadata.processing_context`, honor it as guidance on (re)processing.
-2. If a channel is provided, scan that channel's configured `drop_paths` first.
-   Stage unnormalized files there through `inbox-intake` before processing.
-   Ignore `.DS_Store` and other configured OS noise files.
+2. In every run mode, inspect all configured channel drop/auto directories
+   read-only and report each channel with a non-zero count of unlinked files.
+   Ignore `.DS_Store` and other configured OS noise files. If a channel is
+   provided, stage its unnormalized files through `inbox-intake` before
+   processing, except in Proposal-Only mode.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
@@ -130,7 +132,12 @@ unattended scheduler runs — propose and stop. This is the same non-destructive
 contract as *Maru Run Contract* items 2 and 3, and it holds without the caller
 restating it in the prompt.
 
-1. Process only the named items.
+1. Process only the named items. Inspect configured channel drop/auto
+   directories read-only and report non-zero unlinked file counts per channel;
+   never move or stage drop files. Read static configuration, registry, and
+   schemas once per batch rather than once per item. When a deterministic
+   route validator is configured in `inbox.hooks`, optionally invoke or hand
+   off to it for route checks.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
@@ -156,8 +163,9 @@ block's keys, parsing rules, no-destination values, and `filed_as` renames.
 `inbox-process extract-tasks` turns recent inbox and meeting material into
 structured task candidates instead of routing items. This mode is read-only:
 never write, move, or delete files in any mode (review mode included), and do
-not run follow-up skills. Read `references/extract-tasks.md` before collecting
-inputs; it defines the sources and the `maru_task_candidates_v1` output.
+not run follow-up skills. Inspect configured channel drop/auto directories
+read-only and report non-zero unlinked file counts per channel. Read
+`references/extract-tasks.md` before collecting inputs; it defines the sources and the `maru_task_candidates_v1` output.
 
 ## Channel Invocation
 

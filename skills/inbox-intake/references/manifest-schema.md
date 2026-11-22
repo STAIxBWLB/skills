@@ -78,4 +78,9 @@ workspace item manifest, never in this public skill package.
 ## File Roles
 
 Use `primary` for the main artifact. Use `attachment`, `sidecar`, `metadata`,
-`preview`, or `transcript` for supporting files.
+`preview`, or `transcript` for supporting files. For a `kind: bundle` message
+that references local files in a channel drop/auto directory, copy each
+attachment into the item raw directory and add a `files[]` entry with its
+item-relative `path`, `role: attachment`, `mime`, and `sha256`. Stage a drop
+file with no matching message bundle as a standalone `kind: attachment` or
+`kind: file` item under the root channel.

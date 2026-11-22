@@ -35,7 +35,12 @@ skill does not summarize, route, extract tasks, or write to a vault.
    connector result. If the channel is absent from config, stop and show the
    missing channel key.
 2. Group files or records into one logical item. Keep multi-format variants and
-   sidecar metadata in the same item.
+   sidecar metadata in the same item. For a message bundle that references
+   local attachments in a channel drop/auto directory, copy those files into
+   the item raw directory and list each in `files[]` with `role: attachment`,
+   `mime`, and `sha256`. Stage an orphan drop file with no matching message
+   bundle as a standalone `kind: attachment` or `kind: file` item under the
+   root channel.
 3. If the source path is under a provider-specific subfolder such as
    `drop/mso/mail/`, store that folder name as `metadata.source_kind`; do not
    change the manifest `channel` away from the root channel.
