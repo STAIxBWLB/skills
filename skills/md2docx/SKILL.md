@@ -39,7 +39,7 @@ description: >
 | 머리말 override / 제거 | `./md2docx <file.md> --header "제목"` · `--no-header` |
 | 다중 파일 일괄 | `./md2docx a.md b.md c.md` |
 
-경로 기준: `~/.maru/skills/md2docx/md2docx`
+경로 기준: `<skill>/md2docx` (`<skill>`은 심볼릭 링크를 해제한 이 스킬 디렉토리).
 
 ## 테마 (palette)
 

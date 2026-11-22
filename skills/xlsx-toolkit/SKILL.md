@@ -28,9 +28,10 @@ Excel `.xlsx` 파일을 읽어 markdown/CSV/요약으로 변환하는 read-only 
 
 ## Quick Reference
 
+`<skill>`은 심볼릭 링크를 해제한 이 스킬 디렉토리다.
+
 ```bash
-# 경로는 work repo 기준 (서브모듈 ~/.maru/skills 내부)
-XLSX=~/.maru/skills/xlsx-toolkit/xlsx
+XLSX=<skill>/xlsx
 
 $XLSX read <file.xlsx>                    # 전체 시트 → markdown 표
 $XLSX read <file.xlsx> --sheet 1          # 특정 시트만
@@ -59,7 +60,7 @@ $XLSX to-md <file.xlsx> --sheet 1
 추출 도구 표:
 
 ```markdown
-| `.xlsx` | xlsx-toolkit | `~/.maru/skills/xlsx-toolkit/xlsx read <file>` |
+| `.xlsx` | xlsx-toolkit | `<skill>/xlsx read <file>` |
 ```
 
 요약 생성에 xlsx 콘텐츠를 markdown 표로 포함하여 전달.

@@ -8,6 +8,7 @@ import asyncio
 import os
 import sys
 from pathlib import Path
+from shlex import quote
 from typing import Any
 
 
@@ -72,7 +73,7 @@ async def login(args: argparse.Namespace) -> None:
     try:
         from telethon import TelegramClient
     except ImportError as exc:
-        raise SystemExit(f"telethon is not installed for {sys.executable}. Repair the Maru env with Settings > Skills > Bootstrap in Maru, or, only with no Maru app and no active hashed env, run `envs/default/setup.sh --target ~/.maru/env` from ~/.maru/skills/_builtin or a checkout.") from exc
+        raise SystemExit(f"telethon is not installed for {sys.executable}. Repair the Maru env with Settings > Skills > Bootstrap in Maru, or, only with no Maru app and no active hashed env, run `{quote(str(Path(__file__).resolve().parents[3] / 'envs/default/setup.sh'))} --target ~/.maru/env`.") from exc
     session_file = Path(args.session_file).expanduser()
     if not session_file.is_absolute():
         raise SystemExit("session-file must be absolute")
