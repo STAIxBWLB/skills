@@ -46,7 +46,7 @@ inbox:
     digest_output: _state/digests
 ```
 
-For the argv hook contracts, read `inbox-process` §Hooks.
+For the argv hook contracts, read `../SKILL.md` §Hooks.
 
 `ideation` handoff destinations are not configured here. The scratchpad already
 declares its own root and collection names under `paths.scratchpad` and

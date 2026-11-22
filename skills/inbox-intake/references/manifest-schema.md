@@ -99,8 +99,8 @@ recursively and counting files only, that meets all of these:
   JSON contains a provider message ID.
 - It is not OS noise or a placeholder (`.DS_Store`, `.gitkeep`), and it does
   not match the channel's `drop_ignore` globs.
-- Its SHA-256 matches no `files[].sha256` in an existing item manifest under
-  `pending`, `done`, `failed`, or `duplicate`.
+- Its SHA-256 matches no `files[].sha256` in any item manifest under
+  `inbox.paths.items`, in any state.
 
 When file hashes cannot be computed in this run, report the residual check as
 unavailable, name the missing capability, and do not estimate a count. State
