@@ -39,13 +39,12 @@ skill. The user may scope processing with `inbox-process <channel>`.
      same guidance as trailing `<channel> [context...]`; treat its text
      identically. When an item's manifest already has
      `metadata.processing_context`, honor it as guidance on (re)processing.
-2. In every run mode, inspect each channel's configured `drop_paths`
-   read-only and report each channel with a non-zero count of unlinked files,
-   using the definition in `inbox-intake/references/manifest-schema.md`
-   §Drop Residuals.
-   Ignore `.DS_Store` and other configured OS noise files. If a channel is
-   provided, stage its unnormalized files through `inbox-intake` before
-   processing, except in Proposal-Only mode.
+2. If a channel is provided, stage its unnormalized files through `inbox-intake`
+   before processing. In every run mode, inspect each channel's configured
+   `drop_paths` read-only and report each channel with a non-zero count of
+   unlinked files, using `inbox-intake/references/manifest-schema.md`
+   §Drop Residuals. Check the requested channel after staging. Ignore `.DS_Store`
+   and other configured OS noise files.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
@@ -138,9 +137,9 @@ restating it in the prompt.
    read-only and report non-zero unlinked file counts per channel using
    `inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
-   schemas once per batch rather than once per item. When a deterministic
-   route validator is configured in `inbox.hooks`, optionally invoke or hand
-   off to it for route checks.
+   schemas once per batch rather than once per item. When
+   `inbox.hooks.route_validator` is configured, optionally invoke or hand
+   off to it for read-only route checks.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
@@ -190,6 +189,8 @@ source-kind hints only. Do not require users to call fine-grained channel names.
 
 Hooks are optional and config-driven:
 
+- `route_validator`: optional deterministic route check; it may read and report
+  only, never write or move files.
 - `task_skill`: create local task candidates or call `task-management` when the
   user asks for task registration.
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit

@@ -35,7 +35,7 @@ skill does not summarize, route, extract tasks, or write to a vault.
    connector result. If the channel is absent from config, stop and show the
    missing channel key.
 2. Group files or records into one logical item. Keep multi-format variants and
-   sidecar metadata in the same item. For a message bundle that references
+   sidecar metadata in the same item. For a message or bundle item that references
    local attachments in a channel drop/auto directory, copy those files into
    the item raw directory and list each in `files[]` with `role: attachment`,
    `mime`, and `sha256`. Stage an orphan drop file with no matching message

@@ -78,7 +78,7 @@ workspace item manifest, never in this public skill package.
 ## File Roles
 
 Use `primary` for the main artifact. Use `attachment`, `sidecar`, `metadata`,
-`preview`, or `transcript` for supporting files. For a `kind: bundle` message
+`preview`, or `transcript` for supporting files. For a `kind: message` or `kind: bundle` item
 that references local files in a channel drop/auto directory, copy each
 attachment into the item raw directory and add a `files[]` entry with its
 item-relative `path`, `role: attachment`, `mime`, and `sha256`. Stage a drop
@@ -87,7 +87,7 @@ file with no matching message bundle as a standalone `kind: attachment` or
 
 ## Drop Residuals
 
-A drop file is linked when its SHA-256 or source path matches a `files[]` entry
-in an existing item manifest, or a receipt's `source` or `dedupe_key` in
+A drop file is linked when its SHA-256 matches a `files[].sha256` value in an
+existing item manifest or a `sha256:`-style receipt `dedupe_key` in
 `_state/index.jsonl`. Other drop files are unlinked. Count only unlinked files
 as residuals; a copied source can remain in the drop directory after linking.
