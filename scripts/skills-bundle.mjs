@@ -436,7 +436,7 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
     schema: 1,
     revision,
     bundleVersion: manifest.bundleVersion,
-    displayVersion: `${manifest.bundleVersion} (r${revision})`,
+    displayVersion: manifest.bundleVersion,
     commit,
     publishedAt: new Date().toISOString(),
     minAppVersion: manifest.minAppVersion,

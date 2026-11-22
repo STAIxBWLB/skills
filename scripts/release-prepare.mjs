@@ -9,7 +9,11 @@ function parts(value) {
   return value.split(".").map(BigInt);
 }
 function prepare(manifest, changelog, version, date) {
-  const next = parts(version), current = parts(manifest.bundleVersion);
+  const next = parts(version);
+  let current;
+  try { current = parts(manifest.bundleVersion); } catch {
+    throw new Error(`manifest.json bundleVersion ${manifest.bundleVersion} is invalid; fix it with a reviewed PR`);
+  }
   let greater = false;
   for (let i = 0; i < 3; i++) {
     if (next[i] !== current[i]) { greater = next[i] > current[i]; break; }
@@ -28,8 +32,13 @@ function draft() {
   const subjects = execFileSync("git", ["log", "--format=%s", range], { encoding: "utf8" }).split("\n").filter((s) => /^(feat|fix|perf|refactor|docs|build|ci|chore)(\([^)]*\))?!?: /.test(s));
   return subjects.map((s) => `- ${s}`).join("\n") || "- No conventional-commit subjects found.";
 }
+function localDate(date) {
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+}
 function selfTest() {
   const input = { bundleVersion: "1.0.0" };
+  assert.equal(localDate(new Date(2026, 10, 22)), "2026-11-22");
+  assert.throws(() => prepare({ bundleVersion: "bad" }, "", "1.0.1", "2026-11-22"), /manifest.json bundleVersion bad is invalid/);
   const log = "# Changelog\n\n## [Unreleased]\n\n### Fixed\n\n- Example\n\n## [1.0.0] - 2026-01-01\n\n- Initial\n";
   const result = prepare(input, log, "1.0.1", "2026-11-22");
   assert.equal(result.manifest.bundleVersion, "1.0.1");
@@ -43,7 +52,7 @@ else {
   try {
     const manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
     const changelog = readFileSync("CHANGELOG.md", "utf8");
-    const result = prepare(manifest, changelog, process.argv[2], new Date().toISOString().slice(0, 10));
+    const result = prepare(manifest, changelog, process.argv[2], localDate(new Date()));
     writeFileSync("manifest.json", `${JSON.stringify(result.manifest, null, 2)}\n`);
     writeFileSync("CHANGELOG.md", result.changelog);
     console.log(`Prepared ${process.argv[2]}; review and submit the changes in a PR.`);

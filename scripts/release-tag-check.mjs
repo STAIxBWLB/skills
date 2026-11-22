@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 function check(tag, version, changelog, onMain) {
   if (!onMain) throw new Error("tag commit is not on main; merge the release PR before tagging");
   if (typeof version !== "string" || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version) || tag !== `v${version}`) {
-    throw new Error("tag does not match manifest bundleVersion; tag the reviewed version");
+    throw new Error(`tag ${tag} does not match manifest bundleVersion ${version}; tag the reviewed version`);
   }
   const escaped = version.replaceAll(".", "\\.");
   const section = new RegExp(`^## \\[${escaped}\\] - \\d{4}-\\d{2}-\\d{2}\\s*\\n([\\s\\S]*?)(?=^## \\[|$(?![\\s\\S]))`, "m").exec(changelog);
