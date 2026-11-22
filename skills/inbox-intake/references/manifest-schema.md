@@ -98,5 +98,8 @@ recursively and counting files only, that meets all of these:
   not match the channel's `drop_ignore` globs.
 - Its SHA-256 matches no `files[].sha256` in an existing item manifest.
 
+When file hashes cannot be computed in this run, report the residual check as
+unavailable, name the missing capability, and do not estimate a count.
+
 The collector owns message records. A copied source can remain in the drop
 directory after it is carried.
