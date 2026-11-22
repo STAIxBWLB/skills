@@ -91,8 +91,9 @@ skill. The user may scope processing with `inbox-process <channel>`.
    item manifest `source.original_name`. §A4's scope is tracked text only —
    `.md`, `.txt`, `.svg` with a non-ASCII name. Binaries (`.pdf`, `.hwp`,
    `.hwpx`, `.xlsx`, `.pptx`, `.docx`) keep their original filename.
-9. Move processed items to `done/`, `failed/`, or `duplicate/` and append a
-   receipt to `_state/index.jsonl`. In Maru review mode, skip this step;
+9. Move processed items to `done/`, `failed/`, or `duplicate/`. Before appending
+   a receipt to `_state/index.jsonl`, read
+   `inbox-intake/references/receipt-schema.md`. In Maru review mode, skip this step;
    Maru performs the move and writes the receipt after the user confirms.
 
 ## Maru Run Contract
@@ -205,6 +206,7 @@ Hooks are optional and config-driven:
 
 ## References
 
+- `inbox-intake/references/receipt-schema.md` - receipt schema and event vocabulary
 - `references/summary-schema.md` - required summary shape
 - `references/workspace-config.md` - processing config keys
 - `references/maru-review-output.md` - phase markers and `maru_inbox_review_v1`

@@ -19,7 +19,8 @@ skill does not summarize, route, extract tasks, or write to a vault.
 1. Find `workspace.config.yaml` by walking up from the current directory.
 2. Read `inbox`, including `inbox.paths` and `inbox.naming`, and
    `io.providers` from that file.
-3. Load `references/manifest-schema.md` before creating or editing a manifest.
+3. Load `references/manifest-schema.md` before creating or editing a manifest,
+   and `references/receipt-schema.md` before appending a receipt.
 4. Use the configured inbox root. Default layout:
    - `drop/<channel>/` for channel-root or connector drop aliases
    - `items/pending/` for new normalized items
@@ -51,7 +52,8 @@ skill does not summarize, route, extract tasks, or write to a vault.
    Korean filename to manifest `source.original_name` (the raw copy MAY keep
    the Korean name because `inbox/items/**` is exempt per
    `_meta/rules/naming-and-placement.md` §A4).
-8. Append one JSONL receipt to `_state/index.jsonl`.
+8. Append one JSONL receipt to `_state/index.jsonl` using
+   `references/receipt-schema.md`.
 
 ## Rules
 
@@ -69,5 +71,6 @@ skill does not summarize, route, extract tasks, or write to a vault.
 ## References
 
 - `references/manifest-schema.md` - normalized inbox item schema
+- `references/receipt-schema.md` - receipt schema and event vocabulary
 - `references/workspace-config.md` - expected runtime config keys
 - `templates/manifest.yaml` - manifest starter template
