@@ -7,7 +7,7 @@ JSON compatible with the workspace tool `migrate_tree.py` in the workspace scrip
 which owns the actual moves, reference rewriting, and path-map updates.
 
 Usage:
-  graduate_unit.py projects/oda/koica-tiu-2027 --year 2027 [-o manifest.json]
+  graduate_unit.py projects/<domain>/<slug>-<year> --year YYYY [-o manifest.json]
 """
 
 from __future__ import annotations

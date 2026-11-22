@@ -17,13 +17,14 @@ import csv
 import io
 import sys
 from pathlib import Path
+from shlex import quote
 from typing import Iterable, List, Optional, Tuple
 
 try:
     import openpyxl
     from openpyxl.worksheet.worksheet import Worksheet
 except ImportError:
-    print(f"[xlsx-toolkit] openpyxl 미설치: {sys.executable}. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: ~/.maru/skills/_builtin 또는 checkout의 envs/default/setup.sh --target ~/.maru/env)", file=sys.stderr)
+    print(f"[xlsx-toolkit] openpyxl 미설치: {sys.executable}. 복구: Maru 설정 > Skills > Bootstrap (Maru 앱도 활성 해시 env도 없을 때만: {quote(str(Path(__file__).resolve().parents[3] / 'envs/default/setup.sh'))} --target ~/.maru/env)", file=sys.stderr)
     sys.exit(2)
 
 

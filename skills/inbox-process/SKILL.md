@@ -23,7 +23,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
 3. Load `../inbox-intake/references/manifest-schema.md` before changing item
    state.
 4. Load `references/summary-schema.md` before creating a summary.
-5. Load `ssot.rules`/`naming-and-placement.md` §C before proposing a route — it governs
+5. Load `ssot.naming_and_placement` §C before proposing a route — it governs
    destination subfolder selection inside the target project.
 
 ## Workflow
@@ -80,7 +80,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    context-enrichment §2 entity resolution and `vmem_search` to disambiguate
    before leaving the item pending, and attach the matched `vault_note` /
    `relatedMeetings` to the proposal. Resolve the destination **subfolder** (not
-   just the project) per `naming-and-placement.md` §C — map the item kind to the
+   just the project) per `ssot.naming_and_placement` §C — map the item kind to the
    project's matching subfolder (`<project>/.maru/bu-config.yaml` `tree_map` →
    existing `NN-`/`N-` subfolder → `_incoming/` fallback; never the bare project
    root). Write the decision to `inbox.naming.route_file` in the shape defined in
@@ -209,7 +209,7 @@ Hooks are optional and config-driven:
 - Use `project-registry.yaml` as the first source of truth for the target project.
 - Serialize the decision per *Route File*; a weak route (top score < 3) is
   `confidence: low`, which keeps it out of any automatic apply.
-- Resolve the destination **subfolder** per `naming-and-placement.md` §C: classify the
+- Resolve the destination **subfolder** per `ssot.naming_and_placement` §C: classify the
   item's kind, then map kind → subfolder (`<project>/.maru/bu-config.yaml`
   `tree_map` → existing `NN-`/`N-` subfolder → default kind→category). Never drop
   files at the bare project root.
@@ -231,7 +231,7 @@ Hooks are optional and config-driven:
 - `references/maru-review-output.md` - phase markers and `maru_inbox_review_v1`
 - `references/route-file.md` - route file block and keys
 - `references/extract-tasks.md` - `extract-tasks` inputs and output
-- `ssot.rules`/`naming-and-placement.md` §C - destination subfolder resolution
+- `ssot.naming_and_placement` §C - destination subfolder resolution
   (kind→category→`tree_map`/`_incoming`); never route to a bare project root
 - `../../lib/scratchpad_adapter.md` - scratchpad path resolution for
   `ideation` handoffs
