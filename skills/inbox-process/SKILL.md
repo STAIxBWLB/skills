@@ -39,8 +39,10 @@ skill. The user may scope processing with `inbox-process <channel>`.
      same guidance as trailing `<channel> [context...]`; treat its text
      identically. When an item's manifest already has
      `metadata.processing_context`, honor it as guidance on (re)processing.
-2. In every run mode, inspect all configured channel drop/auto directories
-   read-only and report each channel with a non-zero count of unlinked files.
+2. In every run mode, inspect each channel's configured `drop_paths`
+   read-only and report each channel with a non-zero count of unlinked files,
+   using the definition in `inbox-intake/references/manifest-schema.md`
+   §Drop Residuals.
    Ignore `.DS_Store` and other configured OS noise files. If a channel is
    provided, stage its unnormalized files through `inbox-intake` before
    processing, except in Proposal-Only mode.
@@ -132,8 +134,9 @@ unattended scheduler runs — propose and stop. This is the same non-destructive
 contract as *Maru Run Contract* items 2 and 3, and it holds without the caller
 restating it in the prompt.
 
-1. Process only the named items. Inspect configured channel drop/auto
-   directories read-only and report non-zero unlinked file counts per channel;
+1. Process only the named items. Inspect each channel's configured `drop_paths`
+   read-only and report non-zero unlinked file counts per channel using
+   `inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
    schemas once per batch rather than once per item. When a deterministic
    route validator is configured in `inbox.hooks`, optionally invoke or hand
@@ -163,9 +166,12 @@ block's keys, parsing rules, no-destination values, and `filed_as` renames.
 `inbox-process extract-tasks` turns recent inbox and meeting material into
 structured task candidates instead of routing items. This mode is read-only:
 never write, move, or delete files in any mode (review mode included), and do
-not run follow-up skills. Inspect configured channel drop/auto directories
-read-only and report non-zero unlinked file counts per channel. Read
-`references/extract-tasks.md` before collecting inputs; it defines the sources and the `maru_task_candidates_v1` output.
+not run follow-up skills. Inspect each channel's configured `drop_paths`
+read-only and report non-zero unlinked file counts per channel using
+`inbox-intake/references/manifest-schema.md`
+§Drop Residuals. Put the residual report outside the `maru_task_candidates_v1`
+block. Read `references/extract-tasks.md` before collecting inputs; it defines
+the sources and the `maru_task_candidates_v1` output.
 
 ## Channel Invocation
 
