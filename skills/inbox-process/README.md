@@ -20,3 +20,11 @@ loses.
 Mode-specific material sits in `references/` so a normal routing run does not
 load it: the review-mode output contract (`maru-review-output.md`), the route
 file block (`route-file.md`), and the `extract-tasks` mode (`extract-tasks.md`).
+
+## Cleanup step
+
+Inbox cleanup keeps every terminal item record because stagers rebuild their
+idempotency set from terminal manifests. When those
+records were lost on 2026-09-02, 43 filed items came back into `pending/`. Only
+originals with an identical copy elsewhere are trashed, so closed and rejected
+items keep their only copy.
