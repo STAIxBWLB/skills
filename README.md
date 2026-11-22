@@ -67,6 +67,21 @@ uploaded bundle is invisible to clients.
   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`) are repo secrets; the public key is
   embedded in the app's `tauri.conf.json`.
 
+### Versioned releases
+
+`bundleVersion` is a human-facing semantic version; revision remains the app's
+ordering key. Use a major version for removed or renamed skills, breaking record
+contracts, or a higher `minAppVersion`; use a minor version for a new skill or
+capability, and a patch for fixes and wording.
+
+Add reviewed notes under `Unreleased`, run `make release-prepare VERSION=X.Y.Z`,
+and submit the manifest and changelog changes through a PR. Only push the
+corresponding `vX.Y.Z` tag on explicit instruction. The tag workflow checks
+that its commit is on `main`, the tag matches the manifest, and the changelog
+has the version section; it publishes a separate signed, durable release. It
+does not alter the rolling channel.
+
+
 ## Client behavior (Maru app)
 
 - Auto check 3 s after launch and every 6 h; auto-applies when the update

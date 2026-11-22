@@ -19,6 +19,7 @@ Guidance for AI agents working in this repository.
 - Releases are automatic on push to `main` (see README.md). Never hand-edit
   the `skills-channel` prerelease or its assets; the release workflow
   prunes all but the newest 10 revisions.
+- Change `bundleVersion` only through `make release-prepare`; push tags only on explicit instruction.
 - `minAppVersion` in `manifest.json` changes only when a bundle needs newer
   app code, and is coordinated with a Maru app release.
 - Commit messages: Conventional Commits, English (e.g.

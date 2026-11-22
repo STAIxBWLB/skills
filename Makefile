@@ -2,6 +2,9 @@
 skills-verify: ## Validate manifest, frontmatter, tracked inventory, and the vmem tool contract
 	node scripts/skills-bundle.mjs verify
 	node scripts/check-vmem-tools.mjs
+	node scripts/test-bundle-version.mjs
+	node scripts/release-prepare.mjs --self-test
+	node scripts/release-tag-check.mjs --self-test
 
 .PHONY: skills-package
 skills-package: ## Build the OTA bundle (REVISION required, e.g. make skills-package REVISION=123)
@@ -10,3 +13,7 @@ skills-package: ## Build the OTA bundle (REVISION required, e.g. make skills-pac
 .PHONY: skills-eval
 skills-eval: ## Run behavior evals in isolated temp workspaces (manual; needs an env credential, see evals/README.md)
 	node evals/run.mjs $(EVAL_ARGS)
+
+.PHONY: release-prepare
+release-prepare: ## Prepare a versioned release for review
+	node scripts/release-prepare.mjs "$(VERSION)"
