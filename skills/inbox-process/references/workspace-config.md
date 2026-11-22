@@ -45,6 +45,7 @@ inbox:
     vault_connect_skill: vault-connect
     digest_output: _state/digests
     processed_source_cleanup: [~/Downloads]
+    processed_inbox_cleanup: true
 ```
 
 For the argv hook contracts, read `../SKILL.md` §Hooks.
