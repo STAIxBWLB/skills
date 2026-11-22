@@ -52,7 +52,7 @@ output in the proposal as advisory.
 
 `ideation` handoff destinations are not configured here. The scratchpad already
 declares its own root and collection names under `paths.scratchpad` and
-`scratchpad.*_subdir`; resolve them through `../../../lib/scratchpad_adapter.md`
+`scratchpad.*_subdir`; resolve them through `../../lib/scratchpad_adapter.md` (relative to the skill directory)
 rather than adding an `inbox`-side key that names the same directory twice.
 Those destinations are proposed to the user for confirmation, never written by
 this skill.

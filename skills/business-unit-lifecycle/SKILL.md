@@ -31,6 +31,10 @@ canonical slugs from §E.
 
 ## Create A New Business Unit (proposal-first)
 
+Run these commands from the workspace so the scripts can find
+`workspace.config.yaml` from the current directory. Resolve each `scripts/`
+path relative to this skill directory before invoking it.
+
 ```bash
 python3 scripts/new_business_unit.py <domain> <slug> [--start-year YYYY] [--with 01,04]
 ```
