@@ -31,7 +31,7 @@ Parsing rules the block must satisfy:
 |---|---|
 | `destination` | Workspace-relative subfolder for raw originals, kind-matched per `naming-and-placement.md` §C. Must contain `/`, must not be absolute, `~`-rooted or contain `..`, and its parent must already exist (at most one new leaf folder). `null` when there is no destination. |
 | `project` | Project ID from `project-registry.yaml`, or `null`. |
-| `classification` | `action`, `schedule`, `info`, `ideation`, or `noise`. Recorded on the receipt. |
+| `classification` | Exactly one bare lowercase token: `action`, `schedule`, `info`, `ideation`, or `noise`. No Markdown formatting, `+` compounds, or parenthetical notes; put caveats and nuances in `rationale`. Recorded on the receipt. |
 | `confidence` | `high`, `medium`, or `low`. Only `high` and `medium` are applicable without a person deciding. Use `low` whenever the top registry score is weak (`< 3`), the kind is ambiguous, or the item is `noise`/`handoff`. |
 | `rationale` | Free text. Parsed but never acted on; it is where doubt belongs, for the human reading the proposal. |
 | `filed_as` | Rename map, one line per raw file that needs an English slug. Repeatable and accumulated, unlike the scalar keys above. |
