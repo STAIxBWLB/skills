@@ -79,13 +79,17 @@ workspace item manifest, never in this public skill package.
 
 Use `primary` for the main artifact. Use `attachment`, `sidecar`, `metadata`,
 `preview`, or `transcript` for supporting files. For a `kind: message` or `kind: bundle` item
-that references local files in a channel drop/auto directory, copy each
+that references local files in a channel's configured `drop_paths`, copy each
 attachment into the item raw directory and add a `files[]` entry with its
 item-relative `path`, `role: attachment`, `mime`, and `sha256`. Stage a drop
-file with no matching message bundle as a standalone `kind: attachment` or
-`kind: file` item under the root channel.
+file as a standalone `kind: attachment` or `kind: file` item under the root
+channel only if it is unlinked per §Drop Residuals and not referenced by a
+message or bundle item in this run. Skip linked drop files.
 
 ## Drop Residuals
+
+Ignore directories, OS noise, and placeholder files such as `.DS_Store` and
+`.gitkeep` when identifying or counting drop files.
 
 A drop file is linked when its SHA-256 matches a `files[].sha256` value in an
 existing item manifest or a `sha256:`-style receipt `dedupe_key` in

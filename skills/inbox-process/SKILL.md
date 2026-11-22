@@ -43,8 +43,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    before processing. In every run mode, inspect each channel's configured
    `drop_paths` read-only and report each channel with a non-zero count of
    unlinked files, using `inbox-intake/references/manifest-schema.md`
-   §Drop Residuals. Check the requested channel after staging. Ignore `.DS_Store`
-   and other configured OS noise files.
+   §Drop Residuals. Check the requested channel after staging.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
@@ -106,7 +105,8 @@ sets `reviewFlow: true`), read `references/maru-review-output.md` before
 processing, process **every** selected item in one run, and:
 
 1. Emit concise human-readable progress logs with the phase markers defined in
-   `references/maru-review-output.md`.
+   `references/maru-review-output.md`. Put the residual report in a progress
+   log line or the object's `summary`, never as an extra object field.
 2. You MAY write the inbox-internal artifacts during the run: per item write
    `extracted_file`, `summary_file`, and `route_file` INSIDE that item's
    directory. These are non-destructive and stay within the inbox. You MAY also
@@ -138,8 +138,9 @@ restating it in the prompt.
    `inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
    schemas once per batch rather than once per item. When
-   `inbox.hooks.route_validator` is configured, optionally invoke or hand
-   off to it for read-only route checks.
+   `inbox.hooks.route_validator` is configured, optionally run its command on
+   the batch's route files and include its output in the proposal as advisory.
+   This read-only check is not a follow-up skill.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
@@ -189,8 +190,9 @@ source-kind hints only. Do not require users to call fine-grained channel names.
 
 Hooks are optional and config-driven:
 
-- `route_validator`: optional deterministic route check; it may read and report
-  only, never write or move files.
+- `route_validator`: optional command to check the batch's route files; it may
+  read and report only, never write or move files. Include its output as advisory
+  in the proposal.
 - `task_skill`: create local task candidates or call `task-management` when the
   user asks for task registration.
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit

@@ -38,15 +38,16 @@ inbox:
     require_confirm_before_route: true
     summary_schema: inbox-summary/v1
   hooks:
-    route_validator: <optional-read-only-validator>
+    route_validator: <optional-read-only-command>
     task_skill: task-management
     vault_extract_skill: vault-extract
     vault_connect_skill: vault-connect
     digest_output: _state/digests
 ```
 
-`inbox.hooks.route_validator`, when configured, is an optional deterministic
-route check that may read and report only; it never writes or moves files.
+`inbox.hooks.route_validator`, when configured, is an optional command run on
+the batch's route files. It may read and report only, never write or move files;
+include its output in the proposal as advisory.
 
 `ideation` handoff destinations are not configured here. The scratchpad already
 declares its own root and collection names under `paths.scratchpad` and
