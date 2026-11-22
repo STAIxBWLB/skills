@@ -105,8 +105,8 @@ skill. The user may scope processing with `inbox-process <channel>`.
     `duplicate/`, or `rejected/` (its `raw/` files and any original parked
     beside them in the item directory) and equals no `pending/` item's
     original. Report the count. Leave filename-only matches and subdirectories
-    alone, and never delete permanently. This step runs only after this step 9
-    moved items; Maru review mode, Proposal-Only Mode, and `extract-tasks`
+    alone, and never delete permanently. Run it only when step 9 moved items
+    in this run; Maru review mode, Proposal-Only Mode, and `extract-tasks`
     skip it.
 
 ## Maru Run Contract
