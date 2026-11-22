@@ -50,7 +50,7 @@ Maru to ingest. Maru adopts any markdown in the collection on the next listing.
 Path: `<drafts>/<YYMMDD>-<type>-<slug>.md`.
 
 `<drafts>` is `<paths.scratchpad>/<scratchpad.drafts_subdir>`, resolved per
-`~/.maru/skills/_builtin/lib/scratchpad_adapter.md` (default `scratchpad/drafts`).
+`../../lib/scratchpad_adapter.md` (default `scratchpad/drafts`).
 When that adapter file cannot be read, read `paths.scratchpad` and
 `scratchpad.drafts_subdir` from the nearest `workspace.config.yaml` at or above
 the working directory, use `scratchpad` and `drafts` for an absent key, resolve
@@ -111,7 +111,7 @@ extra provenance (`source_channel`, `run_id`, `message_id`) freely.
 ## Body
 
 Markdown in 개조식 (noun-ending) style per the `gaejosik` skill, following
-`_meta/rules/writing-style.md`. Use the sections that fit the candidate; a
+`ssot.writing_style`. Use the sections that fit the candidate; a
 reply draft and a report draft do not have the same shape. A workable default:
 
 - `## 배경`: what happened and why this needs doing, with the source named.

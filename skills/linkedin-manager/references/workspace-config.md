@@ -8,7 +8,7 @@ path.
 
 ```yaml
 linkedin:
-  root: ~/workspace/PATH/TO/linkedin
+  root: <workspace>/path/to/linkedin
   timezone: Region/City
   profile_url: https://www.linkedin.com/in/HANDLE
   languages: [en]
@@ -56,7 +56,7 @@ A workspace with a boot-size budget may keep this section in its own file and
 leave a pointer comment in `workspace.config.yaml`:
 
 ```yaml
-# linkedin: -> _meta/config/linkedin.yaml
+# linkedin: -> config/linkedin.yaml
 ```
 
 Follow the pointer relative to the directory of `workspace.config.yaml`. The

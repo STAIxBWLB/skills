@@ -2,10 +2,10 @@
 
 This is the lifecycle overlay of the `business-unit-lifecycle` skill contract.
 
-Canonical rule: workspace `_meta/rules/naming-and-placement.md` §B (Tree C
+Canonical rule: workspace `ssot.naming_and_placement` §B (Tree C
 profiles), §B1a (numbering), §E (canonical vocabulary); decision record
 DR-026. Runtime placement of files into any project is governed by
-`_meta/rules/naming-and-placement.md` §C; this skill owns unit tree creation
+`ssot.naming_and_placement` §C; this skill owns unit tree creation
 and lifecycle transitions only.
 
 ## Profiles (Tree C)

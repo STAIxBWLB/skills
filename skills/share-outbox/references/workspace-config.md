@@ -6,7 +6,7 @@ or workspace-only paths.
 
 ```yaml
 share_outbox:
-  root: ~/workspace/work/shared
+  root: <workspace>/shared
   timezone: Region/City
   default_author: author_key
   authors:

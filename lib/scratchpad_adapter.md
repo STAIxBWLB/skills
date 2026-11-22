@@ -25,7 +25,7 @@ literals that silently ignore a relocated or renamed collection.
 
 ```yaml
 paths:
-  scratchpad: ~/workspace/work/scratchpad   # collection root
+  scratchpad: <workspace>/scratchpad   # collection root
 scratchpad:
   ideation_subdir: ideation
   memos_subdir: memos

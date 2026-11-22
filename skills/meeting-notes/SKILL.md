@@ -70,7 +70,7 @@ skill is provider-neutral and does not require inbox staging.
    `YYYY/YYYY-MM/`; Maru applies the write only after user approval. The
    meeting root holds the **canonical** note. When a partner/project also needs a
    copy or reference, place it in that project's meeting subfolder per
-   `_meta/rules/naming-and-placement.md` §C (e.g. the partner's `*-meetings/` or
+   `ssot.naming_and_placement` §C (e.g. the partner's `*-meetings/` or
    `04-operations/meetings/YYYY/`), never the project's bare root.
 8. If configured and explicitly requested, prepare task candidates for
    `task-management` or vault extraction candidates. Pre-fill each task
@@ -131,10 +131,10 @@ Allowed follow-up skills are `vault-extract`, `vault-connect`, and
 - `references/maru-review.md` - review-mode phase markers and review object
 - `references/vault-handoff.md` - normalize-time vault fields and extraction inputs
 - `templates/meeting-note.md` - neutral meeting note template
-- `_meta/rules/naming-and-placement.md` §C - destination subfolder for project/partner
+- `ssot.naming_and_placement` §C - destination subfolder for project/partner
   copies of the meeting note (`*-meetings/`); the canonical note stays in the
   meeting root
-- `ssot.context_enrichment` (`_meta/rules/context-enrichment.md`) - entity
+- `ssot.context_enrichment` - entity
   resolution + context bundle + cross-link contract (consulted when
   `meeting_notes.hooks.enrichment` is set); its §2-7 web-search contract also
   governs external verification in workflow step 5

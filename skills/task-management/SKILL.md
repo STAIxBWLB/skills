@@ -147,6 +147,6 @@ skill.
 - `references/maru-integration.md` - app-facing contract and review-mode output
 - `references/google-cli-cheatsheet.md` - Google CLI examples
 - `references/integration-ids.template.md` - local receipt template
-- `ssot.context_enrichment` (`_meta/rules/context-enrichment.md`) - entity
+- `ssot.context_enrichment` - entity
   resolution + context bundle + cross-link contract (applied on create when
   `task_management.context_enrichment` is true)

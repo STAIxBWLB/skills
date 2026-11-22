@@ -106,7 +106,7 @@ Add this stub to project-registry.yaml when ready:
     orgs: []
 
 Then regenerate the structure index:
-  python3 _meta/scripts/gen_structure.py --project {domain}-{slug}
+  python3 gen_structure.py --project {domain}-{slug}  # workspace tool; see ssot.naming_and_placement §B5
 """
 
 

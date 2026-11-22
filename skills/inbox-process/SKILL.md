@@ -20,7 +20,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    `ssot.project_registry`, `ssot.registry_scoring`, and optional
    `inbox.hooks`. When `inbox.hooks.enrichment` is set, also read
    `ssot.context_enrichment` for entity resolution and weak-route assist.
-3. Load `inbox-intake/references/manifest-schema.md` before changing item
+3. Load `../inbox-intake/references/manifest-schema.md` before changing item
    state.
 4. Load `references/summary-schema.md` before creating a summary.
 5. Load `ssot.rules`/`naming-and-placement.md` §C before proposing a route — it governs
@@ -42,7 +42,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
 2. If a channel is provided, stage its unnormalized files under `drop_paths`
    through `inbox-intake` before processing. In every run mode, inspect each channel's configured
    `drop_paths` read-only and report each channel with a non-zero count of
-   unlinked files, using `inbox-intake/references/manifest-schema.md`
+   unlinked files, using `../inbox-intake/references/manifest-schema.md`
    §Drop Residuals. Check the requested channel after staging.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
@@ -69,7 +69,7 @@ skill. The user may scope processing with `inbox-process <channel>`.
    `requiresConfirmation: true` and propose two destinations in `note`:
    the raw original to the memos collection and the distilled one-idea-per-file
    seeds to `seeds/` under the ideation collection. Resolve both through
-   `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` (`paths.scratchpad` plus `memos_subdir` /
+   `../../lib/scratchpad_adapter.md` (`paths.scratchpad` plus `memos_subdir` /
    `ideation_subdir`); do not join a literal `scratchpad/` segment. Do not write
    the seeds yourself; a person confirms and the split follows the three-way
    triage in the ideation collection's `README.md` §인테이크, which separates
@@ -88,14 +88,14 @@ skill. The user may scope processing with `inbox-process <channel>`.
    In Maru review mode (see *Maru Run Contract*), do not move anything
    yourself — defer the move to Maru's confirmation step.
    When filing a raw original OUT of the exempt inbox zone into a non-exempt
-   project folder, rename it to an English slug per `_meta/rules/naming-and-placement.md` §A4
+   project folder, rename it to an English slug per `ssot.naming_and_placement` §A4
    (`YYMMDD-type-description[-vX].ext`) and preserve the Korean original in the
    item manifest `source.original_name`. §A4's scope is tracked text only —
    `.md`, `.txt`, `.svg` with a non-ASCII name. Binaries (`.pdf`, `.hwp`,
    `.hwpx`, `.xlsx`, `.pptx`, `.docx`) keep their original filename.
 9. Move processed items to `done/`, `failed/`, or `duplicate/`. Before appending
    a receipt to `_state/index.jsonl`, read
-   `inbox-intake/references/receipt-schema.md`. In Maru review mode, skip this step;
+   `../inbox-intake/references/receipt-schema.md`. In Maru review mode, skip this step;
    Maru performs the move and writes the receipt after the user confirms.
 
 ## Maru Run Contract
@@ -135,7 +135,7 @@ restating it in the prompt.
 
 1. Process only the named items. Inspect each channel's configured `drop_paths`
    read-only and report non-zero unlinked file counts per channel in the proposal
-   output using `inbox-intake/references/manifest-schema.md` §Drop Residuals;
+   output using `../inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
    schemas once per batch rather than once per item.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
@@ -168,7 +168,7 @@ structured task candidates instead of routing items. This mode is read-only:
 never write, move, or delete files in any mode (review mode included), and do
 not run follow-up skills. Inspect each channel's configured `drop_paths`
 read-only and report non-zero unlinked file counts per channel using
-`inbox-intake/references/manifest-schema.md`
+`../inbox-intake/references/manifest-schema.md`
 §Drop Residuals. Put the residual report outside the `maru_task_candidates_v1`
 block. Read `references/extract-tasks.md` before collecting inputs; it defines
 the sources and the `maru_task_candidates_v1` output.
@@ -224,7 +224,7 @@ Hooks are optional and config-driven:
 
 ## References
 
-- `inbox-intake/references/receipt-schema.md` - receipt schema and event vocabulary
+- `../inbox-intake/references/receipt-schema.md` - receipt schema and event vocabulary
 - `references/summary-schema.md` - required summary shape
 - `references/workspace-config.md` - processing config keys
 - `references/maru-review-output.md` - phase markers and `maru_inbox_review_v1`
@@ -232,9 +232,9 @@ Hooks are optional and config-driven:
 - `references/extract-tasks.md` - `extract-tasks` inputs and output
 - `ssot.rules`/`naming-and-placement.md` §C - destination subfolder resolution
   (kind→category→`tree_map`/`_incoming`); never route to a bare project root
-- `~/.maru/skills/_builtin/lib/scratchpad_adapter.md` - scratchpad path resolution for
+- `../../lib/scratchpad_adapter.md` - scratchpad path resolution for
   `ideation` handoffs
-- `_meta/rules/naming-and-placement.md` §A4 - English-slug naming for files moved into
+- `ssot.naming_and_placement` §A4 - English-slug naming for files moved into
   non-exempt project folders
-- `ssot.context_enrichment` (`_meta/rules/context-enrichment.md`) - entity
+- `ssot.context_enrichment` - entity
   resolution for weak routes + transcript handoff (when `hooks.enrichment` set)

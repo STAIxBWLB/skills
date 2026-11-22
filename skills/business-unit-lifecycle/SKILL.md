@@ -16,7 +16,7 @@ lifecycle. This skill is public-safe: do not embed personal identity,
 institutional private details, real credentials, or local absolute paths in
 the skill package.
 
-Grammar SSOT: workspace `_meta/rules/naming-and-placement.md` (§B profiles,
+Grammar SSOT: workspace `ssot.naming_and_placement` (§B profiles,
 §B1a numbering, §E canonical vocabulary; DR-026). New directories must use
 canonical slugs from §E.
 
@@ -32,7 +32,7 @@ canonical slugs from §E.
 ## Create A New Business Unit (proposal-first)
 
 ```bash
-python3 ~/.maru/skills/business-unit-lifecycle/scripts/new_business_unit.py <domain> <slug> [--start-year YYYY] [--with 01,04]
+python3 scripts/new_business_unit.py <domain> <slug> [--start-year YYYY] [--with 01,04]
 ```
 
 The default scaffold is minimal: README + `00-readme/` charter +
@@ -45,7 +45,7 @@ registry stub; add it manually only when the user asks.
 ## Create A Cycle Unit (application/renewal, §B6)
 
 ```bash
-python3 ~/.maru/skills/business-unit-lifecycle/scripts/new_business_unit.py <domain> <slug> --profile cycle [--stages 01-announcement,04-proposal]
+python3 scripts/new_business_unit.py <domain> <slug> --profile cycle [--stages 01-announcement,04-proposal]
 ```
 
 Cycle units hold one external selection cycle as numbered `NN-<stage>/` dirs
@@ -57,7 +57,7 @@ Cycle units hold one external selection cycle as numbered `NN-<stage>/` dirs
 ## Add A Year Cycle
 
 ```bash
-python3 ~/.maru/skills/business-unit-lifecycle/scripts/new_year_cycle.py <slug> <year> [--domain DOMAIN]
+python3 scripts/new_year_cycle.py <slug> <year> [--domain DOMAIN]
 ```
 
 Seeds the calendar-year partition only under categories that already exist
@@ -68,7 +68,7 @@ if those category dirs were already created for real content). Errors out if
 ## Graduate A Cycle Unit (selection won)
 
 ```bash
-python3 ~/.maru/skills/business-unit-lifecycle/scripts/graduate_unit.py projects/<domain>/<slug> --year YYYY -o manifest.json
+python3 scripts/graduate_unit.py projects/<domain>/<slug> --year YYYY -o manifest.json
 ```
 
 Emits a `migrate_tree.py`-compatible manifest implementing the DR-025 §5
@@ -94,7 +94,7 @@ commit.
 - Keep unresolved incoming material in `_incoming/` only temporarily; keep old
   versions in `_archive/`.
 - Runtime file placement into ANY project (incl. routed inbox items) follows
-  workspace `_meta/rules/naming-and-placement.md` §C; this skill owns only
+  workspace `ssot.naming_and_placement` §C; this skill owns only
   unit tree creation and lifecycle transitions.
 
 ## References
