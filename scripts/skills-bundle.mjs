@@ -195,6 +195,9 @@ function loadManifest(root) {
   for (const key of ["version", "repoSlug", "channelTag", "minAppVersion", "skillsSubdir", "skills"]) {
     if (manifest[key] === undefined) fail(`manifest.json missing required key: ${key}`);
   }
+  if (typeof manifest.bundleVersion !== "string" || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(manifest.bundleVersion)) {
+    fail("manifest.json bundleVersion missing or invalid; set an X.Y.Z version with make release-prepare");
+  }
   if (!/^\d+\.\d+\.\d+$/.test(manifest.minAppVersion)) {
     fail(`manifest.json minAppVersion is not semver: ${manifest.minAppVersion}`);
   }
@@ -432,7 +435,8 @@ with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
   const metadata = {
     schema: 1,
     revision,
-    displayVersion: `r${revision}`,
+    bundleVersion: manifest.bundleVersion,
+    displayVersion: `${manifest.bundleVersion} (r${revision})`,
     commit,
     publishedAt: new Date().toISOString(),
     minAppVersion: manifest.minAppVersion,

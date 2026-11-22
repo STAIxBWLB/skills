@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "bundleVersion": "1.0.0",
   "repoSlug": "STAIxBWLB/skills",
   "channelTag": "skills-channel",
   "minAppVersion": "1.1.6",
