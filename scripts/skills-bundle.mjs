@@ -196,7 +196,7 @@ function loadManifest(root) {
     if (manifest[key] === undefined) fail(`manifest.json missing required key: ${key}`);
   }
   if (typeof manifest.bundleVersion !== "string" || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(manifest.bundleVersion)) {
-    fail(`manifest.json bundleVersion ${manifest.bundleVersion} is invalid; set it to X.Y.Z in manifest.json`);
+    fail(`manifest.json bundleVersion ${manifest.bundleVersion} is invalid; set it to X.Y.Z in manifest.json in a reviewed PR`);
   }
   if (!/^\d+\.\d+\.\d+$/.test(manifest.minAppVersion)) {
     fail(`manifest.json minAppVersion is not semver: ${manifest.minAppVersion}`);
