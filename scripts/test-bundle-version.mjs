@@ -15,7 +15,7 @@ try {
     writeFileSync(join(root, "manifest.json"), JSON.stringify(fixture));
     const run = spawnSync(process.execPath, [resolve("scripts/skills-bundle.mjs"), "verify", "--root", root], { encoding: "utf8" });
     assert.notEqual(run.status, 0);
-    assert.match(run.stderr, /bundleVersion missing or invalid/);
+    assert.match(run.stderr, /bundleVersion .* is invalid; set it to X.Y.Z in manifest.json/);
   }
   console.log("bundle-version self-test ok");
 } finally { rmSync(root, { recursive: true, force: true }); }

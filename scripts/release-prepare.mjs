@@ -22,7 +22,7 @@ function prepare(manifest, changelog, version, date) {
   const match = /^## \[Unreleased\][ \t]*\r?\n([\s\S]*?)(?=^## \[|$(?![\s\S]))/m.exec(changelog);
   if (!match) throw new Error("CHANGELOG.md lacks an Unreleased section; add one before preparing");
   const content = match[1].replace(/^\s*<!--[^]*?-->\s*$/gm, "").replace(/^\s*#{3,6}\s+.*$/gm, "").trim();
-  if (!content) throw new Error("Unreleased is empty; edit the draft below before preparing");
+  if (!content) throw new Error("Unreleased is empty; add notes under ## [Unreleased] in CHANGELOG.md, then rerun");
   const heading = `## [Unreleased]\n\n## [${version}] - ${date}\n`;
   return { manifest: { ...manifest, bundleVersion: version }, changelog: changelog.slice(0, match.index) + heading + match[1] + changelog.slice(match.index + match[0].length) };
 }
