@@ -78,4 +78,28 @@ workspace item manifest, never in this public skill package.
 ## File Roles
 
 Use `primary` for the main artifact. Use `attachment`, `sidecar`, `metadata`,
-`preview`, or `transcript` for supporting files.
+`preview`, or `transcript` for supporting files. For a `kind: message` or `kind: bundle` item
+that references local files in a channel's configured `drop_paths`, copy each
+attachment into the item raw directory and add a `files[]` entry with its
+item-relative `path`, `role: attachment`, `mime`, and `sha256`. Stage a drop
+file as a standalone `kind: attachment` or `kind: file` item under the root
+channel only if it is unlinked per §Drop Residuals and not referenced by a
+message or bundle item in this run. Skip linked files for standalone staging;
+still link referenced attachments into a message or bundle item in this run.
+
+## Drop Residuals
+
+A drop residual is a file under a channel's configured `drop_paths`, searched
+recursively and counting files only, that meets all of these:
+
+- It is not a message record, meaning it is not in a subfolder whose
+  `source_kinds` maps to `message`.
+- It is not OS noise or a placeholder (`.DS_Store`, `.gitkeep`), and it does
+  not match the channel's `drop_ignore` globs.
+- Its SHA-256 matches no `files[].sha256` in an existing item manifest.
+
+When file hashes cannot be computed in this run, report the residual check as
+unavailable, name the missing capability, and do not estimate a count.
+
+The collector owns message records. A copied source can remain in the drop
+directory after it is carried.

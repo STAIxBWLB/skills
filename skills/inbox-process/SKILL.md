@@ -39,9 +39,11 @@ skill. The user may scope processing with `inbox-process <channel>`.
      same guidance as trailing `<channel> [context...]`; treat its text
      identically. When an item's manifest already has
      `metadata.processing_context`, honor it as guidance on (re)processing.
-2. If a channel is provided, scan that channel's configured `drop_paths` first.
-   Stage unnormalized files there through `inbox-intake` before processing.
-   Ignore `.DS_Store` and other configured OS noise files.
+2. If a channel is provided, stage its unnormalized files under `drop_paths`
+   through `inbox-intake` before processing. In every run mode, inspect each channel's configured
+   `drop_paths` read-only and report each channel with a non-zero count of
+   unlinked files, using `inbox-intake/references/manifest-schema.md`
+   §Drop Residuals. Check the requested channel after staging.
 3. Read each `inbox.naming.manifest_file` and verify
    `schema: inbox-item/v1`.
 4. Extract text from `files[]` into `inbox.naming.extracted_file`.
@@ -103,7 +105,8 @@ sets `reviewFlow: true`), read `references/maru-review-output.md` before
 processing, process **every** selected item in one run, and:
 
 1. Emit concise human-readable progress logs with the phase markers defined in
-   `references/maru-review-output.md`.
+   `references/maru-review-output.md`. Put the residual report in a progress
+   log line or the object's `summary`, never as an extra object field.
 2. You MAY write the inbox-internal artifacts during the run: per item write
    `extracted_file`, `summary_file`, and `route_file` INSIDE that item's
    directory. These are non-destructive and stay within the inbox. You MAY also
@@ -130,11 +133,18 @@ unattended scheduler runs — propose and stop. This is the same non-destructive
 contract as *Maru Run Contract* items 2 and 3, and it holds without the caller
 restating it in the prompt.
 
-1. Process only the named items.
+1. Process only the named items. Inspect each channel's configured `drop_paths`
+   read-only and report non-zero unlinked file counts per channel in the proposal
+   output using `inbox-intake/references/manifest-schema.md` §Drop Residuals;
+   never move or stage drop files. Read static configuration, registry, and
+   schemas once per batch rather than once per item.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
-   `manifest.yaml`. Nothing else.
+   `manifest.yaml`. Write nothing else. When `inbox.hooks.route_validator` is configured, optionally
+   run its command after writing the batch's route files, passing file paths as
+   separate arguments, never through a shell string. Include its output in the
+   proposal as advisory. This read-only check is not a follow-up skill.
 3. Move nothing. The item stays in `pending/`, `_state/index.jsonl` gets no
    receipt, and no raw original is filed into a project folder. A person or the
    applying tool performs the move after confirmation.
@@ -156,8 +166,12 @@ block's keys, parsing rules, no-destination values, and `filed_as` renames.
 `inbox-process extract-tasks` turns recent inbox and meeting material into
 structured task candidates instead of routing items. This mode is read-only:
 never write, move, or delete files in any mode (review mode included), and do
-not run follow-up skills. Read `references/extract-tasks.md` before collecting
-inputs; it defines the sources and the `maru_task_candidates_v1` output.
+not run follow-up skills. Inspect each channel's configured `drop_paths`
+read-only and report non-zero unlinked file counts per channel using
+`inbox-intake/references/manifest-schema.md`
+§Drop Residuals. Put the residual report outside the `maru_task_candidates_v1`
+block. Read `references/extract-tasks.md` before collecting inputs; it defines
+the sources and the `maru_task_candidates_v1` output.
 
 ## Channel Invocation
 
@@ -176,6 +190,10 @@ source-kind hints only. Do not require users to call fine-grained channel names.
 
 Hooks are optional and config-driven:
 
+- `route_validator`: optional command to check the batch's route files; pass
+  file paths as separate arguments, never through a shell string. It may read
+  and report only, never write or move files. Include its output as advisory in
+  the proposal.
 - `task_skill`: create local task candidates or call `task-management` when the
   user asks for task registration.
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit
