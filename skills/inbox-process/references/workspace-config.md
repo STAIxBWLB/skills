@@ -46,8 +46,9 @@ inbox:
 ```
 
 `inbox.hooks.route_validator`, when configured, is an optional command run on
-the batch's route files. It may read and report only, never write or move files;
-include its output in the proposal as advisory.
+the batch's route files. Pass file paths as separate arguments, never through a
+shell string. It may read and report only, never write or move files; include its
+output in the proposal as advisory.
 
 `ideation` handoff destinations are not configured here. The scratchpad already
 declares its own root and collection names under `paths.scratchpad` and

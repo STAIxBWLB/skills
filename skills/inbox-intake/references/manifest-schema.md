@@ -85,14 +85,14 @@ item-relative `path`, `role: attachment`, `mime`, and `sha256`. Stage a drop
 file as a standalone `kind: attachment` or `kind: file` item under the root
 channel only if it is unlinked per §Drop Residuals and not referenced by a
 message or bundle item in this run. Skip linked files for standalone staging;
-still link referenced attachments into a message or bundle item, including an
-existing pending bundle.
+still link referenced attachments into a message or bundle item in this run.
 
 ## Drop Residuals
 
-Report a drop file as a residual when it is inbox content that no existing item
-carries yet. An item carries an attachment or file whose SHA-256 matches its
-`files[].sha256`, and a message record whose provider message ID matches its
-`source.message_id` or `dedupe_key`. Directories, OS noise, placeholders, and
-collector state files (names starting with `.` or `_`) are not inbox content.
-A copied source can remain in the drop directory after it is carried.
+Count as residuals attachment and file drop files under a channel's configured
+`drop_paths` recursively (files only), whose `source_kinds` subfolder maps to
+`attachment` or `file`, plus channel-root files with no such mapping, and whose
+SHA-256 matches no `files[].sha256` in an existing item manifest. Message records
+are not counted; the collector owns them. Ignore OS noise and placeholder files
+such as `.DS_Store` and `.gitkeep`. A copied source can remain in the drop
+directory after it is carried.

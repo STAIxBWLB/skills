@@ -134,16 +134,17 @@ contract as *Maru Run Contract* items 2 and 3, and it holds without the caller
 restating it in the prompt.
 
 1. Process only the named items. Inspect each channel's configured `drop_paths`
-   read-only and report non-zero unlinked file counts per channel using
-   `inbox-intake/references/manifest-schema.md` §Drop Residuals;
+   read-only and report non-zero unlinked file counts per channel in the proposal
+   output using `inbox-intake/references/manifest-schema.md` §Drop Residuals;
    never move or stage drop files. Read static configuration, registry, and
    schemas once per batch rather than once per item.
 2. Write `inbox.naming.extracted_file`, `inbox.naming.summary_file` and
    `inbox.naming.route_file` inside each item's directory, and
    `metadata.processing_context` / `metadata.processing_hints` into its
    `manifest.yaml`. Write nothing else. When `inbox.hooks.route_validator` is configured, optionally
-   run its command after writing the batch's route files and include its output
-   in the proposal as advisory. This read-only check is not a follow-up skill.
+   run its command after writing the batch's route files, passing file paths as
+   separate arguments, never through a shell string. Include its output in the
+   proposal as advisory. This read-only check is not a follow-up skill.
 3. Move nothing. The item stays in `pending/`, `_state/index.jsonl` gets no
    receipt, and no raw original is filed into a project folder. A person or the
    applying tool performs the move after confirmation.
@@ -189,9 +190,10 @@ source-kind hints only. Do not require users to call fine-grained channel names.
 
 Hooks are optional and config-driven:
 
-- `route_validator`: optional command to check the batch's route files; it may
-  read and report only, never write or move files. Include its output as advisory
-  in the proposal.
+- `route_validator`: optional command to check the batch's route files; pass
+  file paths as separate arguments, never through a shell string. It may read
+  and report only, never write or move files. Include its output as advisory in
+  the proposal.
 - `task_skill`: create local task candidates or call `task-management` when the
   user asks for task registration.
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit
