@@ -99,6 +99,15 @@ skill. The user may scope processing with `inbox-process <channel>`.
    a receipt to `_state/index.jsonl`, read
    `../inbox-intake/references/receipt-schema.md`. In Maru review mode, skip this step;
    Maru performs the move and writes the receipt after the user confirms.
+10. When `inbox.hooks.processed_source_cleanup` lists directories, finish the
+    run by moving their leftover source copies to the OS trash: a top-level
+    regular file whose sha256 equals an original of an item now in `done/`,
+    `duplicate/`, or `rejected/` (its `raw/` files and any original parked
+    beside them in the item directory) and equals no `pending/` item's
+    original. Report the count. Leave filename-only matches and subdirectories
+    alone, and never delete permanently. Run it only when step 9 moved items
+    in this run; Maru review mode, Proposal-Only Mode, and `extract-tasks`
+    skip it.
 
 ## Maru Run Contract
 
@@ -206,6 +215,9 @@ Hooks are optional and config-driven:
 - `vault_extract_skill` and `vault_connect_skill`: only propose or call explicit
   vault skills. This public skill must not write vault notes by itself.
 - `digest_output`: write a local digest under the configured inbox state path.
+- `processed_source_cleanup`: list of local directories (such as the user's
+  download folder) whose copies of filed originals go to the trash in
+  *Workflow* step 10.
 - `enrichment`: when set, consult `ssot.context_enrichment` to resolve entities
   for weak routes and to enrich route proposals (`vault_note`,
   `relatedMeetings`), and to hand `kind: transcript` items to `meeting-notes`.
