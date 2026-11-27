@@ -68,8 +68,8 @@
       ]
     },
     {
-      "name": "ship",
-      "path": "skills/ship",
+      "name": "merge-deploy",
+      "path": "skills/merge-deploy",
       "tier": "core",
       "tags": [
         "git",

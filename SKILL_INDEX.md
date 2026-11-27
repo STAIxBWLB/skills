@@ -19,7 +19,7 @@ sync with it.
 - Slide deck prompts: `canva-deck`, `notebooklm-deck`, `gpt-images-deck`
 - Project workflows: `business-unit-lifecycle`
 - IO and inbox/outbox: `io-mso`, `io-gws`, `io-telegram`, `io-kakao`, `inbox-intake`, `inbox-process`, `meeting-notes`, `meeting-source-review`, `share-outbox`
-- Task and git: `task-management`, `git-sync`, `ship`
+- Task and git: `task-management`, `git-sync`, `merge-deploy`
 - Ideation and drafts: `ideation-drafts`, `draft-writer`
 
 ## Install
