@@ -1,7 +1,7 @@
 ---
-name: ship
+name: merge-deploy
 description: >
-  Use when the user asks to merge a PR, merge and deploy, ship a change, update a
+  Use when the user asks to merge a PR, merge and deploy, land a change, update a
   submodule pointer after a merge, or confirm that a deploy landed. Takes one
   merge-ready pull request to a verified deploy: review-thread and CI gate, squash
   merge, submodule pointer propagation up the parent chain, then deploy dispatch
@@ -10,7 +10,7 @@ description: >
   GitHub, and workspace.config.yaml, never from this skill package.
 ---
 
-# Ship
+# Merge Deploy
 
 Carry one merged-ready pull request through merge, pointer propagation, and
 deploy verification. Invoking this skill is the merge instruction the workspace
@@ -41,14 +41,14 @@ policy.
 ## Commands
 
 ```bash
-/ship                  # gate -> merge -> pointer -> deploy -> verify
-/ship check            # gate report only, no writes
-/ship merge            # gate -> merge -> pointer, no deploy
-/ship deploy           # deploy dispatch + verify only
-/ship <pr-number>      # scope to one pull request
-/ship --all            # every mergeable open PR, oldest first
-/ship --dry-run        # print the plan, touch nothing
-/ship <pr-number> --reviewer <claude|codex|kimi>  # select the review host
+/merge-deploy                # gate -> merge -> pointer -> deploy -> verify
+/merge-deploy check          # gate report only, no writes
+/merge-deploy merge          # gate -> merge -> pointer, no deploy
+/merge-deploy deploy         # deploy dispatch + verify only
+/merge-deploy <pr-number>    # scope to one pull request
+/merge-deploy --all          # every mergeable open PR, oldest first
+/merge-deploy --dry-run      # print the plan, touch nothing
+/merge-deploy <pr-number> --reviewer <claude|codex|kimi>  # select the review host
 ```
 
 With no PR number and no `--all`, resolve the PR from the current branch, and
@@ -161,7 +161,7 @@ Commit messages in English. Do not add a `Co-Authored-By` trailer.
 
 ### 4. Deploy Dispatch
 
-For `/ship deploy` on a repository with a web surface, read
+For `/merge-deploy deploy` on a repository with a web surface, read
 `references/canary.md` and capture its baseline before dispatching.
 
 Detect how the repository deploys. Never assume.
@@ -223,7 +223,7 @@ Once a signal confirms the deploy of a web surface, run the observation in
 ## Output
 
 ```markdown
-## Ship Report
+## Merge Deploy Report
 
 SHIP_ROOT: <path>  (<owner>/<repo>)
 

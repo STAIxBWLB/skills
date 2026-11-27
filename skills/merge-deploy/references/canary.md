@@ -1,6 +1,6 @@
 # Canary
 
-Apply this file when the run will deploy (`/ship`, `/ship deploy`) a repository
+Apply this file when the run will deploy (`/merge-deploy`, `/merge-deploy deploy`) a repository
 with a deployed web surface: capture the baseline before the change reaches
 production, then observe and compare after the stage 5 deploy signal. It
 extends stage 5 Verify and is never a merge gate. A repository with no web
@@ -47,12 +47,12 @@ do not compare.
 
 Capture before production changes: at stage 1, before the merge, because a
 push-triggered or git-integration deploy starts at the merge. With
-`/ship deploy`, capture before the dispatch. Record the time, the origin, and
+`/merge-deploy deploy`, capture before the dispatch. Record the time, the origin, and
 which deployment was live when the platform reports it (deployment id or
 commit). With `--all`, one baseline before the first merge covers the run.
 
 Keep the baseline in the session; this procedure writes no files. In
-`/ship check` and `--dry-run`, list the routes and their source without
+`/merge-deploy check` and `--dry-run`, list the routes and their source without
 requesting them.
 
 A baseline that does not exist, failed, or was captured after production
@@ -80,7 +80,7 @@ reverts.
 
 ## Report fields
 
-Fill the Canary section of the Ship Report:
+Fill the Canary section of the Merge Deploy Report:
 
 - Baseline: captured this run, with time and live deployment; or `none`, with
   the section titled current-state check.

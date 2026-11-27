@@ -37,7 +37,7 @@ reason for every skip, findings with dispositions, and the issue-or-PR and
 `REVIEW.md`-or-fallback checks. A review of an older head is stale even if
 GitHub still shows it as approved. A changed base also makes the review stale.
 If there is no complete current-head-and-base report, perform the review as
-part of `/ship` or `/ship merge`. `/ship check` and `/ship --dry-run` only
+part of `/merge-deploy` or `/merge-deploy merge`. `/merge-deploy check` and `/merge-deploy --dry-run` only
 inspect existing evidence and report a missing review as a blocker; they do not
 fetch refs or run a new review, so their no-write promise holds.
 
@@ -80,7 +80,7 @@ unadjudicated. Review completion alone never grants merge authorization.
 
 ## Review receipt
 
-Add this block under the PR table in the Ship Report:
+Add this block under the PR table in the Merge Deploy Report:
 
 ```markdown
 Review receipt for #<n>:

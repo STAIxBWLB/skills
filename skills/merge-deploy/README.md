@@ -1,6 +1,6 @@
 SKILL.md is the instruction source for this skill. This file is background for maintainers; it holds no directives.
 
-# Ship background
+# Merge Deploy background
 
 ## OCR policy scope
 
@@ -46,6 +46,6 @@ recovered incidents in the record. Its browser tool and default thresholds
 were not adopted; this skill uses the host's existing page-check tool and its
 own short defaults, labelled in the report so a runbook can replace them.
 
-Canary lives inside `ship` rather than as a separate skill so that boot and
+Canary lives inside `merge-deploy` rather than as a separate skill so that boot and
 deploy detection are not duplicated. Without a baseline the section is a
 current-state check, because a before/after claim needs a before.
