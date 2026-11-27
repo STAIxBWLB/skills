@@ -4,6 +4,8 @@ All notable changes to this bundle are documented here.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-27
+
 ### Changed
 
 - `ship` is renamed `merge-deploy` (invoke `/merge-deploy`), because the Claude Code built-in `/ship` shadows a skill of that name; runtimes that call `ship` must switch (#180).
